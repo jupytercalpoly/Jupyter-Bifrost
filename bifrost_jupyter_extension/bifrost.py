@@ -4,7 +4,6 @@
 # Copyright (c) waidhoferj.
 # Distributed under the terms of the Modified BSD License.
 import pandas as pd
-import json
 import random
 
 from traitlets.traitlets import validate, observe
@@ -17,6 +16,14 @@ from typing import List as ListType
 from ipywidgets import DOMWidget, register
 from traitlets import Unicode, List, Int, Dict
 from ._frontend import module_name, module_version
+from IPython.core.display import display
+
+
+def plot(df:pd.DataFrame, kind="line", x=None, y=None) -> pd.DataFrame:
+    w = BifrostWidget(df, kind, x, y)
+    display(w)
+    return w.df_history[-1]
+
 
 @register
 class BifrostWidget(DOMWidget):
@@ -33,10 +40,17 @@ class BifrostWidget(DOMWidget):
     df_history = list()
     operation_history = list()
     current_dataframe_index = Int(0).tag(sync=True)
-    graph_spec: Dict({}).tag(sync=True)
+    graph_spec = Dict({}).tag(sync=True)
     df_variable_name:str = "" 
     output_variable: str = ""
     generate_random_dist = Int(0).tag(sync=True)
+
+    def __init__(self, df:pd.DataFrame, kind="line", x=None, y=None, **kwargs):
+        super().__init__(**kwargs)
+        self.df_history.append(df)
+        spec = self.create_graph_data(self.df_history[-1], kind)
+        self.set_trait("graph_spec", spec)
+
 
     @observe("generate_random_dist")
     def create_random_distribution(self, changes):
@@ -46,9 +60,6 @@ class BifrostWidget(DOMWidget):
         df = pd.DataFrame(dist, columns=["x", "y"])
         self.df_history.append(df)
         spec = self.create_graph_data(self.df_history[-1], kind)
-        # print({"graph_spec" : self.graph_spec})
-        
-        # self.notify_change({'name': 'graph_spec', 'old': self.graph_spec, 'new': spec, 'owner': self, 'type': 'change'})
         self.set_trait("graph_spec", spec)
 
     def create_graph_data(self, df: pd.DataFrame, kind: str, x:str=None, y:str=None) -> dict:

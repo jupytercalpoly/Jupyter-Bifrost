@@ -6,7 +6,9 @@ import {
   DOMWidgetView,
   ISerializers,
 } from '@jupyter-widgets/base';
-import embed from "vega-embed"
+import embed from "vega-embed";
+import ReactDOM from 'react-dom';
+import Test from './components/Test';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
@@ -59,13 +61,20 @@ export class BifrostView extends DOMWidgetView {
     this.createRandomDist = this.createRandomDist.bind(this);
     this.testButton.addEventListener("click", this.createRandomDist);
     this.el.appendChild(this.testButton);
+    const reactWrapper = document.createElement("div")
+    reactWrapper.id="react-wrapper"
+    this.el.appendChild(reactWrapper)
+    ReactDOM.render(Test, reactWrapper)
+
+
+    // this.el.appendChild(ReactWidget.create(Test()))
 
     // Python -> Javscript update
     this.model.on('change:graph_spec', this.graphChanged, this);
   }
 
   createRandomDist() {
-    this.model.set("generate_random_dist",Date.now());
+    this.model.set("generate_random_dist", Date.now());
     this.model.save_changes();
     this.graphChanged();
   }
@@ -76,3 +85,5 @@ export class BifrostView extends DOMWidgetView {
     embed("#vis", graphSpec);
   }
 }
+
+
