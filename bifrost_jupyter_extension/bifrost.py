@@ -78,7 +78,7 @@ class BifrostWidget(DOMWidget):
             y = df.columns[1]
             
         graph_df = df[[x,y]]
-        data = [{x: row[x], y:row[y]} for _, row in graph_df.iterrows()]
+        data = {"data": [{x: row[x], y:row[y]} for _, row in graph_df.iterrows()]}
         types = graph_df.dtypes
         
         def map_to_graph_type(dtype: str) -> str:
@@ -89,10 +89,10 @@ class BifrostWidget(DOMWidget):
         
         types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
         graph_data = {
+            "width": 400,
+            "height": 200,
             "mark": kind,
-            "data": {
-                "values": data
-            },
+            "data": data,
             "encoding": {
                 "x": {"field": x, "type": types[x]},
                 "y": {"field": y, "type": types[y]},

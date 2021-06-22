@@ -6,10 +6,9 @@ import {
   DOMWidgetView,
   ISerializers,
 } from '@jupyter-widgets/base';
-import embed from "vega-embed";
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Test from './components/Test';
+import BifrostReactWidget from './components/BifrostReactWidget';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
@@ -26,11 +25,11 @@ export class BifrostModel extends DOMWidgetModel {
       _view_name: BifrostModel.view_name,
       _view_module: BifrostModel.view_module,
       _view_module_version: BifrostModel.view_module_version,
-      operation_history : [],
-      output_variable: "",
-      current_dataframe_index : 0,
+      operation_history: [],
+      output_variable: '',
+      current_dataframe_index: 0,
       graph_spec: {},
-      generate_random_dist: 0
+      generate_random_dist: 0,
     };
   }
 
@@ -48,42 +47,25 @@ export class BifrostModel extends DOMWidgetModel {
 }
 
 export class BifrostView extends DOMWidgetView {
-  
-  private graphEl: HTMLDivElement;
-  private testButton: HTMLButtonElement;
+  // private graphEl: HTMLDivElement;
+  // private testButton: HTMLButtonElement;
 
   render() {
     this.el.classList.add('bifrost-widget');
-    this.graphEl = document.createElement('div');
-    this.graphEl.id = "vis";
-    this.el.appendChild(this.graphEl);
-    this.testButton = document.createElement("button");
-    this.testButton.innerText = "Change Distribution";
-    this.createRandomDist = this.createRandomDist.bind(this);
-    this.testButton.addEventListener("click", this.createRandomDist);
-    this.el.appendChild(this.testButton);
-    const reactWrapper = document.createElement("div")
-    reactWrapper.id="react-wrapper"
-    this.el.appendChild(reactWrapper)
+    // this.graphEl = document.createElement('div');
+    // this.graphEl.id = 'vis';
+    // this.el.appendChild(this.graphEl);
+    // this.testButton = document.createElement('button');
+    // this.testButton.innerText = 'Change Distribution';
+    // this.createRandomDist = this.createRandomDist.bind(this);
+    // this.testButton.addEventListener('click', this.createRandomDist);
+    // this.el.appendChild(this.testButton);
 
-    const component = React.createElement('div', {}, React.createElement(Test, {'name': 'world', key: 'test-key'}));
-    ReactDOM.render(component, reactWrapper)
-
-    // Python -> Javscript update
-    this.model.on('change:graph_spec', this.graphChanged, this);
-  }
-
-  createRandomDist() {
-    this.model.set("generate_random_dist", Date.now());
-    this.model.save_changes();
-    this.graphChanged();
-  }
-
-  graphChanged() {
-    const graphSpec = this.model.get("graph_spec");
-    console.log(graphSpec);
-    embed("#vis", graphSpec);
+    const component = React.createElement(BifrostReactWidget, {
+      name: 'world',
+      key: 'test-key',
+      model: this.model,
+    });
+    ReactDOM.render(component, this.el);
   }
 }
-
-

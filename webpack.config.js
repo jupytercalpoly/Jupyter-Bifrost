@@ -6,6 +6,7 @@ const rules = [
   { test: /\.ts$/, loader: 'ts-loader' },
   { test: /\.js$/, loader: 'source-map-loader' },
   { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+  { test: /\.s[ac]ss$/, use: ['style-loader', 'css-loader', 'sass-loader'] },
   { test: /\.tsx$/, loader: 'babel-loader' }
 ];
 
@@ -14,7 +15,7 @@ const externals = ['@jupyter-widgets/base'];
 
 const resolve = {
   // Add '.ts' and '.tsx' as resolvable extensions.
-  extensions: [".webpack.js", ".web.js", ".ts", ".js", '.tsx', 'jsx']
+  extensions: [".webpack.js", ".web.js", ".ts", ".js", '.tsx', '.jsx', ".scss"]
 };
 
 module.exports = [
@@ -66,7 +67,6 @@ module.exports = [
     externals,
     resolve,
   },
-
 
   /**
    * Documentation widget bundle
