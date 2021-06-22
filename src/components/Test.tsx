@@ -1,5 +1,5 @@
-import React from "react"
+import React from 'react';
 
-export default function Test () {
-    return  <h1>hello world</h1>;
-}
+export default function Welcome(props: any) {
+    return <h1>Hello, {props.name}</h1>;
+  }

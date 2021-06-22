@@ -7,6 +7,7 @@ import {
   ISerializers,
 } from '@jupyter-widgets/base';
 import embed from "vega-embed";
+import React from 'react';
 import ReactDOM from 'react-dom';
 import Test from './components/Test';
 
@@ -64,10 +65,9 @@ export class BifrostView extends DOMWidgetView {
     const reactWrapper = document.createElement("div")
     reactWrapper.id="react-wrapper"
     this.el.appendChild(reactWrapper)
-    ReactDOM.render(Test, reactWrapper)
 
-
-    // this.el.appendChild(ReactWidget.create(Test()))
+    const component = React.createElement('div', {}, React.createElement(Test, {'name': 'world', key: 'test-key'}));
+    ReactDOM.render(component, reactWrapper)
 
     // Python -> Javscript update
     this.model.on('change:graph_spec', this.graphChanged, this);

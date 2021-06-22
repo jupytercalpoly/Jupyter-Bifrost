@@ -5,7 +5,8 @@ const version = require('./package.json').version;
 const rules = [
   { test: /\.ts$/, loader: 'ts-loader' },
   { test: /\.js$/, loader: 'source-map-loader' },
-  { test: /\.css$/, use: ['style-loader', 'css-loader']}
+  { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+  { test: /\.tsx$/, loader: 'babel-loader' }
 ];
 
 // Packages that shouldn't be bundled but loaded at runtime
@@ -13,7 +14,7 @@ const externals = ['@jupyter-widgets/base'];
 
 const resolve = {
   // Add '.ts' and '.tsx' as resolvable extensions.
-  extensions: [".webpack.js", ".web.js", ".ts", ".js"]
+  extensions: [".webpack.js", ".web.js", ".ts", ".js", '.tsx', 'jsx']
 };
 
 module.exports = [
@@ -52,15 +53,15 @@ module.exports = [
   {
     entry: './src/index.ts',
     output: {
-        filename: 'index.js',
-        path: path.resolve(__dirname, 'dist'),
-        libraryTarget: 'amd',
-        library: "bifrost-jupyter-extension",
-        publicPath: 'https://unpkg.com/bifrost-jupyter-extension@' + version + '/dist/'
+      filename: 'index.js',
+      path: path.resolve(__dirname, 'dist'),
+      libraryTarget: 'amd',
+      library: "bifrost-jupyter-extension",
+      publicPath: 'https://unpkg.com/bifrost-jupyter-extension@' + version + '/dist/'
     },
     devtool: 'source-map',
     module: {
-        rules: rules
+      rules: rules
     },
     externals,
     resolve,
