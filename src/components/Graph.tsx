@@ -1,24 +1,28 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import { VegaLite, VisualizationSpec, PlainObject } from 'react-vega';
+import { VegaLite } from 'react-vega';
+import {useModelState, useModelEvent, GraphSpec} from"../hooks/bifrost-model"
 
-interface GraphProps {
-  spec: VisualizationSpec;
-  data: PlainObject | undefined;
-}
 
-export default function Graph(props: GraphProps) {
+export default function Graph() {
   function handleHover(e: any) {
     console.log(e);
   }
 
+  const [{spec, data}] = useModelState<GraphSpec>("graph_spec", {data:{}, spec:{}})
+  const setDist = useModelState<number>("generate_random_dist", 0)[1]
+
   const signalListeners = { cursor: handleHover };
 
   return (
-    <VegaLite
-      spec={props.spec}
-      data={props.data}
+    <div>
+      <VegaLite
+      spec={spec}
+      data={data}
       signalListeners={signalListeners}
     />
+    <button onClick={() => setDist(Date.now())}>dist</button>
+    </div>
+    
   );
 }

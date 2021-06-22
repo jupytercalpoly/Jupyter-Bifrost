@@ -47,23 +47,10 @@ export class BifrostModel extends DOMWidgetModel {
 }
 
 export class BifrostView extends DOMWidgetView {
-  // private graphEl: HTMLDivElement;
-  // private testButton: HTMLButtonElement;
-
   render() {
     this.el.classList.add('bifrost-widget');
-    // this.graphEl = document.createElement('div');
-    // this.graphEl.id = 'vis';
-    // this.el.appendChild(this.graphEl);
-    // this.testButton = document.createElement('button');
-    // this.testButton.innerText = 'Change Distribution';
-    // this.createRandomDist = this.createRandomDist.bind(this);
-    // this.testButton.addEventListener('click', this.createRandomDist);
-    // this.el.appendChild(this.testButton);
 
     const component = React.createElement(BifrostReactWidget, {
-      name: 'world',
-      key: 'test-key',
       model: this.model,
     });
     ReactDOM.render(component, this.el);

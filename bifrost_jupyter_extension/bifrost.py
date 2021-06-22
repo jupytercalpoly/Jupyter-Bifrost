@@ -88,11 +88,12 @@ class BifrostWidget(DOMWidget):
             return "nominal"
         
         types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
-        graph_data = {
+
+        graph_spec = {
             "width": 400,
             "height": 200,
             "mark": kind,
-            "data": data,
+            "data": {"name": "data"},
             "encoding": {
                 "x": {"field": x, "type": types[x]},
                 "y": {"field": y, "type": types[y]},
@@ -101,7 +102,7 @@ class BifrostWidget(DOMWidget):
 
         # TODO: Figure out aggregation etc.
 
-        return graph_data
+        return {"data": data, "spec": graph_spec}
 
 
 
