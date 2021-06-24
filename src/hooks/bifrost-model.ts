@@ -16,19 +16,27 @@ type ModelStateName = "df_history"|
 "graph_spec"|
 "df_variable_name"|
 "output_variable"|
-"generate_random_dist"
+"generate_random_dist" |
+"df_columns" | "graph_encodings";
 
 interface ModelCallback {
     (model: WidgetModel, event: Backbone.EventHandler): void
 }
 
-interface ModelUpdater {
-    (val:any, options?: any) : void
-}
+
 
 export interface GraphSpec {
     data: PlainObject | undefined,
-    spec: VisualizationSpec
+    spec: VisualizationSpec &  {
+        width?: number,
+        height?: number,
+    }
+}
+
+export interface GraphEncodings {
+    x?: string,
+    y?: string,
+    color?:string
 }
 
 // HOOKS
@@ -37,18 +45,18 @@ export interface GraphSpec {
 /**
  * 
  * @param name property name in the Python model object.
- * @param standIn Default value in case model value doesn't exist.
  * @param mutation optional mutator that is run on the Python model value before setting the JavaScript state.
  * @returns model state and set state function.
  */
-export function useModelState<T>(name: ModelStateName, standIn: T, mutation: (val:any) => T = noop): [T, ModelUpdater] {
-    const [state,setState] = useState<T>(standIn)
+export function useModelState<T>(name: ModelStateName, mutation: (val:any) => T = noop): [T, (val: T, options?:any) => void] {
     const model = useModel()
+    const [state,setState] = useState<T>(model?.get(name) as T)
+    
     useModelEvent(`change:${name}`, (model) => {
         setState(mutation(model.get(name)))
     }, [name])
 
-    function updateModel(val:any, options?: any) {
+    function updateModel(val:T, options?: any) {
         model?.set(name, val)
         model?.save_changes()
     }
