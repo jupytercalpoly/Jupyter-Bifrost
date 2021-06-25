@@ -20,7 +20,8 @@ type ModelStateName =
   | 'output_variable'
   | 'generate_random_dist'
   | 'df_columns'
-  | 'graph_encodings';
+  | 'graph_encodings'
+  | 'selected_data';
 
 interface ModelCallback {
   (model: WidgetModel, event: Backbone.EventHandler): void;

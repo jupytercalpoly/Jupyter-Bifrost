@@ -48,6 +48,7 @@ class BifrostWidget(DOMWidget):
     output_variable: str = ""
     generate_random_dist = Int(0).tag(sync=True)
     df_columns = List([]).tag(sync=True)
+    selected_data = List([]).tag(sync=True)
 
     def __init__(self, df:pd.DataFrame, kind="line", x=None, y=None, **kwargs):
         super().__init__(**kwargs)
@@ -59,6 +60,7 @@ class BifrostWidget(DOMWidget):
             y = df.columns[1]
         self.set_trait("df_columns", list(df.columns))
         self.set_trait("graph_encodings", {"x": x, "y": y})
+        self.set_trait("selected_data", [])
         spec = self.create_graph_data(self.df_history[-1], kind, x=x,y=y)
         self.set_trait("graph_spec", spec)
         
