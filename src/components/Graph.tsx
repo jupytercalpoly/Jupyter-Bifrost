@@ -22,6 +22,7 @@ export default function Graph() {
     setDist(Date.now());
   }, []);
 
+  // multiple signals can be added by adding a new field
   const signalListeners = { brush: handleBrush };
 
   return (

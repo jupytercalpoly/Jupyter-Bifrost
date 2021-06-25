@@ -26,7 +26,9 @@ export default function VariablesTab() {
     useModelState<GraphEncodings>('graph_encodings');
 
   const updateEncodings = (encoding: string, column: string) => {
-    if (Object.values(graphEncodings).includes(column)) return;
+    if (Object.values(graphEncodings).includes(column)) {
+      return;
+    }
     setGraphEncodings({ ...graphEncodings, [encoding]: column });
   };
   return (
