@@ -6,7 +6,7 @@ import { useModelState, GraphSpec } from '../hooks/bifrost-model';
 
 export default function Graph() {
   const [selectedData, setSelectedData] =
-    useModelState<(string | {})[]>('selected_data');
+    useModelState<(string | Record<string, unknown>)[]>('selected_data');
 
   function handleBrush(...args: any) {
     setSelectedData(args);
