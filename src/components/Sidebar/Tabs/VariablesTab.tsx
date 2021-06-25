@@ -32,18 +32,21 @@ export default function VariablesTab() {
   return (
     <section className="VariablesTab" css={variableTabCss}>
       {Object.entries(graphEncodings).map(([encoding, col]) => (
-        <p>
+        <p key={encoding + '=' + col}>
           {encoding} : {col}
         </p>
       ))}
       <ul className="columns-list">
         {columns.map((col) => {
           return (
-            <li className="column-el">
+            <li className="column-el" key={col}>
               <span>{col}</span>
               <ul className="encoding-list">
                 {possibleEncodings.map((encoding) => (
-                  <button onClick={() => updateEncodings(encoding, col)}>
+                  <button
+                    onClick={() => updateEncodings(encoding, col)}
+                    key={encoding + '-button'}
+                  >
                     {encoding}
                   </button>
                 ))}
