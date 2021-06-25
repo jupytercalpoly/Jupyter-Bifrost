@@ -154,3 +154,6 @@ bifrost_jupyter_extension/labextension/*.tgz
 
 # Packed lab extensions
 bifrost_jupyter_extension/labextension
+
+# eslint
+.eslintcache
