@@ -4,7 +4,7 @@
 # Copyright (c) waidhoferj.
 # Distributed under the terms of the Modified BSD License.
 import pandas as pd
-import random
+import random, typing
 
 from traitlets.traitlets import validate, observe
 
@@ -17,6 +17,9 @@ from traitlets import Unicode, List, Int, Dict
 from ._frontend import module_name, module_version
 from IPython.core.display import display
 
+
+# class DfProperty(typing.TypedDict):
+#     variables: list[str]
 
 def plot(df:pd.DataFrame, kind="line", x=None, y=None) -> pd.DataFrame:
     w = BifrostWidget(df, kind, x, y)
@@ -45,6 +48,7 @@ class BifrostWidget(DOMWidget):
     output_variable: str = ""
     generate_random_dist = Int(0).tag(sync=True)
     df_columns = List([]).tag(sync=True)
+    selected_data = List([]).tag(sync=True)
 
     def __init__(self, df:pd.DataFrame, kind="line", x=None, y=None, **kwargs):
         super().__init__(**kwargs)
@@ -56,6 +60,7 @@ class BifrostWidget(DOMWidget):
             y = df.columns[1]
         self.set_trait("df_columns", list(df.columns))
         self.set_trait("graph_encodings", {"x": x, "y": y})
+        self.set_trait("selected_data", [])
         spec = self.create_graph_data(self.df_history[-1], kind, x=x,y=y)
         self.set_trait("graph_spec", spec)
         
@@ -78,12 +83,9 @@ class BifrostWidget(DOMWidget):
         print(self.graph_encodings)
 
 
-
-
-
     @observe("generate_random_dist")
     def create_random_distribution(self, _):
-        graph_kinds = ['tick', 'bar', 'line']
+        graph_kinds = ['tick', 'bar', 'line', 'point']
         kind = random.choice(graph_kinds)
         dist = np.random.uniform(0,1, (random.randint(25,50), 4))
         df = pd.DataFrame(dist, columns=["foo", "bar", "something", "else"])
@@ -91,6 +93,7 @@ class BifrostWidget(DOMWidget):
         spec = self.create_graph_data(self.df_history[-1], kind)
         self.set_trait("df_columns", list(df.columns))
         self.set_trait("graph_spec", spec)
+        # self.set_trait("df_prop", list(df.columns))
 
     @observe("df_columns")
     def on_col_change(self, change):
@@ -131,7 +134,9 @@ class BifrostWidget(DOMWidget):
         graph_spec = {
             "width": 400,
             "height": 200,
-            "mark": kind,
+            "mark": {"type": kind, "tooltip": True},
+            "params": [{"name": "brush", "select": "interval"}],
+            "signals": [{'name': 'tooltip'}],
             "data": {"name": "data"},
             "encoding": {
                 encoding : {"field": col, "type": types[col]} for encoding, col in zip(["x", "y", "color"], df_filter)

@@ -5,9 +5,14 @@ import { VegaLite } from 'react-vega';
 import { useModelState, GraphSpec } from '../hooks/bifrost-model';
 
 export default function Graph() {
-  function handleHover(e: any) {
-    console.log(e);
+  const [selectedData, setSelectedData] =
+    useModelState<(string | {})[]>('selected_data');
+
+  function handleBrush(...args: any) {
+    setSelectedData(args);
   }
+
+  console.log(selectedData);
 
   const [{ spec, data }] = useModelState<GraphSpec>('graph_spec');
   const setDist = useModelState<number>('generate_random_dist')[1];
@@ -17,7 +22,8 @@ export default function Graph() {
     setDist(Date.now());
   }, []);
 
-  const signalListeners = { cursor: handleHover };
+  // multiple signals can be added by adding a new field
+  const signalListeners = { brush: handleBrush };
 
   return (
     <div>
