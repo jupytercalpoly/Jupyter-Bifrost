@@ -93,7 +93,6 @@ class BifrostWidget(DOMWidget):
         self.set_trait("graph_spec", spec)
         # self.set_trait("df_prop", list(df.columns))
 
-
     @observe("df_columns")
     def on_col_change(self, change):
         print(change["new"])
