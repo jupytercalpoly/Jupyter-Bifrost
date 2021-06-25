@@ -8,4 +8,5 @@ export enum OnboardingScreenName {
 export interface ScreenProps {
     onNext: () => void,
     onBack: () => void,
+    stepNumber:number
 }

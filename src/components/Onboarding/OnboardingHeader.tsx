@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 import React from 'react';
-import { caretRightIcon } from '@jupyterlab/ui-components';
+import { ArrowRight } from 'react-feather';
 
 const headerCss = css`
   padding: 20px;
@@ -9,13 +9,20 @@ const headerCss = css`
   background: white;
 
   .app-title {
-    color: gray;
-    font-weight: 600;
+    color: #98a19f;
+    font-weight: 700;
+    font-size: 17px;
+    margin: 7px 0;
   }
+
+  .section-title {
+    font-weight: 800;
+  }
+
   .title-wrapper {
     display: flex;
+    justify-content: space-between;
     width: 100%;
-    margin: 15px 0;
   }
 `;
 
@@ -30,10 +37,10 @@ interface HeaderProps {
 export default function OnboardingHeader(props: HeaderProps) {
   return (
     <header css={headerCss}>
-      <h3>Jupyter Bifrost</h3>
+      <h3 className="app-title">Jupyter Bifrost</h3>
       <ProgressIndicator stepNumber={props.stepNumber} />
       <div className="title-wrapper">
-        <h2>{props.title}</h2>
+        <h2 className="section-title">{props.title}</h2>
         <NextButton onClick={props.onNext} />
       </div>
       <div className="content">{props.children}</div>
@@ -43,21 +50,17 @@ export default function OnboardingHeader(props: HeaderProps) {
 
 let progressCss = css`
   padding: 0;
-  margin: 20px;
   list-style: none;
+
   li {
+    width: 12px;
+    height: 12px;
     display: inline-block;
-    margin: 0 15px;
-  }
-
-  button {
-    width: 20px;
-    height: 20px;
-    color: gray;
+    margin: 0 3px;
+    background-color: #98a19f;
     border-radius: 50%;
-
     &.active-step {
-      color: red;
+      background-color: #b62f2f;
     }
   }
 `;
@@ -70,25 +73,27 @@ function ProgressIndicator({ stepNumber }: ProgressProps) {
   const numSteps = 5;
   return (
     <ul className="ProgressIndicator" css={progressCss}>
-      {new Array(numSteps).fill(0).map((_) => (
-        <li>
-          <button className="dot"></button>
-        </li>
+      {new Array(numSteps).fill(0).map((_, i) => (
+        <li className={i == stepNumber ? 'active-step' : ''}></li>
       ))}
     </ul>
   );
 }
 
 const nextButtonCss = css`
-  padding: 20px;
-  color: red;
+  padding: 10px;
+  background-color: #e97575;
+  border: none;
   border-radius: 50%;
+  cursor: pointer;
+  width: 35px;
+  height: 35px;
 `;
 
 function NextButton(props: { onClick: () => void }) {
   return (
     <button onClick={props.onClick} css={nextButtonCss}>
-      <caretRightIcon.react />
+      <ArrowRight size={35} color="white" />
     </button>
   );
 }

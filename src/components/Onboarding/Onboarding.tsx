@@ -1,26 +1,34 @@
+/**@jsx jsx */
+import { jsx, css } from '@emotion/react';
+
 import React, { useState } from 'react';
 import ColumnScreen from './ColumnScreen';
 import EncodingScreen from './EncodingScreen';
 import MarkScreen from './MarkScreen';
-import { OnboardingScreenName, ScreenProps } from './Screen';
+import { OnboardingScreenName } from './Screen';
 
-type ScreenMap = {
-  [name in OnboardingScreenName]: (props: ScreenProps) => JSX.Element;
-};
+const screenFlow = [ColumnScreen, EncodingScreen, MarkScreen];
 
-const screenMapping: ScreenMap = {
-  [OnboardingScreenName.Column]: ColumnScreen,
-  [OnboardingScreenName.Mark]: MarkScreen,
-  [OnboardingScreenName.Encoding]: EncodingScreen,
-};
+const onboardingCss = css`
+  min-height: 500px;
+  width: 500px;
+  max-width: 100%;
+  border: 1px solid #ddd;
+`;
 
 export default function Onboarding() {
-  const [screenName, setScreenName] = useState(OnboardingScreenName.Column);
+  const [screenIndex, setScreenIndex] = useState(OnboardingScreenName.Column);
 
-  const Screen = screenMapping[screenName];
+  const Screen = screenFlow[screenIndex];
   return (
-    <section className="Onboarding">
-      <Screen onNavigation={setScreenName} />
+    <section className="Onboarding" css={onboardingCss}>
+      <Screen
+        stepNumber={screenIndex}
+        onNext={() =>
+          setScreenIndex((i) => (i < screenFlow.length - 1 ? ++i : i))
+        }
+        onBack={() => setScreenIndex((i) => (i > 0 ? --i : i))}
+      />
     </section>
   );
 }
