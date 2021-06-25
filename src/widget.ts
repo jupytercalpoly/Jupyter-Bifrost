@@ -29,9 +29,9 @@ export class BifrostModel extends DOMWidgetModel {
       output_variable: '',
       current_dataframe_index: 0,
       graph_spec: {},
+      graph_encodings: {},
       generate_random_dist: 0,
-      df_history: [],
-      df_prop: [],
+      df_columns: [],
     };
   }
 
