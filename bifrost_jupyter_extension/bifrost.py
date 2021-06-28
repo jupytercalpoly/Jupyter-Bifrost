@@ -15,7 +15,8 @@ import numpy as np
 from ipywidgets import DOMWidget, register
 from traitlets import Unicode, List, Int, Dict
 from ._frontend import module_name, module_version
-from IPython.core.display import display
+from IPython.core.display import JSON, display
+import json
 
 
 # class DfProperty(typing.TypedDict):
@@ -43,12 +44,17 @@ class BifrostWidget(DOMWidget):
     operation_history = List([]).tag(sync=True)
     current_dataframe_index = Int(0).tag(sync=True)
     graph_spec = Dict({}).tag(sync=True)
+    graph_data = List([]).tag(sync=True)
     graph_encodings = Dict({}).tag(sync=True)
     df_variable_name:str = "" 
     output_variable: str = ""
     generate_random_dist = Int(0).tag(sync=True)
     df_columns = List([]).tag(sync=True)
+    selected_columns = List([]).tag(sync=True)
+    selected_mark = Unicode("").tag(sync=True)
     selected_data = List([]).tag(sync=True)
+    suggested_graphs = List([]).tag(sync=True)
+    
 
     def __init__(self, df:pd.DataFrame, kind="line", x=None, y=None, **kwargs):
         super().__init__(**kwargs)
@@ -61,8 +67,9 @@ class BifrostWidget(DOMWidget):
         self.set_trait("df_columns", list(df.columns))
         self.set_trait("graph_encodings", {"x": x, "y": y})
         self.set_trait("selected_data", [])
-        spec = self.create_graph_data(self.df_history[-1], kind, x=x,y=y)
-        self.set_trait("graph_spec", spec)
+        graph_info = self.create_graph_data(self.df_history[-1], kind, x=x,y=y)
+        self.set_trait("graph_spec", graph_info["spec"])
+        self.set_trait("graph_data", graph_info["data"])
         
 
     @observe("graph_encodings")
@@ -80,7 +87,7 @@ class BifrostWidget(DOMWidget):
     @observe("current_dataframe_index")
     def change_dataframe(self, changes):
         df_index:int = changes["new"]
-        print(self.graph_encodings)
+
 
 
     @observe("generate_random_dist")
@@ -90,14 +97,12 @@ class BifrostWidget(DOMWidget):
         dist = np.random.uniform(0,1, (random.randint(25,50), 4))
         df = pd.DataFrame(dist, columns=["foo", "bar", "something", "else"])
         self.df_history.append(df)
-        spec = self.create_graph_data(self.df_history[-1], kind)
+        graph_info = self.create_graph_data(self.df_history[-1], kind)
         self.set_trait("df_columns", list(df.columns))
-        self.set_trait("graph_spec", spec)
+        self.set_trait("graph_spec", graph_info["spec"])
+        self.set_trait("graph_data", graph_info["data"])
         # self.set_trait("df_prop", list(df.columns))
 
-    @observe("df_columns")
-    def on_col_change(self, change):
-        print(change["new"])
 
         
 
@@ -124,8 +129,9 @@ class BifrostWidget(DOMWidget):
         df_filter = [col for col in [x,y, color] if col]
         graph_df = df[df_filter]
 
-        data = {"data": [{col: row[col] for col in df_filter} for _, row in graph_df.iterrows()]}
-        types = graph_df.dtypes
+        data = json.loads(df.to_json(orient="records"))
+        # types = graph_df.dtypes
+        types = df.dtypes
         
         
         
@@ -134,18 +140,19 @@ class BifrostWidget(DOMWidget):
         graph_spec = {
             "width": 400,
             "height": 200,
-            "mark": {"type": kind, "tooltip": True},
+            "mark": "?",
             "params": [{"name": "brush", "select": "interval"}],
             "signals": [{'name': 'tooltip'}],
             "data": {"name": "data"},
-            "encoding": {
-                encoding : {"field": col, "type": types[col]} for encoding, col in zip(["x", "y", "color"], df_filter)
-            }
+            "encodings": [
+                {"field": col, "type": types[col], "channel" : "?"} for col in df.columns
+            ],
+            "chooseBy": "effectiveness"
         }
 
         # TODO: Figure out aggregation etc.
 
-        return {"data": data, "spec": graph_spec}
+        return {"data": data, "spec" :{"spec": graph_spec}}
 
 
 

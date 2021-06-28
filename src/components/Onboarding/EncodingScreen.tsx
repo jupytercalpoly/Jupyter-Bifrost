@@ -1,16 +1,15 @@
 import React from 'react';
 import { ScreenProps } from './Screen';
-import OnboardingHeader from './OnboardingHeader';
+import NavHeader from './NavHeader';
 
 export default function EncodingScreen(props: ScreenProps) {
   return (
     <article className="EncodingScreen">
-      <OnboardingHeader
+      <NavHeader
         title="How would you like to encode your chart?"
         onNext={props.onNext}
         onPrevious={props.onBack}
-        stepNumber={props.stepNumber}
-      ></OnboardingHeader>
+      ></NavHeader>
     </article>
   );
 }

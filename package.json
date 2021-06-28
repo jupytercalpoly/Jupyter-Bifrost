@@ -61,6 +61,7 @@
     "@jupyter-widgets/base": "^1.1.10 || ^2.0.0 || ^3.0.0 || ^4.0.0",
     "@jupyterlab/application": "^3.0.11",
     "@types/react-dom": "^17.0.8",
+    "compassql": "^0.21.2",
     "husky": "^6.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
