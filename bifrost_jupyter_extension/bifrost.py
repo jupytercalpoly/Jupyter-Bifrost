@@ -106,7 +106,7 @@ class BifrostWidget(DOMWidget):
 
         
 
-    def create_graph_data(self, df: pd.DataFrame, kind: str, x:str=None, y:str=None, color:str=None) -> dict:
+    def create_graph_data(self, df: pd.DataFrame, kind: str = None, x:str=None, y:str=None, color:str=None) -> dict:
         """
             Converts a dataframe into a Vega Lite Graph JSON string.
         """
