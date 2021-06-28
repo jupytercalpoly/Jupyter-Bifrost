@@ -12,31 +12,25 @@ from unittest import TestCase
 from ..bifrost import BifrostWidget
 
 
-def test_example_creation_blank():
-    w = BifrostWidget()
+def test_example_creation():
     df = pd.DataFrame([[1, "Jay"], [2, "John"]], columns=[ "Favorite Number","Name"])
-    expected = {
-            "mark": "bar",
-            "data": {
-                "values": [
-                    { "Name": "Jay", "Favorite Number": 1},
-                    { "Name": "John", "Favorite Number": 2},
-                ]
-            },
-            "encoding": {
-                "x": {"field": "Name", "type": "nominal"},
-                "y": {"field": "Favorite Number", "type": "quantitative"},
-            }
-
+    w = BifrostWidget(df)
+    
+    expected_spec = {
+            "width": 400,
+            "height": 200,
+            "mark": "?",
+            "params": [{"name": "brush", "select": "interval"}],
+            "signals": [{'name': 'tooltip'}],
+            "data": {"name": "data"},
+            "encodings": [
+                {"field": "Favorite Number", "type": "quantitative", "channel" : "?"},
+                {"field": "Name", "type": "nominal", "channel" : "?"}
+            ],
+            "chooseBy": "effectiveness"
         }
     
     # TODO: Make this a deep compare
-    actual = w.create_graph_data(df, "bar", "Name", "Favorite Number")
-    TestCase().assertDictEqual(actual,expected)
-    
-def test_random_dist():
-    w = BifrostWidget()
-    print("this test")
-    w.create_random_distribution({"value": 123})
-    assert len(w.graph_spec) > 0
-    
+    actual = w.create_graph_data(df)
+    print(actual)
+    TestCase().assertDictEqual(actual["spec"]["spec"],expected_spec)

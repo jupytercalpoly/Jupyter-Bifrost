@@ -33,6 +33,10 @@ export class BifrostModel extends DOMWidgetModel {
       generate_random_dist: 0,
       df_columns: [],
       selected_data: [],
+      selected_columns: [],
+      selected_mark: '',
+      graph_data: [],
+      suggested_graphs: [],
     };
   }
 

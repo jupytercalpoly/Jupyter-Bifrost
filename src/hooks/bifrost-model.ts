@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { WidgetModel } from '@jupyter-widgets/base';
-import { VisualizationSpec, PlainObject } from 'react-vega';
+import { PlainObject } from 'react-vega';
+import { Query } from 'compassql/build/src/query/query';
+import { ResultTree } from 'compassql/build/src/result';
+import { TopLevel, FacetedUnitSpec } from 'vega-lite/build/src/spec';
 
 export const BifrostModelContext = createContext<WidgetModel | undefined>(
   undefined
@@ -21,19 +24,23 @@ type ModelStateName =
   | 'generate_random_dist'
   | 'df_columns'
   | 'graph_encodings'
-  | 'selected_data';
+  | 'selected_data'
+  | 'selected_columns'
+  | 'selected_mark'
+  | 'graph_data'
+  | 'suggested_graphs';
 
 interface ModelCallback {
   (model: WidgetModel, event: Backbone.EventHandler): void;
 }
 
-export interface GraphSpec {
-  data: PlainObject | undefined;
-  spec: VisualizationSpec & {
-    width?: number;
-    height?: number;
-  };
-}
+export type SuggestedGraphs = (
+  | TopLevel<FacetedUnitSpec<string>>
+  | ResultTree<TopLevel<FacetedUnitSpec<string>>>
+)[];
+
+export type GraphData = PlainObject;
+export type GraphSpec = Query;
 
 export interface GraphEncodings {
   x?: string;
@@ -55,7 +62,7 @@ export function useModelState<T>(
   mutation: (val: any) => T = noop
 ): [T, (val: T, options?: any) => void] {
   const model = useModel();
-  const [state, setState] = useState<T>(model?.get(name) as T);
+  const [state, setState] = useState<T>(mutation(model?.get(name)));
 
   useModelEvent(
     `change:${name}`,

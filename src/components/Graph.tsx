@@ -1,34 +1,36 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import { useEffect } from 'react';
-import { VegaLite } from 'react-vega';
-import { useModelState, GraphSpec } from '../hooks/bifrost-model';
+import { VegaLite, VisualizationSpec } from 'react-vega';
+import { useModelState, GraphData } from '../hooks/bifrost-model';
+import NavHeader from './Onboarding/NavHeader';
 
-export default function Graph() {
-  const [selectedData, setSelectedData] =
-    useModelState<(string | {})[]>('selected_data');
+interface GraphProps {
+  spec: VisualizationSpec;
+  onPrevious: () => void;
+}
+export default function Graph(props: GraphProps) {
+  const [selectedData, setSelectedData] = useModelState<any[]>('selected_data');
 
   function handleBrush(...args: any) {
+    console.log(args);
     setSelectedData(args);
   }
 
   console.log(selectedData);
 
-  const [{ spec, data }] = useModelState<GraphSpec>('graph_spec');
-  const setDist = useModelState<number>('generate_random_dist')[1];
-
-  // For testing purposes
-  useEffect(() => {
-    setDist(Date.now());
-  }, []);
+  const data = useModelState<GraphData>('graph_data', (data) => ({ data }))[0];
 
   // multiple signals can be added by adding a new field
   const signalListeners = { brush: handleBrush };
 
   return (
     <div>
-      <VegaLite spec={spec} data={data} signalListeners={signalListeners} />
-      <button onClick={() => setDist(Date.now())}>dist</button>
+      <NavHeader title="Chart" onPrevious={props.onPrevious} />
+      <VegaLite
+        spec={props.spec}
+        data={data}
+        signalListeners={signalListeners}
+      />
     </div>
   );
 }
