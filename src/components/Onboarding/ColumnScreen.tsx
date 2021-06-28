@@ -48,7 +48,7 @@ export default function ColumnScreen(props: ScreenProps) {
     const filteredEncodings = spec.spec.encodings.filter((encoding: any) =>
       selectedColumns.has(encoding.field)
     );
-    let filteredSpecs: Query[] = [];
+    const filteredSpecs: Query[] = [];
     for (let i = 0; i < filteredEncodings.length - 1; i++) {
       filteredSpecs.push({
         spec: { ...spec.spec, encodings: filteredEncodings.slice(i, i + 3) },
@@ -72,8 +72,11 @@ export default function ColumnScreen(props: ScreenProps) {
 
   function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
     const updatedSet = new Set(selectedColumns);
-    if (e.target.checked) updatedSet.add(e.target.value);
-    else updatedSet.delete(e.target.value);
+    if (e.target.checked) {
+      updatedSet.add(e.target.value);
+    } else {
+      updatedSet.delete(e.target.value);
+    }
     setSelectedColumns(updatedSet);
   }
 

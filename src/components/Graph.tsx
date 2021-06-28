@@ -9,8 +9,7 @@ interface GraphProps {
   onPrevious: () => void;
 }
 export default function Graph(props: GraphProps) {
-  const [selectedData, setSelectedData] =
-    useModelState<(string | {})[]>('selected_data');
+  const [selectedData, setSelectedData] = useModelState<any[]>('selected_data');
 
   function handleBrush(...args: any) {
     console.log(args);

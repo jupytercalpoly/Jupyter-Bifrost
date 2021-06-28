@@ -5,7 +5,6 @@ import { Query } from 'compassql/build/src/query/query';
 import { ResultTree } from 'compassql/build/src/result';
 import { TopLevel, FacetedUnitSpec } from 'vega-lite/build/src/spec';
 
-
 export const BifrostModelContext = createContext<WidgetModel | undefined>(
   undefined
 );
@@ -26,20 +25,22 @@ type ModelStateName =
   | 'df_columns'
   | 'graph_encodings'
   | 'selected_data'
-  | "selected_columns" 
-  | "selected_mark"
-  | "graph_data"
-  | "suggested_graphs"
+  | 'selected_columns'
+  | 'selected_mark'
+  | 'graph_data'
+  | 'suggested_graphs';
 
 interface ModelCallback {
   (model: WidgetModel, event: Backbone.EventHandler): void;
 }
 
-export type SuggestedGraphs = (TopLevel<FacetedUnitSpec<string>> | ResultTree<TopLevel<FacetedUnitSpec<string>>>)[]
+export type SuggestedGraphs = (
+  | TopLevel<FacetedUnitSpec<string>>
+  | ResultTree<TopLevel<FacetedUnitSpec<string>>>
+)[];
 
 export type GraphData = PlainObject;
-export type GraphSpec = Query
-
+export type GraphSpec = Query;
 
 export interface GraphEncodings {
   x?: string;

@@ -34,7 +34,9 @@ export default function ChartChooser(props: ChartChooserProps) {
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   function displayChart() {
-    if (selectedIndex === -1) return;
+    if (selectedIndex === -1) {
+      return;
+    }
     const spec = suggestedGraphs[selectedIndex] as VisualizationSpec;
     props.onChartSelected(spec);
   }
