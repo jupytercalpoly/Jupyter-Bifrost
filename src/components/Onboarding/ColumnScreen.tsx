@@ -6,7 +6,7 @@ import { ScreenProps } from './Screen';
 import NavHeader from './NavHeader';
 import SearchBar from '../SearchBar';
 import {
-  GraphSpec,
+  QuerySpec,
   GraphData,
   useModelState,
   SuggestedGraphs,
@@ -33,7 +33,7 @@ const columnScreenCss = css`
 export default function ColumnScreen(props: ScreenProps) {
   const [query, setQuery] = useState('');
   const columnChoices = useModelState<string[]>('df_columns')[0];
-  const spec = useModelState<GraphSpec>('graph_spec')[0];
+  const spec = useModelState<QuerySpec>('query_spec')[0];
   const data = useModelState<GraphData>('graph_data')[0];
   const setSuggestedGraphs =
     useModelState<SuggestedGraphs>('suggested_graphs')[1];

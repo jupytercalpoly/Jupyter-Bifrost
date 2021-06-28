@@ -88,7 +88,7 @@ function VisualizationScreen({
   return (
     <article className="BifrostWidget" css={bifrostWidgetCss}>
       <GridArea area="graph">
-        <Graph spec={spec} onPrevious={onPrevious} />
+        <Graph onBack={onPrevious} />
       </GridArea>
       <GridArea area="sidebar">
         <Sidebar />

@@ -1,10 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { WidgetModel } from '@jupyter-widgets/base';
-import { PlainObject } from 'react-vega';
+import { PlainObject, VisualizationSpec } from 'react-vega';
 import { Query } from 'compassql/build/src/query/query';
 import { ResultTree } from 'compassql/build/src/result';
 import { TopLevel, FacetedUnitSpec } from 'vega-lite/build/src/spec';
-
 export const BifrostModelContext = createContext<WidgetModel | undefined>(
   undefined
 );
@@ -19,6 +18,7 @@ type ModelStateName =
   | 'operation_history'
   | 'current_dataframe_index'
   | 'graph_spec'
+  | 'query_spec'
   | 'df_variable_name'
   | 'output_variable'
   | 'generate_random_dist'
@@ -40,7 +40,23 @@ export type SuggestedGraphs = (
 )[];
 
 export type GraphData = PlainObject;
-export type GraphSpec = Query;
+export type QuerySpec = Query;
+
+export interface EncodingInfo {
+  field: string;
+  type: string;
+}
+export type GraphSpec = VisualizationSpec & {
+  width: number;
+  height: number;
+  mark: string;
+  encoding: {
+    x?: EncodingInfo;
+    y?: EncodingInfo;
+    color?: EncodingInfo;
+  };
+  data: { name: string };
+};
 
 export interface GraphEncodings {
   x?: string;

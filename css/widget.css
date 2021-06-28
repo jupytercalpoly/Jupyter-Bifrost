@@ -2,3 +2,10 @@
   background-color: lightseagreen;
   padding: 0px 2px;
 }
+
+button.wrapper {
+  border: none;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+}

@@ -1,15 +1,15 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import { VegaLite, VisualizationSpec } from 'react-vega';
-import { useModelState, GraphData } from '../hooks/bifrost-model';
-import NavHeader from './Onboarding/NavHeader';
+import { ArrowLeft } from 'react-feather';
+import { VegaLite } from 'react-vega';
+import { useModelState, GraphData, GraphSpec } from '../hooks/bifrost-model';
 
 interface GraphProps {
-  spec: VisualizationSpec;
-  onPrevious: () => void;
+  onBack: () => void;
 }
 export default function Graph(props: GraphProps) {
   const [selectedData, setSelectedData] = useModelState<any[]>('selected_data');
+  const spec = useModelState<GraphSpec>('graph_spec')[0];
 
   function handleBrush(...args: any) {
     console.log(args);
@@ -25,12 +25,10 @@ export default function Graph(props: GraphProps) {
 
   return (
     <div>
-      <NavHeader title="Chart" onPrevious={props.onPrevious} />
-      <VegaLite
-        spec={props.spec}
-        data={data}
-        signalListeners={signalListeners}
-      />
+      <button className="wrapper" onClick={props.onBack}>
+        <ArrowLeft />
+      </button>
+      <VegaLite spec={spec} data={data} signalListeners={signalListeners} />
     </div>
   );
 }
