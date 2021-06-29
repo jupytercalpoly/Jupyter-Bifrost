@@ -19,15 +19,6 @@ from IPython.core.display import JSON, display
 import json
 
 
-# class DfProperty(typing.TypedDict):
-#     variables: list[str]
-
-def plot(df:pd.DataFrame, kind="line", x=None, y=None) -> pd.DataFrame:
-    w = BifrostWidget(df, kind, x, y)
-    display(w)
-    return w.df_history[-1]
-
-
 @register
 class BifrostWidget(DOMWidget):
     """
