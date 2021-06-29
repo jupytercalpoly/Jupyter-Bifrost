@@ -4,6 +4,7 @@ import { PlainObject, VisualizationSpec } from 'react-vega';
 import { Query } from 'compassql/build/src/query/query';
 import { ResultTree } from 'compassql/build/src/result';
 import { TopLevel, FacetedUnitSpec } from 'vega-lite/build/src/spec';
+import { VegaEncoding } from '../modules/VegaEncodings';
 export const BifrostModelContext = createContext<WidgetModel | undefined>(
   undefined
 );
@@ -46,23 +47,14 @@ export interface EncodingInfo {
   field: string;
   type: string;
 }
+
 export type GraphSpec = VisualizationSpec & {
   width: number;
   height: number;
   mark: string;
-  encoding: {
-    x?: EncodingInfo;
-    y?: EncodingInfo;
-    color?: EncodingInfo;
-  };
+  encoding: Record<VegaEncoding, EncodingInfo>;
   data: { name: string };
 };
-
-export interface GraphEncodings {
-  x?: string;
-  y?: string;
-  color?: string;
-}
 
 // HOOKS
 //============================================================================================

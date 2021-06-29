@@ -8,6 +8,7 @@ const searchBarCss = css`
   background-color: #eee;
   border-radius: 20px;
   width: 100%;
+  padding: 10px 15px;
 `;
 
 interface SearchProps {
@@ -15,6 +16,7 @@ interface SearchProps {
   onResultsChange: (results: string[]) => void;
   onChange: (value: string) => void;
   value: string;
+  placeholder?: string;
 }
 
 export default function SearchBar(props: SearchProps) {
@@ -45,6 +47,7 @@ export default function SearchBar(props: SearchProps) {
       css={searchBarCss}
       type="search"
       value={props.value}
+      placeholder={props.placeholder}
       onChange={(e) => props.onChange(e.target.value)}
     />
   );

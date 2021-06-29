@@ -4,7 +4,7 @@ import { jsx, css } from '@emotion/react';
 import React, { useState } from 'react';
 import { ScreenProps } from './Screen';
 import NavHeader from './NavHeader';
-import SearchBar from '../SearchBar';
+import SearchBar from '../ui-widgets/SearchBar';
 import {
   QuerySpec,
   GraphData,
@@ -41,7 +41,6 @@ export default function ColumnScreen(props: ScreenProps) {
   const [selectedColumns, setSelectedColumns] = useState(new Set());
 
   function submit() {
-    console.log({ selectedColumns, spec });
     const opt = {};
 
     const schema = build(data, opt);
@@ -65,6 +64,10 @@ export default function ColumnScreen(props: ScreenProps) {
       )
       .map((leaves) => leaves.items)
       .flat();
+
+    if (!items.length) {
+      return;
+    }
 
     setSuggestedGraphs(items as SuggestedGraphs);
     props.onNext();

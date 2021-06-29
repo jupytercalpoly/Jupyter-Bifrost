@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, css } from '@emotion/react';
+import { jsx, css, ThemeProvider } from '@emotion/react';
 
 // import Graph from './Graph';
 import Sidebar from './Sidebar/Sidebar';
@@ -10,6 +10,7 @@ import ChartChooser from './Onboarding/ChartChooser';
 import ColumnScreen from './Onboarding/ColumnScreen';
 import { VisualizationSpec } from 'react-vega';
 import Graph from './Graph';
+import theme from '../theme';
 
 const bifrostWidgetCss = css`
   // Element-based styles
@@ -20,6 +21,10 @@ const bifrostWidgetCss = css`
 
   // Global styles for the widget
   //===========================================================
+  * {
+    box-sizing: border-box;
+  }
+
   button {
     cursor: pointer;
     transition: transform 0.4s;
@@ -72,9 +77,11 @@ export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
       break;
   }
   return (
-    <BifrostModelContext.Provider value={props.model}>
-      {Screen}
-    </BifrostModelContext.Provider>
+    <ThemeProvider theme={theme}>
+      <BifrostModelContext.Provider value={props.model}>
+        {Screen}
+      </BifrostModelContext.Provider>
+    </ThemeProvider>
   );
 }
 
