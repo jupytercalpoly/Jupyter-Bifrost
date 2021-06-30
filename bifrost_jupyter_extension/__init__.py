@@ -6,6 +6,19 @@
 
 from .bifrost import BifrostWidget
 from ._version import __version__, version_info
+import typing
+import pandas as pd
+from IPython.core.display import display
+
+@pd.api.extensions.register_dataframe_accessor("bifrost")
+class BifrostAccessor:
+    def __init__(self, pandas_obj: typing.Union[pd.DataFrame, pd.Series]):
+        self._obj = pandas_obj
+
+    def plot(self, kind="line", x=None, y=None) -> pd.DataFrame:
+        w = BifrostWidget(self._obj, kind, x, y)
+        display(w)
+        return w.df_history[-1]
 
 def _jupyter_labextension_paths():
     """Called by Jupyter Lab Server to detect if it is a valid labextension and
