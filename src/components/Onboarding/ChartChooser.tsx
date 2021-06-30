@@ -6,6 +6,7 @@ import {
   useModelState,
   GraphData,
   SuggestedGraphs,
+  GraphSpec,
 } from '../../hooks/bifrost-model';
 import NavHeader from './NavHeader';
 
@@ -31,13 +32,16 @@ interface ChartChooserProps {
 export default function ChartChooser(props: ChartChooserProps) {
   const suggestedGraphs = useModelState<SuggestedGraphs>('suggested_graphs')[0];
   const data = useModelState<GraphData>('graph_data', (data) => ({ data }))[0];
+  const setGraphSpec = useModelState<GraphSpec>('graph_spec')[1];
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   function displayChart() {
     if (selectedIndex === -1) {
       return;
     }
-    const spec = suggestedGraphs[selectedIndex] as VisualizationSpec;
+
+    const spec = suggestedGraphs[selectedIndex] as GraphSpec;
+    setGraphSpec(spec);
     props.onChartSelected(spec);
   }
 

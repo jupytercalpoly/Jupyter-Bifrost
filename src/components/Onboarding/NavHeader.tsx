@@ -27,13 +27,6 @@ const headerCss = css`
     align-items: center;
     width: 100%;
   }
-
-  button.wrapper {
-    border: none;
-    background: transparent;
-    margin: 0;
-    padding: 0;
-  }
 `;
 
 interface HeaderProps {

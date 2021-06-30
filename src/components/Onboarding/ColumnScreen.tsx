@@ -4,9 +4,9 @@ import { jsx, css } from '@emotion/react';
 import React, { useState } from 'react';
 import { ScreenProps } from './Screen';
 import NavHeader from './NavHeader';
-import SearchBar from '../SearchBar';
+import SearchBar from '../ui-widgets/SearchBar';
 import {
-  GraphSpec,
+  QuerySpec,
   GraphData,
   useModelState,
   SuggestedGraphs,
@@ -33,7 +33,7 @@ const columnScreenCss = css`
 export default function ColumnScreen(props: ScreenProps) {
   const [query, setQuery] = useState('');
   const columnChoices = useModelState<string[]>('df_columns')[0];
-  const spec = useModelState<GraphSpec>('graph_spec')[0];
+  const spec = useModelState<QuerySpec>('query_spec')[0];
   const data = useModelState<GraphData>('graph_data')[0];
   const setSuggestedGraphs =
     useModelState<SuggestedGraphs>('suggested_graphs')[1];
@@ -41,7 +41,6 @@ export default function ColumnScreen(props: ScreenProps) {
   const [selectedColumns, setSelectedColumns] = useState(new Set());
 
   function submit() {
-    console.log({ selectedColumns, spec });
     const opt = {};
 
     const schema = build(data, opt);
@@ -65,6 +64,10 @@ export default function ColumnScreen(props: ScreenProps) {
       )
       .map((leaves) => leaves.items)
       .flat();
+
+    if (!items.length) {
+      return;
+    }
 
     setSuggestedGraphs(items as SuggestedGraphs);
     props.onNext();
