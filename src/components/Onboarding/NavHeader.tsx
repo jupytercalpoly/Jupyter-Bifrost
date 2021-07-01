@@ -63,8 +63,8 @@ const nextButtonCss = css`
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  width: 35px;
-  height: 35px;
+  width: 55px;
+  height: 55px;
   margin-left: 20px;
 `;
 

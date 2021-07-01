@@ -54,6 +54,16 @@ export const vegaEncodingList = [
   'facet',
   'row',
   'column',
-];
+] as const;
+
+const vegaColTypesList = [
+  "quantitative",
+  "temporal",
+  "ordinal",
+  "nominal",
+  "geojson",
+] as const
+
+export type VegaColumnType = typeof vegaColTypesList[number]
 
 export type VegaEncoding = typeof vegaEncodingList[number];

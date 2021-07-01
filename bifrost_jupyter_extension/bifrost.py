@@ -131,6 +131,7 @@ class BifrostWidget(DOMWidget):
             "encodings": [
                 {"field": col, "type": types[col], "channel" : "?"} for col in df.columns
             ],
+            "transform": [],
             "chooseBy": "effectiveness"
         }
 
