@@ -4,11 +4,16 @@ import { jsx, css, ThemeProvider, Global } from '@emotion/react';
 // import Graph from './Graph';
 import Sidebar from './Sidebar/Sidebar';
 import { WidgetModel } from '@jupyter-widgets/base';
-import { BifrostModelContext, useModelState } from '../hooks/bifrost-model';
-import { useEffect, useState, useRef } from 'react';
+import {
+  BifrostModelContext,
+  GraphSpec,
+  useModelState,
+} from '../hooks/bifrost-model';
+import React, { useEffect, useState, useRef } from 'react';
 import ChartChooser from './Onboarding/ChartChooser';
 import ColumnScreen from './Onboarding/ColumnScreen';
 import { VisualizationSpec } from 'react-vega';
+import produce from 'immer';
 import Graph from './Graph';
 import theme from '../theme';
 
@@ -108,11 +113,17 @@ function VisualizationScreen({
   spec: VisualizationSpec;
   onPrevious: () => void;
 }) {
-  const setGraphSpec = useModelState('graph_spec')[1];
-  const graphAreaRef = useRef<HTMLDivElement>();
+  const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
+  const graphAreaRef = useRef<HTMLDivElement>(null);
   useResize(
     (e) => {
-      graphAreaRef.current?.getBoundingClientRect;
+      if (!graphAreaRef.current) return;
+      const { width, height } = graphAreaRef.current.getBoundingClientRect();
+      const newSpec = produce(graphSpec, (gs) => {
+        gs.width = width;
+        gs.height = height;
+      });
+      setGraphSpec(newSpec);
     },
     [graphAreaRef.current]
   );
@@ -132,16 +143,15 @@ function VisualizationScreen({
 interface GridAreaProps {
   area: string;
   children?: any;
-  ref?: React.LegacyRef<HTMLDivElement>;
 }
 
-function GridArea(props: GridAreaProps) {
-  return (
-    <div style={{ gridArea: props.area }} ref={props.ref}>
+const GridArea = React.forwardRef<HTMLDivElement, GridAreaProps>(
+  (props, ref) => (
+    <div style={{ gridArea: props.area }} ref={ref}>
       {props.children}
     </div>
-  );
-}
+  )
+);
 
 function useResize(callback: (e: UIEvent) => void, deps: any[]) {
   useEffect(() => {
