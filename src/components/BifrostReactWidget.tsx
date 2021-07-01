@@ -4,8 +4,8 @@ import { jsx, css, ThemeProvider, Global } from '@emotion/react';
 // import Graph from './Graph';
 import Sidebar from './Sidebar/Sidebar';
 import { WidgetModel } from '@jupyter-widgets/base';
-import { BifrostModelContext } from '../hooks/bifrost-model';
-import { useState } from 'react';
+import { BifrostModelContext, useModelState } from '../hooks/bifrost-model';
+import { useEffect, useState, useRef } from 'react';
 import ChartChooser from './Onboarding/ChartChooser';
 import ColumnScreen from './Onboarding/ColumnScreen';
 import { VisualizationSpec } from 'react-vega';
@@ -108,9 +108,18 @@ function VisualizationScreen({
   spec: VisualizationSpec;
   onPrevious: () => void;
 }) {
+  const setGraphSpec = useModelState('graph_spec')[1];
+  const graphAreaRef = useRef<HTMLDivElement>();
+  useResize(
+    (e) => {
+      graphAreaRef.current?.getBoundingClientRect;
+    },
+    [graphAreaRef.current]
+  );
+
   return (
     <article className="BifrostWidget" css={bifrostWidgetCss}>
-      <GridArea area="graph">
+      <GridArea ref={graphAreaRef} area="graph">
         <Graph onBack={onPrevious} />
       </GridArea>
       <GridArea area="sidebar">
@@ -120,6 +129,23 @@ function VisualizationScreen({
   );
 }
 
-function GridArea(props: { area: string; children: any }) {
-  return <div style={{ gridArea: props.area }}>{props.children}</div>;
+interface GridAreaProps {
+  area: string;
+  children?: any;
+  ref?: React.LegacyRef<HTMLDivElement>;
+}
+
+function GridArea(props: GridAreaProps) {
+  return (
+    <div style={{ gridArea: props.area }} ref={props.ref}>
+      {props.children}
+    </div>
+  );
+}
+
+function useResize(callback: (e: UIEvent) => void, deps: any[]) {
+  useEffect(() => {
+    window.addEventListener('resize', callback);
+    return () => void window.removeEventListener('resize', callback);
+  }, deps);
 }

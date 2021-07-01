@@ -49,7 +49,7 @@ export interface EncodingInfo {
   scale?: {
     [scaleType: string] : any
   },
-  
+  aggregate?: string
 }
 
 export type GraphSpec = VisualizationSpec & {

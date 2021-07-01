@@ -4,7 +4,10 @@ import produce from 'immer';
 import { useMemo } from 'react';
 import { ArrowLeft } from 'react-feather';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
-import { VegaEncoding } from '../../../modules/VegaEncodings';
+import {
+  VegaEncoding,
+  vegaAggregationList,
+} from '../../../modules/VegaEncodings';
 
 const screenCss = (theme: any) => css`
   position: absolute;
@@ -62,19 +65,22 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const [graphData] = useModelState<GraphData<number>>('graph_data');
   const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
   const { field } = graphSpec.encoding[props.encoding];
-  const bounds: [number, number] = useMemo(
-    () =>
-      graphData.reduce(
-        (minMax, cur) => {
-          let val = cur[field];
-          if (minMax[0] > val) minMax[0] = val;
-          if (minMax[1] < val) minMax[1] = val;
-          return minMax;
-        },
-        [Infinity, -Infinity]
-      ),
-    [graphData]
-  );
+  const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
+  const bounds = useMemo(getBounds, [graphData]);
+  const currentMin = getFilterVal('gte') || bounds[0];
+  const currentMax = getFilterVal('lte') || bounds[1];
+
+  function getBounds(): [number, number] {
+    return graphData.reduce(
+      (minMax, cur) => {
+        let val = cur[field];
+        if (minMax[0] > val) minMax[0] = val;
+        if (minMax[1] < val) minMax[1] = val;
+        return minMax;
+      },
+      [Infinity, -Infinity]
+    );
+  }
 
   function updateFilter(type: string, val: number) {
     const index = graphSpec.transform.findIndex(
@@ -107,8 +113,13 @@ function QuantitativeFilters(props: FilterGroupProps) {
     )?.filter[type];
   }
 
-  const currentMin = getFilterVal('gte');
-  const currentMax = getFilterVal('lte');
+  function updateAggregation(aggregation: string) {
+    const newSpec = produce(graphSpec, (gs) => {
+      gs.encoding[props.encoding].aggregate =
+        aggregation === 'none' ? '' : aggregation;
+    });
+    setGraphSpec(newSpec);
+  }
 
   return (
     <div className="filters">
@@ -134,6 +145,18 @@ function QuantitativeFilters(props: FilterGroupProps) {
           step={(bounds[1] - bounds[0]) / 100}
           onChange={(e) => updateFilter('lte', e.target.valueAsNumber)}
         />
+      </label>
+
+      <label>
+        Aggregation:{' '}
+        <select
+          value={currentAggregation}
+          onChange={(e) => updateAggregation(e.target.value)}
+        >
+          {['none', ...vegaAggregationList].map((aggregation) => (
+            <option value={aggregation}>{aggregation}</option>
+          ))}
+        </select>
       </label>
     </div>
   );
