@@ -64,6 +64,7 @@ export default function ChartChooser(props: ChartChooserProps) {
             className={
               selectedIndex === i ? 'graph-wrapper selected' : 'graph-wrapper'
             }
+            key={`spec_${i}`}
             onClick={() => setSelectedIndex(i)}
           >
             <VegaLite spec={spec as VisualizationSpec} data={data} />

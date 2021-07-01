@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import { ScreenProps } from './Screen';
 import NavHeader from './NavHeader';
 import SearchBar from '../ui-widgets/SearchBar';
+import Tag from '../ui-widgets/Tag';
+
 import {
   QuerySpec,
   GraphData,
@@ -23,12 +25,24 @@ const columnScreenCss = css`
   .choice {
     display: block;
     margin: 10px;
+    margin-left: 40px;
+    width: fit-content;
   }
 
   fieldset {
     border: none;
   }
+
+  .column-tags {
+    padding: 0px;
+    display: flex;
+  }
 `;
+
+interface inputTag {
+  id: string;
+  text: string;
+}
 
 export default function ColumnScreen(props: ScreenProps) {
   const [query, setQuery] = useState('');
@@ -38,7 +52,12 @@ export default function ColumnScreen(props: ScreenProps) {
   const setSuggestedGraphs =
     useModelState<SuggestedGraphs>('suggested_graphs')[1];
   const [results, setResults] = useState(columnChoices);
-  const [selectedColumns, setSelectedColumns] = useState(new Set());
+  const [selectedColumns, setSelectedColumns] = useState(new Set<string>());
+  const [selectedTags, setSelectedTags] = useState<inputTag[]>([]);
+  const suggestions: inputTag[] = [];
+  columnChoices.forEach((column: string) =>
+    suggestions.push({ id: column, text: column })
+  );
 
   function submit() {
     const opt = {};
@@ -59,7 +78,9 @@ export default function ColumnScreen(props: ScreenProps) {
       .map((spec) => recommend(spec, schema, opt).result)
       .map((res) =>
         mapLeaves(res, (item: SpecQueryModel) => {
-          return item.toSpec();
+          const newSpec: Record<string, any> = item.toSpec();
+          newSpec['params'] = (spec.spec as Record<string, any>)['params'];
+          return newSpec;
         })
       )
       .map((leaves) => leaves.items)
@@ -75,36 +96,139 @@ export default function ColumnScreen(props: ScreenProps) {
 
   function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
     const updatedSet = new Set(selectedColumns);
+    const updatedTags = selectedTags.slice();
     if (e.target.checked) {
       updatedSet.add(e.target.value);
+      updatedTags.push({ id: e.target.value, text: e.target.value });
     } else {
       updatedSet.delete(e.target.value);
+      const willRemovedTag = updatedTags.filter(
+        (tag) => tag.id == e.target.value
+      )[0];
+      const index = updatedTags.indexOf(willRemovedTag);
+      if (index > -1) {
+        updatedTags.splice(index, 1);
+      }
     }
     setSelectedColumns(updatedSet);
+    setSelectedTags(updatedTags);
+  }
+
+  function handleDelete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    const updatedSet = new Set(selectedColumns);
+    const selectedTag = (e.target as HTMLButtonElement).className.split('_')[1];
+
+    updatedSet.delete(selectedTag);
+
+    const choice = document.getElementsByClassName(
+      `choice_${selectedTag}`
+    )[0] as HTMLInputElement;
+    choice.checked = false;
+
+    setSelectedColumns(updatedSet);
+  }
+
+  function handleKeydown(e: React.KeyboardEvent<HTMLInputElement>) {
+    switch (e.key) {
+      case 'Enter':
+        e.preventDefault();
+        e.stopPropagation();
+        if (columnChoices.includes(query)) {
+          const updatedSet = new Set(selectedColumns);
+          updatedSet.add(query);
+          setSelectedColumns(updatedSet);
+        } else {
+          if (query.length != 0) {
+            const choice = document.querySelectorAll(
+              '.choice input'
+            )[0] as HTMLInputElement;
+
+            const updatedSet = new Set(selectedColumns);
+            updatedSet.add(choice.value);
+            setSelectedColumns(updatedSet);
+          }
+        }
+        break;
+      case 'Backspace':
+        if (query.length == 0) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const tags = document.querySelectorAll('.column-tag');
+          if (tags.length != 0) {
+            const updatedSet = new Set(selectedColumns);
+            const tagName = (
+              tags[tags.length - 1].getElementsByTagName(
+                'span'
+              )[0] as HTMLSpanElement
+            ).textContent;
+
+            tagName && updatedSet.delete(tagName);
+            setSelectedColumns(updatedSet);
+          }
+        }
+    }
   }
 
   return (
     <article className="ColumnScreen" css={columnScreenCss}>
       <NavHeader title="Select Columns" onNext={submit}>
+        <ul className="column-tags">
+          {Array.from(selectedColumns).map((column: string) => {
+            return (
+              <Tag key={`tag_${column}`}>
+                <div className="tag-wrapper">
+                  <span style={{ padding: '0px 5px' }}>{column}</span>
+                  <button
+                    className={`tagButton_${column}`}
+                    onClick={handleDelete}
+                  >
+                    X
+                  </button>
+                </div>
+              </Tag>
+            );
+          })}
+        </ul>
         <SearchBar
           choices={columnChoices}
           value={query}
           onChange={setQuery}
           onResultsChange={setResults}
+          onKeyDown={handleKeydown}
         />
       </NavHeader>
       <form onSubmit={(e) => e.preventDefault()}>
         <fieldset>
-          {results.map((col) => (
-            <label className="choice">
-              <input
-                type="checkbox"
-                value={col}
-                onChange={handleCheckboxChange}
-              />{' '}
-              {col}
-            </label>
-          ))}
+          {results.map((col) => {
+            if (selectedColumns.has(col)) {
+              return (
+                <label className="choice" key={col}>
+                  <input
+                    className={`choice_${col}`}
+                    type="checkbox"
+                    value={col}
+                    onChange={handleCheckboxChange}
+                    checked
+                  />{' '}
+                  {col}
+                </label>
+              );
+            } else {
+              return (
+                <label className="choice" key={col}>
+                  <input
+                    className={`choice_${col}`}
+                    type="checkbox"
+                    value={col}
+                    onChange={handleCheckboxChange}
+                    checked={false}
+                  />{' '}
+                  {col}
+                </label>
+              );
+            }
+          })}
         </fieldset>
       </form>
     </article>

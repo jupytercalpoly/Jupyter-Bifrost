@@ -21,7 +21,7 @@ export default function Graph(props: GraphProps) {
 
   // multiple signals can be added by adding a new field
   const signalListeners = { brush: handleBrush };
-
+  console.log(spec);
   return (
     <div>
       <VegaLite spec={spec} data={data} signalListeners={signalListeners} />

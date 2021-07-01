@@ -118,11 +118,14 @@ class BifrostWidget(DOMWidget):
         types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
 
         query_spec = {
+            "config":{
+                "mark": {"tooltip": True}
+            },
             "width": 400,
             "height": 200,
             "mark": "?",
             "params": [{"name": "brush", "select": "interval"}],
-            "signals": [{'name': 'tooltip'}],
+            # "signals": [{'name': 'tooltip'}],
             "data": {"name": "data"},
             "encodings": [
                 {"field": col, "type": types[col], "channel" : "?"} for col in df.columns
