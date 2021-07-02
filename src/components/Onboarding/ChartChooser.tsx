@@ -34,6 +34,7 @@ export default function ChartChooser(props: ChartChooserProps) {
     data,
   }))[0];
   const setGraphSpec = useModelState<GraphSpec>('graph_spec')[1];
+  const setOpHistory = useModelState<GraphSpec[]>('operation_history')[1];
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   function displayChart() {
@@ -43,6 +44,7 @@ export default function ChartChooser(props: ChartChooserProps) {
 
     const spec = suggestedGraphs[selectedIndex] as GraphSpec;
     setGraphSpec(spec);
+    setOpHistory([spec]);
     props.onChartSelected(spec);
   }
 

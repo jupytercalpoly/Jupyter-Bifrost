@@ -4,6 +4,7 @@ import { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab';
+import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 
 const sidebarCss = css`
   width: 100%;
@@ -34,6 +35,7 @@ export default function Sidebar() {
       />
       <div className="sidebar-content">
         <TabContents />
+        <ApplyButton />
       </div>
     </aside>
   );
@@ -83,5 +85,36 @@ function TabBar(props: TabBarProps) {
         ))}
       </ul>
     </nav>
+  );
+}
+
+const applyCss = (theme: any) => css`
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: ${theme.color.primary};
+  font-weight: 700;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 14px;
+`;
+
+function ApplyButton() {
+  const [opHistory, setOpHistory] =
+    useModelState<GraphSpec[]>('operation_history');
+  const spec = useModelState<GraphSpec>('graph_spec')[0];
+  const [index, setIndex] = useModelState<number>('current_dataframe_index');
+
+  function appendSpecToHistory() {
+    const newHist = opHistory.slice(0, index + 1);
+    newHist.push(spec);
+    setOpHistory(newHist);
+    setIndex(newHist.length - 1);
+  }
+
+  return (
+    <button css={applyCss} onClick={appendSpecToHistory}>
+      Apply
+    </button>
   );
 }

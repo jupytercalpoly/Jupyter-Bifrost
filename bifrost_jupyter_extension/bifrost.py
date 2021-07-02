@@ -68,10 +68,6 @@ class BifrostWidget(DOMWidget):
         # Vega spec is updated from the frontend. To track history, respond to these changes here.
         pass
 
-    @observe("current_dataframe_index")
-    def change_dataframe(self, changes):
-        df_index:int = changes["new"]
-
 
 
     @observe("generate_random_dist")
