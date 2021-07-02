@@ -58,6 +58,7 @@ export default function ColumnScreen(props: ScreenProps) {
   columnChoices.forEach((column: string) =>
     suggestions.push({ id: column, text: column })
   );
+  const keyPressed = { Shift: false, Enter: false };
 
   function submit() {
     const opt = {};
@@ -131,21 +132,30 @@ export default function ColumnScreen(props: ScreenProps) {
   function handleKeydown(e: React.KeyboardEvent<HTMLInputElement>) {
     switch (e.key) {
       case 'Enter':
-        e.preventDefault();
-        e.stopPropagation();
-        if (columnChoices.includes(query)) {
-          const updatedSet = new Set(selectedColumns);
-          updatedSet.add(query);
-          setSelectedColumns(updatedSet);
+        if (keyPressed['Shift']) {
+          e.preventDefault();
+          e.stopPropagation();
+          keyPressed['Enter'] = true;
+          props.onNext();
         } else {
-          if (query.length != 0) {
-            const choice = document.querySelectorAll(
-              '.choice input'
-            )[0] as HTMLInputElement;
-
+          e.preventDefault();
+          e.stopPropagation();
+          if (columnChoices.includes(query)) {
             const updatedSet = new Set(selectedColumns);
-            updatedSet.add(choice.value);
+            updatedSet.add(query);
             setSelectedColumns(updatedSet);
+          } else {
+            if (query.length != 0) {
+              const choice = document.querySelectorAll(
+                '.choice input'
+              )[0] as HTMLInputElement;
+
+              if (choice) {
+                const updatedSet = new Set(selectedColumns);
+                updatedSet.add(choice.value);
+                setSelectedColumns(updatedSet);
+              }
+            }
           }
         }
         break;
@@ -167,11 +177,31 @@ export default function ColumnScreen(props: ScreenProps) {
             setSelectedColumns(updatedSet);
           }
         }
+        break;
+      case 'Shift':
+        e.preventDefault();
+        e.stopPropagation();
+        keyPressed['Shift'] = true;
+        break;
+    }
+  }
+
+  function handleKeyUp(e: React.KeyboardEvent<HTMLElement>) {
+    switch (e.key) {
+      case 'Shift':
+        keyPressed['Shift'] = false;
+        keyPressed['Enter'] = false;
+        break;
     }
   }
 
   return (
-    <article className="ColumnScreen" css={columnScreenCss}>
+    <article
+      className="ColumnScreen"
+      css={columnScreenCss}
+      onKeyUp={handleKeyUp}
+      onKeyDown={handleKeydown}
+    >
       <NavHeader title="Select Columns" onNext={submit}>
         <ul className="column-tags">
           {Array.from(selectedColumns).map((column: string) => {
@@ -195,7 +225,6 @@ export default function ColumnScreen(props: ScreenProps) {
           value={query}
           onChange={setQuery}
           onResultsChange={setResults}
-          onKeyDown={handleKeydown}
         />
       </NavHeader>
       <form onSubmit={(e) => e.preventDefault()}>
