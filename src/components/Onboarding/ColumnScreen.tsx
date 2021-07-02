@@ -65,6 +65,7 @@ export default function ColumnScreen(props: ColumnScreenProps) {
     props.preSelectedColumns
   );
   const keyPressed = { Shift: false, Enter: false };
+  // let focused_index = 0;
 
   function submit() {
     const opt = {};
@@ -180,8 +181,16 @@ export default function ColumnScreen(props: ColumnScreenProps) {
         keyPressed['Shift'] = true;
         break;
       case 'ArrowDown':
+        console.log('down');
+        if (document.activeElement?.className == 'searchBar') {
+          const top_result = document.querySelectorAll(
+            '.choice'
+          )[0] as HTMLElement;
+          top_result.focus();
+        }
         break;
       case 'ArrowUp':
+        console.log('up');
         break;
       case 'Tab':
         console.log('tab');
@@ -240,33 +249,18 @@ export default function ColumnScreen(props: ColumnScreenProps) {
       <form onSubmit={(e) => e.preventDefault()}>
         <fieldset>
           {results.map((col) => {
-            if (selectedColumns.has(col)) {
-              return (
-                <label className="choice" key={col}>
-                  <input
-                    className={`choice_${col}`}
-                    type="checkbox"
-                    value={col}
-                    onChange={handleCheckboxChange}
-                    checked
-                  />{' '}
-                  {col}
-                </label>
-              );
-            } else {
-              return (
-                <label className="choice" key={col}>
-                  <input
-                    className={`choice_${col}`}
-                    type="checkbox"
-                    value={col}
-                    onChange={handleCheckboxChange}
-                    checked={false}
-                  />{' '}
-                  {col}
-                </label>
-              );
-            }
+            return (
+              <label className="choice" key={col}>
+                <input
+                  className={`choice_${col}`}
+                  type="checkbox"
+                  value={col}
+                  onChange={handleCheckboxChange}
+                  checked={selectedColumns.has(col)}
+                />{' '}
+                {col}
+              </label>
+            );
           })}
         </fieldset>
       </form>

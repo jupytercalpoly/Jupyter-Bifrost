@@ -21,7 +21,7 @@ const suggestedChartCss = (theme: any) => css`
     border-radius: 5px;
     transition: border-color 0.5s;
     &.selected {
-      border-color: ${theme.color.primary[1]};
+      border: 10px solid ${theme.color.primary[2]};
     }
   }
 `;
@@ -39,7 +39,6 @@ export default function ChartChooser(props: ChartChooserProps) {
   const setGraphSpec = useModelState<GraphSpec>('graph_spec')[1];
   const setOpHistory = useModelState<GraphSpec[]>('spec_history')[1];
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-  const keyPressed = { Shift: false, Enter: false };
 
   function displayChart() {
     if (selectedIndex === -1) {
@@ -52,40 +51,18 @@ export default function ChartChooser(props: ChartChooserProps) {
     props.onChartSelected(spec);
   }
 
-  function handleKeyUp(e: React.KeyboardEvent<HTMLElement>) {
-    switch (e.key) {
-      case 'Shift':
-        keyPressed['Shift'] = false;
-        keyPressed['Enter'] = false;
-        break;
-    }
-  }
-
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     switch (e.key) {
       case 'Enter':
-        if (keyPressed['Shift']) {
-          e.preventDefault();
-          e.stopPropagation();
-          keyPressed['Enter'] = true;
-          displayChart();
-        }
-        break;
-
-      case 'Shift':
         e.preventDefault();
         e.stopPropagation();
-        keyPressed['Shift'] = true;
+        displayChart();
         break;
     }
   }
 
   return (
-    <section
-      className="ChartChooser"
-      onKeyUp={handleKeyUp}
-      onKeyDown={handleKeyDown}
-    >
+    <section className="ChartChooser" onKeyDown={handleKeyDown}>
       <NavHeader
         title="Select Chart"
         onNext={displayChart}
@@ -101,6 +78,26 @@ export default function ChartChooser(props: ChartChooserProps) {
             onClick={() => setSelectedIndex(i)}
           >
             <VegaLite spec={spec as VisualizationSpec} data={data} />
+            <div
+              className="graph-info"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                marginLeft: '20px',
+              }}
+            >
+              <b style={{ textTransform: 'capitalize' }}>{`${
+                (spec as any).mark
+              } Chart`}</b>
+              <span>
+                <b>x: </b>
+                {(spec as any).encoding.x.field}
+              </span>
+              <span>
+                <b>y: </b>
+                {(spec as any).encoding.y.field}
+              </span>
+            </div>
           </div>
         ))}
       </div>

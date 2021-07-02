@@ -41,21 +41,12 @@ interface HeaderProps {
   onPrevious?: () => void;
 }
 
-const previousButtonCss = css`
-  margin-right: 10px;
-  cursor: pointer;
-`;
-
 export default function NavHeader(props: HeaderProps) {
   return (
     <header css={headerCss}>
       <div className="options">
         {props.onPrevious && (
-          <button
-            className="wrapper"
-            onClick={props.onPrevious}
-            css={previousButtonCss}
-          >
+          <button className="wrapper" onClick={props.onPrevious}>
             <ArrowLeft />
           </button>
         )}
