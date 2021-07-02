@@ -1,10 +1,9 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 import { useState } from 'react';
-import { VegaLite, VisualizationSpec } from 'react-vega';
+import { PlainObject, VegaLite, VisualizationSpec } from 'react-vega';
 import {
   useModelState,
-  GraphData,
   SuggestedGraphs,
   GraphSpec,
 } from '../../hooks/bifrost-model';
@@ -31,7 +30,9 @@ interface ChartChooserProps {
 
 export default function ChartChooser(props: ChartChooserProps) {
   const suggestedGraphs = useModelState<SuggestedGraphs>('suggested_graphs')[0];
-  const data = useModelState<GraphData>('graph_data', (data) => ({ data }))[0];
+  const data = useModelState<PlainObject>('graph_data', (data) => ({
+    data,
+  }))[0];
   const setGraphSpec = useModelState<GraphSpec>('graph_spec')[1];
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 

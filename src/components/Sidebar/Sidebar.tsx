@@ -8,6 +8,12 @@ import CustomizationTab from './Tabs/CustomizationTab';
 const sidebarCss = css`
   width: 100%;
   height: 100%;
+
+  .sidebar-content {
+    border: 2px solid #e4e4e4;
+    border-top: none;
+    padding: 10px;
+  }
 `;
 const tabMapping: { [name: string]: () => jsx.JSX.Element } = {
   Variables: VariablesTab,
@@ -26,7 +32,7 @@ export default function Sidebar() {
         onTabSelected={setSelectedTab}
         activeTab={selectedTab}
       />
-      <div className="content">
+      <div className="sidebar-content">
         <TabContents />
       </div>
     </aside>

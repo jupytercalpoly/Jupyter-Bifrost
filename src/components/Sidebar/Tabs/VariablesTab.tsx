@@ -12,8 +12,10 @@ import {
 import { VegaEncoding, vegaEncodingList } from '../../../modules/VegaEncodings';
 import Pill from '../../ui-widgets/Pill';
 import SearchBar from '../../ui-widgets/SearchBar';
+import FilterScreen from './FilterScreen';
 
 const variableTabCss = css`
+  position: relative;
   .encoding-list,
   .encoding-choices {
     margin: 0;
@@ -46,6 +48,7 @@ export default function VariablesTab() {
   const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
   const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>('');
   const [showEncodings, setShowEncodings] = useState(false);
+  const [filterEncoding, setFilterEncoding] = useState<VegaEncoding | ''>('');
 
   const updateEncodings = (column: string) => {
     if (activeEncoding === '') {
@@ -78,8 +81,8 @@ export default function VariablesTab() {
     setGraphSpec(newSpec);
   }
 
-  function openFilters(encoding: string) {
-    console.log('open filters...');
+  function openFilters(encoding: VegaEncoding) {
+    setFilterEncoding(encoding);
   }
 
   function addEncoding(encoding: VegaEncoding) {
@@ -114,7 +117,10 @@ export default function VariablesTab() {
           <XCircle size={20} />
         </button>
         <b>{encoding}:</b> <span>{col.field}</span>
-        <button className="wrapper" onClick={() => openFilters(encoding)}>
+        <button
+          className="wrapper"
+          onClick={() => openFilters(encoding as VegaEncoding)}
+        >
           <Filter size={20} />
         </button>
       </Pill>
@@ -159,6 +165,12 @@ export default function VariablesTab() {
           );
         })}
       </ul>
+      {filterEncoding && (
+        <FilterScreen
+          encoding={filterEncoding}
+          onBack={() => setFilterEncoding('')}
+        />
+      )}
     </section>
   );
 }

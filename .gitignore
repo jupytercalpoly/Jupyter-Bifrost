@@ -157,3 +157,5 @@ bifrost_jupyter_extension/labextension
 
 # eslint
 .eslintcache
+
+.vscode

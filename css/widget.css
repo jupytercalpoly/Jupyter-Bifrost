@@ -1,6 +1,7 @@
-.custom-widget {
-  background-color: lightseagreen;
-  padding: 0px 2px;
+.bifrost-widget {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 button.wrapper {

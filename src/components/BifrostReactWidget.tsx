@@ -1,11 +1,11 @@
 /** @jsx jsx */
-import { jsx, css, ThemeProvider } from '@emotion/react';
+import { jsx, css, ThemeProvider, Global } from '@emotion/react';
 
 // import Graph from './Graph';
 import Sidebar from './Sidebar/Sidebar';
 import { WidgetModel } from '@jupyter-widgets/base';
 import { BifrostModelContext } from '../hooks/bifrost-model';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import ChartChooser from './Onboarding/ChartChooser';
 import ColumnScreen from './Onboarding/ColumnScreen';
 import { VisualizationSpec } from 'react-vega';
@@ -18,7 +18,10 @@ const bifrostWidgetCss = css`
   display: grid;
   grid-template-columns: 2fr 1fr;
   grid-template-areas: 'graph sidebar';
+  max-width: calc(100% - 64px);
+`;
 
+const globalStyles = css`
   // Global styles for the widget
   //===========================================================
   * {
@@ -32,6 +35,18 @@ const bifrostWidgetCss = css`
     &:active {
       transform: scale(0.95);
     }
+  }
+
+  h1 {
+    font-size: 35px;
+    font-weight: 800;
+    margin: 10px 0;
+    margin-bottom: 15px;
+  }
+
+  h2 {
+    font-size: 25px;
+    font-weight: 800;
   }
 `;
 
@@ -80,6 +95,7 @@ export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
     <ThemeProvider theme={theme}>
       <BifrostModelContext.Provider value={props.model}>
         {Screen}
+        <Global styles={globalStyles} />
       </BifrostModelContext.Provider>
     </ThemeProvider>
   );
@@ -104,6 +120,15 @@ function VisualizationScreen({
   );
 }
 
-function GridArea(props: { area: string; children: any }) {
-  return <div style={{ gridArea: props.area }}>{props.children}</div>;
+interface GridAreaProps {
+  area: string;
+  children?: any;
 }
+
+const GridArea = React.forwardRef<HTMLDivElement, GridAreaProps>(
+  (props, ref) => (
+    <div style={{ gridArea: props.area }} ref={ref}>
+      {props.children}
+    </div>
+  )
+);

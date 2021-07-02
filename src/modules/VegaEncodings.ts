@@ -54,6 +54,43 @@ export const vegaEncodingList = [
   'facet',
   'row',
   'column',
-];
+] as const;
+
+const vegaColTypesList = [
+  'quantitative',
+  'temporal',
+  'ordinal',
+  'nominal',
+  'geojson',
+] as const;
+
+export const vegaAggregationList = [
+  'count',
+  'valid',
+  'values',
+  'missing',
+  'distinct',
+  'sum',
+  'product',
+  'mean',
+  'variance',
+  'variancep',
+  'stdev',
+  'stdevp',
+  'stderr',
+  'median',
+  'q1',
+  'q3',
+  'ci0',
+  'ci1',
+  'min',
+  'max',
+  'argmin',
+  'argmax',
+] as const;
+
+export type VegaColumnType = typeof vegaColTypesList[number];
 
 export type VegaEncoding = typeof vegaEncodingList[number];
+
+export type VegaAggregation = typeof vegaAggregationList[number];
