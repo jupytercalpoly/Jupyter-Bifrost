@@ -45,11 +45,11 @@ export type QuerySpec = Query;
 
 export interface EncodingInfo {
   field: string;
-  type: VegaColumnType | "";
+  type: VegaColumnType | '';
   scale?: {
-    [scaleType: string] : any
-  },
-  aggregate?: string
+    [scaleType: string]: any;
+  };
+  aggregate?: string;
 }
 
 export type GraphSpec = VisualizationSpec & {
@@ -58,7 +58,7 @@ export type GraphSpec = VisualizationSpec & {
   mark: string;
   encoding: Record<VegaEncoding, EncodingInfo>;
   transform: {
-    [transformType: string] : any
+    [transformType: string]: any;
   }[];
   data: { name: string };
 };

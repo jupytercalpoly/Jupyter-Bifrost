@@ -8,6 +8,7 @@ import {
   VegaEncoding,
   vegaAggregationList,
 } from '../../../modules/VegaEncodings';
+import { isFunction } from '../../../modules/utils';
 
 const screenCss = (theme: any) => css`
   position: absolute;
@@ -73,9 +74,13 @@ function QuantitativeFilters(props: FilterGroupProps) {
   function getBounds(): [number, number] {
     return graphData.reduce(
       (minMax, cur) => {
-        let val = cur[field];
-        if (minMax[0] > val) minMax[0] = val;
-        if (minMax[1] < val) minMax[1] = val;
+        const val = cur[field];
+        if (minMax[0] > val) {
+          minMax[0] = val;
+        }
+        if (minMax[1] < val) {
+          minMax[1] = val;
+        }
         return minMax;
       },
       [Infinity, -Infinity]
@@ -83,28 +88,8 @@ function QuantitativeFilters(props: FilterGroupProps) {
   }
 
   function updateFilter(type: string, val: number) {
-    const index = graphSpec.transform.findIndex(
-      (t) => t.filter.field === field && type in t.filter
-    );
-    let newSpec: GraphSpec;
-    if (index !== -1) {
-      // Filter exists
-      newSpec = produce(graphSpec, (gs) => {
-        gs.transform[index].filter[type] = val;
-      });
-    } else {
-      // Create Filter
-      newSpec = produce(graphSpec, (gs) => {
-        gs.transform.push({
-          filter: {
-            field,
-            [type]: val,
-          },
-        });
-      });
-    }
+    const newSpec = updateSpecFilter(graphSpec, props.encoding, type, val);
     setGraphSpec(newSpec);
-    console.log(newSpec.transform);
   }
 
   function getFilterVal(type: string): number | undefined {
@@ -164,12 +149,97 @@ function QuantitativeFilters(props: FilterGroupProps) {
 
 function CategoricalFilters(props: FilterGroupProps) {
   const [graphData] = useModelState<GraphData<string>>('graph_data');
+  const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
+  const categories = useMemo(getCategories, []);
+
+  function getCategories() {
+    const { field } = graphSpec.encoding[props.encoding];
+    const categorySet = graphData.reduce((categories, row) => {
+      categories.add(row[field]);
+      return categories;
+    }, new Set<string>());
+
+    return Array.from(categorySet);
+  }
+
+  function updateFilter(
+    type: string,
+    setCategory: (currentVal: string[] | null) => string[]
+  ) {
+    const newSpec = updateSpecFilter<string[]>(
+      graphSpec,
+      props.encoding,
+      type,
+      setCategory
+    );
+    setGraphSpec(newSpec);
+  }
+
+  function selectCategory(e: React.ChangeEvent<HTMLInputElement>) {
+    const category = e.target.value;
+    updateFilter('oneOf', (currentCategories) => {
+      if (!currentCategories) {
+        return [category];
+      }
+      if (e.target.checked) {
+        return [...currentCategories, category];
+      } else {
+        return currentCategories.filter((c) => c !== category);
+      }
+    });
+  }
 
   return (
-    <ul>
-      {Object.keys(graphData[0]).map((k) => (
-        <li key={k}>{k}</li>
+    <ul style={{ listStyle: 'none' }}>
+      {categories.map((category) => (
+        <li key={category}>
+          <label className="choice">
+            <input type="checkbox" value={category} onChange={selectCategory} />{' '}
+            {category}
+          </label>
+        </li>
       ))}
     </ul>
   );
+}
+
+function updateSpecFilter<T>(
+  graphSpec: GraphSpec,
+  encoding: VegaEncoding,
+  type: string,
+  val: T | ((currentVal: T | null) => T)
+) {
+  const { field } = graphSpec.encoding[encoding];
+  const index = graphSpec.transform.findIndex(
+    (t) => t.filter.field === field && type in t.filter
+  );
+  const filterFound = index !== -1;
+  let value: T;
+  if (isFunction(val)) {
+    const currentVal = filterFound
+      ? graphSpec.transform[index].filter[type]
+      : null;
+    value = val(currentVal);
+  } else {
+    value = val;
+  }
+
+  let newSpec: GraphSpec;
+  if (filterFound) {
+    // Filter exists
+    newSpec = produce(graphSpec, (gs) => {
+      gs.transform[index].filter[type] = value;
+    });
+  } else {
+    // Create Filter
+    newSpec = produce(graphSpec, (gs) => {
+      gs.transform.push({
+        filter: {
+          field,
+          [type]: value,
+        },
+      });
+    });
+  }
+  return newSpec;
 }

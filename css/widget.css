@@ -1,9 +1,7 @@
 .bifrost-widget {
   position: relative;
   box-sizing: border-box;
-  border: 2px solid black;
   max-width: 100%;
-  overflow: hidden;
 }
 
 button.wrapper {
