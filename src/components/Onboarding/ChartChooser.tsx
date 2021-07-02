@@ -27,7 +27,7 @@ const suggestedChartCss = (theme: any) => css`
 `;
 
 interface ChartChooserProps {
-  onBack: () => void;
+  onBack?: () => void;
   onChartSelected: (spec: VisualizationSpec) => void;
 }
 
@@ -39,6 +39,7 @@ export default function ChartChooser(props: ChartChooserProps) {
   const setGraphSpec = useModelState<GraphSpec>('graph_spec')[1];
   const setOpHistory = useModelState<GraphSpec[]>('spec_history')[1];
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const keyPressed = { Shift: false, Enter: false };
 
   function displayChart() {
     if (selectedIndex === -1) {
@@ -51,8 +52,40 @@ export default function ChartChooser(props: ChartChooserProps) {
     props.onChartSelected(spec);
   }
 
+  function handleKeyUp(e: React.KeyboardEvent<HTMLElement>) {
+    switch (e.key) {
+      case 'Shift':
+        keyPressed['Shift'] = false;
+        keyPressed['Enter'] = false;
+        break;
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    switch (e.key) {
+      case 'Enter':
+        if (keyPressed['Shift']) {
+          e.preventDefault();
+          e.stopPropagation();
+          keyPressed['Enter'] = true;
+          displayChart();
+        }
+        break;
+
+      case 'Shift':
+        e.preventDefault();
+        e.stopPropagation();
+        keyPressed['Shift'] = true;
+        break;
+    }
+  }
+
   return (
-    <section className="ChartChooser">
+    <section
+      className="ChartChooser"
+      onKeyUp={handleKeyUp}
+      onKeyDown={handleKeyDown}
+    >
       <NavHeader
         title="Select Chart"
         onNext={displayChart}

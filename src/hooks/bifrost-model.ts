@@ -29,7 +29,8 @@ type ModelStateName =
   | 'selected_columns'
   | 'selected_mark'
   | 'graph_data'
-  | 'suggested_graphs';
+  | 'suggested_graphs'
+  | 'flags';
 
 interface ModelCallback {
   (model: WidgetModel, event: Backbone.EventHandler): void;
@@ -61,6 +62,11 @@ export type GraphSpec = VisualizationSpec & {
     [transformType: string]: any;
   }[];
   data: { name: string };
+};
+
+export type Flags = {
+  columns_provided: boolean;
+  kind_provided: boolean;
 };
 
 // HOOKS

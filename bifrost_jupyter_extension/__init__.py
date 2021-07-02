@@ -15,8 +15,8 @@ class BifrostAccessor:
     def __init__(self, pandas_obj: typing.Union[pd.DataFrame, pd.Series]):
         self._obj = pandas_obj
 
-    def plot(self, kind="line", x=None, y=None) -> pd.DataFrame:
-        w = BifrostWidget(self._obj, kind, x, y)
+    def plot(self, kind=None, x=None, y=None, color=None) -> pd.DataFrame:
+        w = BifrostWidget(self._obj, kind, x, y, color)
         display(w)
         return w.df_history[-1]
 

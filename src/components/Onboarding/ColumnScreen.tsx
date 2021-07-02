@@ -2,7 +2,6 @@
 import { jsx, css } from '@emotion/react';
 
 import React, { useState } from 'react';
-import { ScreenProps } from './Screen';
 import NavHeader from './NavHeader';
 import SearchBar from '../ui-widgets/SearchBar';
 import Tag from '../ui-widgets/Tag';
@@ -27,6 +26,14 @@ const columnScreenCss = css`
     margin: 10px;
     margin-left: 40px;
     width: fit-content;
+    input[type='checkbox']:focus {
+      outline: #771c79 solid 2px;
+    }
+
+    input[type='checkbox']:checked {
+      /* outline: none; */
+      background-color: #771c79;
+    }
   }
 
   fieldset {
@@ -39,12 +46,13 @@ const columnScreenCss = css`
   }
 `;
 
-interface inputTag {
-  id: string;
-  text: string;
+interface ColumnScreenProps {
+  onNext: () => void;
+  onBack?: () => void;
+  preSelectedColumns: Set<string>;
 }
 
-export default function ColumnScreen(props: ScreenProps) {
+export default function ColumnScreen(props: ColumnScreenProps) {
   const [query, setQuery] = useState('');
   const columnChoices = useModelState<string[]>('df_columns')[0];
   const spec = useModelState<QuerySpec>('query_spec')[0];
@@ -52,11 +60,9 @@ export default function ColumnScreen(props: ScreenProps) {
   const setSuggestedGraphs =
     useModelState<SuggestedGraphs>('suggested_graphs')[1];
   const [results, setResults] = useState(columnChoices);
-  const [selectedColumns, setSelectedColumns] = useState(new Set<string>());
-  const [selectedTags, setSelectedTags] = useState<inputTag[]>([]);
-  const suggestions: inputTag[] = [];
-  columnChoices.forEach((column: string) =>
-    suggestions.push({ id: column, text: column })
+
+  const [selectedColumns, setSelectedColumns] = useState(
+    props.preSelectedColumns
   );
   const keyPressed = { Shift: false, Enter: false };
 
@@ -97,22 +103,12 @@ export default function ColumnScreen(props: ScreenProps) {
 
   function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
     const updatedSet = new Set(selectedColumns);
-    const updatedTags = selectedTags.slice();
     if (e.target.checked) {
       updatedSet.add(e.target.value);
-      updatedTags.push({ id: e.target.value, text: e.target.value });
     } else {
       updatedSet.delete(e.target.value);
-      const willRemovedTag = updatedTags.filter(
-        (tag) => tag.id == e.target.value
-      )[0];
-      const index = updatedTags.indexOf(willRemovedTag);
-      if (index > -1) {
-        updatedTags.splice(index, 1);
-      }
     }
     setSelectedColumns(updatedSet);
-    setSelectedTags(updatedTags);
   }
 
   function handleDelete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -132,14 +128,14 @@ export default function ColumnScreen(props: ScreenProps) {
   function handleKeydown(e: React.KeyboardEvent<HTMLInputElement>) {
     switch (e.key) {
       case 'Enter':
+        e.preventDefault();
+        e.stopPropagation();
+
         if (keyPressed['Shift']) {
-          e.preventDefault();
-          e.stopPropagation();
           keyPressed['Enter'] = true;
-          props.onNext();
+          console.log(selectedColumns);
+          submit();
         } else {
-          e.preventDefault();
-          e.stopPropagation();
           if (columnChoices.includes(query)) {
             const updatedSet = new Set(selectedColumns);
             updatedSet.add(query);
@@ -182,6 +178,20 @@ export default function ColumnScreen(props: ScreenProps) {
         e.preventDefault();
         e.stopPropagation();
         keyPressed['Shift'] = true;
+        break;
+      case 'ArrowDown':
+        break;
+      case 'ArrowUp':
+        break;
+      case 'Tab':
+        console.log('tab');
+        e.preventDefault();
+        e.stopPropagation();
+        const choice = document.querySelectorAll(
+          '.choice input'
+        )[0] as HTMLInputElement;
+        console.log(choice);
+        choice.focus();
         break;
     }
   }
