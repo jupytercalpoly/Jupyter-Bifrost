@@ -5,7 +5,8 @@
 [![codecov](https://codecov.io/gh//bifrost-jupyter-extension/branch/master/graph/badge.svg)](https://codecov.io/gh//bifrost-jupyter-extension)
 
 
-A Jupyter Widget for data visualization
+A Jupyter Widget for data visualization. 
+Read [Press Release](./docs/PRESS_RELEASE.md) for more information.
 
 ## Installation
 
