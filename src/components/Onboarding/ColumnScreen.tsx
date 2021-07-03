@@ -17,10 +17,13 @@ import { recommend } from 'compassql/build/src/recommend';
 import { mapLeaves } from 'compassql/build/src/result';
 import { SpecQueryModel } from 'compassql/build/src/model';
 import { Query } from 'compassql/build/src/query/query';
+import { X } from 'react-feather';
 
 // TODO: get this from the backend
 
 const columnScreenCss = css`
+  display: flex;
+
   .choice {
     display: block;
     margin: 10px;
@@ -43,6 +46,7 @@ const columnScreenCss = css`
   .column-tags {
     padding: 0px;
     display: flex;
+    flex-wrap: wrap;
   }
 `;
 
@@ -114,7 +118,9 @@ export default function ColumnScreen(props: ColumnScreenProps) {
 
   function handleDelete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const updatedSet = new Set(selectedColumns);
-    const selectedTag = (e.target as HTMLButtonElement).className.split('_')[1];
+    const selectedTag = (e.currentTarget as HTMLButtonElement).className.split(
+      '_'
+    )[1];
 
     updatedSet.delete(selectedTag);
 
@@ -221,7 +227,38 @@ export default function ColumnScreen(props: ColumnScreenProps) {
       onKeyUp={handleKeyUp}
       onKeyDown={handleKeydown}
     >
-      <NavHeader title="Select Columns" onNext={submit}>
+      <section className="searchColumns">
+        <NavHeader title="Select Columns" onNext={submit}>
+          <SearchBar
+            choices={columnChoices}
+            value={query}
+            onChange={setQuery}
+            onResultsChange={setResults}
+          />
+        </NavHeader>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <fieldset>
+            {results.map((col) => {
+              return (
+                <label className="choice" key={col}>
+                  <input
+                    className={`choice_${col}`}
+                    type="checkbox"
+                    value={col}
+                    onChange={handleCheckboxChange}
+                    checked={selectedColumns.has(col)}
+                  />{' '}
+                  {col}
+                </label>
+              );
+            })}
+          </fieldset>
+        </form>
+      </section>
+      <section
+        className="column-tags-wrapper"
+        style={{ marginTop: '36px', width: '400px' }}
+      >
         <ul className="column-tags">
           {Array.from(selectedColumns).map((column: string) => {
             return (
@@ -232,38 +269,14 @@ export default function ColumnScreen(props: ColumnScreenProps) {
                     className={`tagButton_${column}`}
                     onClick={handleDelete}
                   >
-                    X
+                    <X size={10} />
                   </button>
                 </div>
               </Tag>
             );
           })}
         </ul>
-        <SearchBar
-          choices={columnChoices}
-          value={query}
-          onChange={setQuery}
-          onResultsChange={setResults}
-        />
-      </NavHeader>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <fieldset>
-          {results.map((col) => {
-            return (
-              <label className="choice" key={col}>
-                <input
-                  className={`choice_${col}`}
-                  type="checkbox"
-                  value={col}
-                  onChange={handleCheckboxChange}
-                  checked={selectedColumns.has(col)}
-                />{' '}
-                {col}
-              </label>
-            );
-          })}
-        </fieldset>
-      </form>
+      </section>
     </article>
   );
 }

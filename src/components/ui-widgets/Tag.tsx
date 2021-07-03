@@ -7,6 +7,7 @@ const tagCss = css`
   height: 23px;
   width: 95px;
   text-align: center;
+  margin-top: 15px;
 
   .tag-wrapper {
     background-color: #eee;
@@ -19,11 +20,11 @@ const tagCss = css`
   .tag-wrapper button {
     border: none;
     background-color: #eee;
-    font-size: 14px;
-    font-family: var(--jp-ui-font-family);
+    width: 15px;
     color: var(--jp-widgets-color);
     border-radius: 50%;
     cursor: pointer;
+    padding: 0px;
   }
 
   .tag-wrapper button:hover {

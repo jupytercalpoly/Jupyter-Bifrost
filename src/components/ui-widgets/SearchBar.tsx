@@ -7,23 +7,25 @@ import React from 'react';
 
 const searchBarCss = css`
   border: 1px solid #bdbdbd;
-  background-color: #eee;
+  /* background-color: #eee; */
   border-radius: 0 20px 20px 0px;
   width: 80%;
-  height: 23px;
+  height: 100%;
   margin: 0px;
   margin-left: 35px;
   border-left: none;
+  padding: 0px;
 `;
 
 const searchIconCss = css`
   position: absolute;
-  background-color: #eee;
+  /* background-color: #eee; */
   width: 30px;
-  height: auto;
+  height: 23px;
   border: 1px solid #bdbdbd;
   border-right: none;
   border-radius: 20px 0 0 20px;
+  margin-left: 5px;
   padding-left: 5px;
 `;
 
@@ -63,7 +65,7 @@ export default function SearchBar(props: SearchProps) {
   }, [props.value]);
 
   return (
-    <div className="searchBar">
+    <div className="searchBar" style={{ height: '23px' }}>
       <span css={searchIconCss}>
         <Search size={21} />
       </span>
