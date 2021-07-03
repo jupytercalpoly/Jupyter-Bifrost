@@ -16,7 +16,7 @@ const noop = (a: any) => a;
 
 type ModelStateName =
   | 'df_history'
-  | 'operation_history'
+  | 'spec_history'
   | 'current_dataframe_index'
   | 'graph_spec'
   | 'query_spec'

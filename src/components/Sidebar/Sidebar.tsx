@@ -4,7 +4,7 @@ import { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab';
-import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
+import { useModelState, GraphSpec } from '../../hooks/bifrost-model';
 
 const sidebarCss = css`
   width: 100%;
@@ -13,6 +13,7 @@ const sidebarCss = css`
   .sidebar-content {
     border: 2px solid #e4e4e4;
     border-top: none;
+    border-bottom: none;
     padding: 10px;
   }
 `;
@@ -35,8 +36,8 @@ export default function Sidebar() {
       />
       <div className="sidebar-content">
         <TabContents />
-        <ApplyButton />
       </div>
+      <ActionBar />
     </aside>
   );
 }
@@ -88,24 +89,32 @@ function TabBar(props: TabBarProps) {
   );
 }
 
-const applyCss = (theme: any) => css`
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background-color: ${theme.color.primary};
-  font-weight: 700;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 14px;
+const actionBarCss = css`
+  ul {
+    display: flex;
+    justify-content: center;
+    border: 2px solid #e4e4e4;
+    border-top: none;
+    list-style: none;
+    margin: 0;
+    padding: 12px;
+    box-shadow: 0 0 20px #00000017;
+  }
+  li {
+    margin: 0 10px;
+  }
 `;
 
-function ApplyButton() {
-  const [opHistory, setOpHistory] =
-    useModelState<GraphSpec[]>('operation_history');
+function ActionBar() {
+  const [opHistory, setOpHistory] = useModelState<GraphSpec[]>('spec_history');
   const spec = useModelState<GraphSpec>('graph_spec')[0];
   const [index, setIndex] = useModelState<number>('current_dataframe_index');
 
-  function appendSpecToHistory() {
+  function exportCode() {
+    alert("We'll have this done real soon!");
+  }
+
+  function applyGraphChanges() {
     const newHist = opHistory.slice(0, index + 1);
     newHist.push(spec);
     setOpHistory(newHist);
@@ -113,8 +122,15 @@ function ApplyButton() {
   }
 
   return (
-    <button css={applyCss} onClick={appendSpecToHistory}>
-      Apply
-    </button>
+    <nav className="action-bar" css={actionBarCss}>
+      <ul>
+        <li>
+          <button onClick={applyGraphChanges}>Apply Changes</button>
+        </li>
+        <li>
+          <button onClick={exportCode}>Export Code</button>
+        </li>
+      </ul>
+    </nav>
   );
 }

@@ -57,9 +57,9 @@ export default function NavHeader(props: HeaderProps) {
   );
 }
 
-const nextButtonCss = css`
+const nextButtonCss = (theme: any) => css`
   padding: 10px;
-  background-color: #e97575;
+  background-color: ${theme.color.primary[0]};
   border: none;
   border-radius: 50%;
   cursor: pointer;
