@@ -25,17 +25,40 @@ const columnScreenCss = css`
   display: flex;
 
   .choice {
-    display: block;
+    display: flex;
     margin: 10px;
     margin-left: 40px;
     width: fit-content;
-    input[type='checkbox']:focus {
+
+    /* input[type='checkbox']:focus {
       outline: #771c79 solid 2px;
+    } */
+
+    input[type='checkbox'] {
+      all: unset;
+      width: 13px;
+      height: 13px;
+      display: inline-block;
+      cursor: pointer;
+      border: 1px solid #aaa;
+      border-radius: 20%;
+      margin-right: 6px;
     }
 
     input[type='checkbox']:checked {
-      /* outline: none; */
-      background-color: #771c79;
+      background: #771c79;
+    }
+
+    input[type='checkbox']:checked::after {
+      position: absolute;
+      color: white;
+      content: '✓';
+      padding-left: 1px;
+      line-height: 1;
+    }
+
+    input[type='checkbox']:focus-visible {
+      outline: auto;
     }
   }
 
