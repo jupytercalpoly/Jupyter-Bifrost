@@ -6,15 +6,19 @@ import { Search } from 'react-feather';
 import React from 'react';
 
 const searchBarCss = css`
-  border: 1px solid #bdbdbd;
-  /* background-color: #eee; */
-  border-radius: 0 20px 20px 0px;
-  width: 80%;
-  height: 100%;
-  margin: 0px;
-  margin-left: 35px;
-  border-left: none;
-  padding: 0px;
+  height: 23px;
+  margin-top: 10px;
+  input {
+    border: 1px solid #bdbdbd;
+    /* background-color: #eee; */
+    border-radius: 0 20px 20px 0px;
+    width: 80%;
+    height: 100%;
+    margin: 0px;
+    margin-left: 35px;
+    border-left: none;
+    padding: 0px;
+  }
 `;
 
 const searchIconCss = css`
@@ -65,13 +69,12 @@ export default function SearchBar(props: SearchProps) {
   }, [props.value]);
 
   return (
-    <div className="searchBar" style={{ height: '23px' }}>
+    <div className="searchBar" css={searchBarCss}>
       <span css={searchIconCss}>
         <Search size={21} />
       </span>
       <input
         ref={ref}
-        css={searchBarCss}
         type="search"
         value={props.value}
         placeholder={props.placeholder}
