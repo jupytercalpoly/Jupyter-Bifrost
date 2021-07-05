@@ -9,17 +9,20 @@ import {
 } from '../../hooks/bifrost-model';
 import NavHeader from './NavHeader';
 
-const suggestedChartCss = (theme: any) => css`
-  padding: 20px;
-  display: flex;
-  overflow: scroll;
+const suggestedChartCss = css`
+  width: 100vw;
+
+  .suggestedCharts {
+    padding: 20px;
+    padding-left: 40px;
+    display: flex;
+    overflow: scroll;
+    width: 85%;
+  }
 
   .graph-wrapper {
     padding: 10px;
-    margin: 0 10px;
-    border: 3px solid transparent;
-    border-radius: 5px;
-    transition: border-color 0.5s;
+    /* margin: 0 10px; */
     &.selected {
       border: 10px solid ${theme.color.primary[2]};
     }
@@ -62,13 +65,17 @@ export default function ChartChooser(props: ChartChooserProps) {
   }
 
   return (
-    <section className="ChartChooser" onKeyDown={handleKeyDown}>
+    <section
+      className="ChartChooser"
+      onKeyDown={handleKeyDown}
+      css={suggestedChartCss}
+    >
       <NavHeader
         title="Select Chart"
         onNext={displayChart}
         onPrevious={props.onBack}
       />
-      <div className="suggestedCharts" css={suggestedChartCss}>
+      <div className="suggestedCharts">
         {suggestedGraphs.map((spec, i) => (
           <div
             className={
