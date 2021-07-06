@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import NavHeader from './NavHeader';
 import SearchBar from '../ui-widgets/SearchBar';
 import Tag from '../ui-widgets/Tag';
@@ -18,6 +18,7 @@ import { mapLeaves } from 'compassql/build/src/result';
 import { SpecQueryModel } from 'compassql/build/src/model';
 import { Query } from 'compassql/build/src/query/query';
 import { X } from 'react-feather';
+import { useEffect } from 'react';
 
 // TODO: get this from the backend
 
@@ -30,36 +31,37 @@ const columnScreenCss = css`
     margin-left: 40px;
     width: fit-content;
 
-    /* input[type='checkbox']:focus {
-      outline: #771c79 solid 2px;
-    } */
-
-    input[type='checkbox'] {
-      all: unset;
-      width: 13px;
-      height: 13px;
-      display: inline-block;
-      cursor: pointer;
-      border: 1px solid #aaa;
-      border-radius: 20%;
-      margin-right: 6px;
+    &.focused {
+      border: 1px solid black;
+      background-color: grey;
     }
+  }
 
-    input[type='checkbox']:checked {
-      background: #771c79;
-    }
+  input[type='checkbox'] {
+    all: unset;
+    width: 13px;
+    height: 13px;
+    display: inline-block;
+    cursor: pointer;
+    border: 1px solid #aaa;
+    border-radius: 20%;
+    margin-right: 6px;
+  }
 
-    input[type='checkbox']:checked::after {
-      position: absolute;
-      color: white;
-      content: '✓';
-      padding-left: 1px;
-      line-height: 1;
-    }
+  input[type='checkbox']:checked {
+    background: #771c79;
+  }
 
-    input[type='checkbox']:focus-visible {
-      outline: auto;
-    }
+  input[type='checkbox']:checked::after {
+    position: absolute;
+    color: white;
+    content: '✓';
+    padding-left: 1px;
+    line-height: 1;
+  }
+
+  input[type='checkbox']:focus-visible {
+    outline: auto;
   }
 
   fieldset {
@@ -87,12 +89,22 @@ export default function ColumnScreen(props: ColumnScreenProps) {
   const setSuggestedGraphs =
     useModelState<SuggestedGraphs>('suggested_graphs')[1];
   const [results, setResults] = useState(columnChoices);
+  const optionsRef = useRef<HTMLFieldSetElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const [focusedIdx, setFocusedIdx] = useState<number>(0);
 
   const [selectedColumns, setSelectedColumns] = useState(
     props.preSelectedColumns
   );
   const keyPressed = { Shift: false, Enter: false };
-  // let focused_index = 0;
+
+  useEffect(() => {
+    searchRef.current?.focus();
+    if (results.length != 0) {
+      setFocusedIdx(0);
+    }
+  }, [results]);
 
   function submit() {
     const opt = {};
@@ -163,7 +175,6 @@ export default function ColumnScreen(props: ColumnScreenProps) {
 
         if (keyPressed['Shift']) {
           keyPressed['Enter'] = true;
-          console.log(selectedColumns);
           submit();
         } else {
           if (columnChoices.includes(query)) {
@@ -171,16 +182,14 @@ export default function ColumnScreen(props: ColumnScreenProps) {
             updatedSet.add(query);
             setSelectedColumns(updatedSet);
           } else {
-            if (query.length != 0) {
-              const choice = document.querySelectorAll(
-                '.choice input'
-              )[0] as HTMLInputElement;
+            const choice = optionsRef.current?.querySelector(
+              '.choice.focused input'
+            ) as HTMLInputElement;
 
-              if (choice) {
-                const updatedSet = new Set(selectedColumns);
-                updatedSet.add(choice.value);
-                setSelectedColumns(updatedSet);
-              }
+            if (choice) {
+              const updatedSet = new Set(selectedColumns);
+              updatedSet.add(choice.value);
+              setSelectedColumns(updatedSet);
             }
           }
         }
@@ -210,26 +219,19 @@ export default function ColumnScreen(props: ColumnScreenProps) {
         keyPressed['Shift'] = true;
         break;
       case 'ArrowDown':
-        console.log('down');
-        if (document.activeElement?.className == 'searchBar') {
-          const top_result = document.querySelectorAll(
-            '.choice'
-          )[0] as HTMLElement;
-          top_result.focus();
+        e.preventDefault();
+        e.stopPropagation();
+        if (focusedIdx < results.length - 1) {
+          setFocusedIdx(focusedIdx + 1);
         }
         break;
       case 'ArrowUp':
-        console.log('up');
-        break;
-      case 'Tab':
-        console.log('tab');
         e.preventDefault();
         e.stopPropagation();
-        const choice = document.querySelectorAll(
-          '.choice input'
-        )[0] as HTMLInputElement;
-        console.log(choice);
-        choice.focus();
+
+        if (focusedIdx > 0) {
+          setFocusedIdx(focusedIdx - 1);
+        }
         break;
     }
   }
@@ -257,13 +259,17 @@ export default function ColumnScreen(props: ColumnScreenProps) {
             value={query}
             onChange={setQuery}
             onResultsChange={setResults}
+            forwardedRef={searchRef}
           />
         </NavHeader>
         <form onSubmit={(e) => e.preventDefault()}>
-          <fieldset>
-            {results.map((col) => {
+          <fieldset ref={optionsRef}>
+            {results.map((col, i) => {
               return (
-                <label className="choice" key={col}>
+                <label
+                  className={i == focusedIdx ? 'choice focused' : 'choice'}
+                  key={col}
+                >
                   <input
                     className={`choice_${col}`}
                     type="checkbox"

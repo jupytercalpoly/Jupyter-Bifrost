@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PlainObject, VegaLite, VisualizationSpec } from 'react-vega';
 import {
   useModelState,
@@ -41,7 +41,12 @@ export default function ChartChooser(props: ChartChooserProps) {
   }))[0];
   const setGraphSpec = useModelState<GraphSpec>('graph_spec')[1];
   const setOpHistory = useModelState<GraphSpec[]>('spec_history')[1];
-  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const chartChooserRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    chartChooserRef.current?.focus();
+  }, []);
 
   function displayChart() {
     if (selectedIndex === -1) {
@@ -61,14 +66,26 @@ export default function ChartChooser(props: ChartChooserProps) {
         e.stopPropagation();
         displayChart();
         break;
+      case 'ArrowRight':
+        if (selectedIndex < suggestedGraphs.length - 1) {
+          setSelectedIndex(selectedIndex + 1);
+        }
+        break;
+      case 'ArrowLeft':
+        if (selectedIndex != 0) {
+          setSelectedIndex(selectedIndex - 1);
+        }
+        break;
     }
   }
 
   return (
     <section
+      tabIndex={-1}
       className="ChartChooser"
       onKeyDown={handleKeyDown}
       css={suggestedChartCss}
+      ref={chartChooserRef}
     >
       <NavHeader
         title="Select Chart"

@@ -33,19 +33,18 @@ const searchIconCss = css`
   padding-left: 5px;
 `;
 
-interface SearchProps {
+export interface SearchProps {
   choices: string[];
   onResultsChange: (results: string[]) => void;
   onChange: (value: string) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   value: string;
   placeholder?: string;
+  forwardedRef?: React.ForwardedRef<HTMLInputElement>;
 }
 
 export default function SearchBar(props: SearchProps) {
-  const ref = React.createRef<HTMLInputElement>();
   useEffect(() => {
-    ref.current?.focus();
     const notAlpha = /[^A-Za-z]/g;
     const normQuery = props.value.replace(notAlpha, '').toLowerCase();
     const compScore = (name: string) =>
@@ -74,7 +73,7 @@ export default function SearchBar(props: SearchProps) {
         <Search size={21} />
       </span>
       <input
-        ref={ref}
+        ref={props.forwardedRef}
         type="search"
         value={props.value}
         placeholder={props.placeholder}
