@@ -25,7 +25,7 @@ export class BifrostModel extends DOMWidgetModel {
       _view_name: BifrostModel.view_name,
       _view_module: BifrostModel.view_module,
       _view_module_version: BifrostModel.view_module_version,
-      operation_history: [],
+      spec_history: [],
       output_variable: '',
       current_dataframe_index: 0,
       graph_spec: {},

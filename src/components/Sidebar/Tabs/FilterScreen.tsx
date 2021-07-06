@@ -20,7 +20,7 @@ const screenCss = (theme: any) => css`
 
   h1 {
     .encoding {
-      color: ${theme.color.primary};
+      color: ${theme.color.primary[0]};
     }
   }
 `;

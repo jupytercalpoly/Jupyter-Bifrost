@@ -1,6 +1,5 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import { ArrowLeft } from 'react-feather';
 import { VegaLite } from 'react-vega';
 import { useModelState, GraphData, GraphSpec } from '../hooks/bifrost-model';
 
@@ -25,9 +24,6 @@ export default function Graph(props: GraphProps) {
 
   return (
     <div>
-      <button className="wrapper" onClick={props.onBack}>
-        <ArrowLeft />
-      </button>
       <VegaLite spec={spec} data={data} signalListeners={signalListeners} />
     </div>
   );

@@ -32,7 +32,7 @@ class BifrostWidget(DOMWidget):
     _view_module_version = Unicode(module_version).tag(sync=True)
 
     df_history = list()
-    operation_history = List([]).tag(sync=True)
+    spec_history = List([]).tag(sync=True)
     current_dataframe_index = Int(0).tag(sync=True)
     query_spec = Dict({}).tag(sync=True)
     graph_spec = Dict({}).tag(sync=True)
@@ -67,10 +67,6 @@ class BifrostWidget(DOMWidget):
     def update_graph_from_cols(self, changes):
         # Vega spec is updated from the frontend. To track history, respond to these changes here.
         pass
-
-    @observe("current_dataframe_index")
-    def change_dataframe(self, changes):
-        df_index:int = changes["new"]
 
 
 

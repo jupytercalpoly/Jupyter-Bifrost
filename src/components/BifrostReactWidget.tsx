@@ -7,6 +7,7 @@ import { WidgetModel } from '@jupyter-widgets/base';
 import { BifrostModelContext } from '../hooks/bifrost-model';
 import React, { useState } from 'react';
 import ChartChooser from './Onboarding/ChartChooser';
+import NavBar from './NavBar';
 import ColumnScreen from './Onboarding/ColumnScreen';
 import { VisualizationSpec } from 'react-vega';
 import Graph from './Graph';
@@ -17,11 +18,12 @@ const bifrostWidgetCss = css`
   //===========================================================
   display: grid;
   grid-template-columns: 2fr 1fr;
-  grid-template-areas: 'graph sidebar';
+  grid-template-rows: auto 1fr;
+  grid-template-areas: 'nav sidebar' 'graph sidebar';
   max-width: calc(100% - 64px);
 `;
 
-const globalStyles = css`
+const globalStyles = (theme: any) => css`
   // Global styles for the widget
   //===========================================================
   * {
@@ -31,9 +33,24 @@ const globalStyles = css`
   button {
     cursor: pointer;
     transition: transform 0.4s;
+    background-color: ${theme.color.primary[0]};
+    color: white;
+    font-weight: 700;
+    padding: 10px 15px;
+    border-radius: 7px;
+    font-size: 16px;
+    border: none;
 
     &:active {
       transform: scale(0.95);
+    }
+
+    &.wrapper {
+      border: none;
+      background: transparent;
+      margin: 0;
+      padding: 0;
+      color: initial;
     }
   }
 
@@ -110,6 +127,9 @@ function VisualizationScreen({
 }) {
   return (
     <article className="BifrostWidget" css={bifrostWidgetCss}>
+      <GridArea area="nav">
+        <NavBar onBack={onPrevious} />
+      </GridArea>
       <GridArea area="graph">
         <Graph onBack={onPrevious} />
       </GridArea>
