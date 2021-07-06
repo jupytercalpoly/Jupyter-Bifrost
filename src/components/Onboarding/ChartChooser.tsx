@@ -8,6 +8,7 @@ import {
   GraphSpec,
 } from '../../hooks/bifrost-model';
 import NavHeader from './NavHeader';
+import theme from '../../theme';
 
 const suggestedChartCss = css`
   width: 100vw;

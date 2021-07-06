@@ -19,20 +19,20 @@ export default function Graph(props: GraphProps) {
 
   const data = useModelState<GraphData>('graph_data', (data) => ({ data }))[0];
 
-  let back_button: JSX.Element | null = null;
-  if (props.onBack) {
-    back_button = (
-      <button className="wrapper" onClick={props.onBack}>
-        <ArrowLeft />
-      </button>
-    );
-  }
+  // let back_button: JSX.Element | null = null;
+  // if (props.onBack) {
+  //   back_button = (
+  //     <button className="wrapper" onClick={props.onBack}>
+  //       <ArrowLeft />
+  //     </button>
+  //   );
+  // }
   // multiple signals can be added by adding a new field
   const signalListeners = { brush: handleBrush };
 
   return (
     <div>
-      {back_button}
+      {/* {back_button} */}
       <VegaLite spec={spec} data={data} signalListeners={signalListeners} />
     </div>
   );

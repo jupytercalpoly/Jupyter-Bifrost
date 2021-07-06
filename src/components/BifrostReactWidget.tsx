@@ -12,7 +12,7 @@ import {
   GraphData,
   QuerySpec,
 } from '../hooks/bifrost-model';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import ChartChooser from './Onboarding/ChartChooser';
 import NavBar from './NavBar';
 import ColumnScreen from './Onboarding/ColumnScreen';
@@ -89,6 +89,7 @@ export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
     <ThemeProvider theme={theme}>
       <BifrostModelContext.Provider value={props.model}>
         <OnBoardingWidget />
+        <Global styles={globalStyles} />
       </BifrostModelContext.Provider>
     </ThemeProvider>
   );

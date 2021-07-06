@@ -63,13 +63,13 @@ export default function NavHeader(props: HeaderProps) {
 }
 
 const nextButtonCss = (theme: any) => css`
-  padding: 10px;
+  padding: 0;
   background-color: ${theme.color.primary[0]};
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  width: 55px;
-  height: 55px;
+  height: 28px;
+  width: 28px;
   margin-left: 20px;
 `;
 

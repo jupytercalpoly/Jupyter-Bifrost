@@ -15,7 +15,7 @@ const graphNavCss = css`
 `;
 
 interface NavBarProps {
-  onBack(): void;
+  onBack?(): void;
 }
 
 export default function NavBar(props: NavBarProps) {
