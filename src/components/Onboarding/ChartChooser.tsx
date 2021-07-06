@@ -73,7 +73,7 @@ export default function ChartChooser(props: ChartChooserProps) {
         }
         break;
       case 'ArrowLeft':
-        if (selectedIndex != 0) {
+        if (selectedIndex !== 0) {
           setSelectedIndex(selectedIndex - 1);
         }
         break;

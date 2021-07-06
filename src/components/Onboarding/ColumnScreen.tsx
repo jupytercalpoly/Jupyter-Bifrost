@@ -101,7 +101,7 @@ export default function ColumnScreen(props: ColumnScreenProps) {
 
   useEffect(() => {
     searchRef.current?.focus();
-    if (results.length != 0) {
+    if (results.length !== 0) {
       setFocusedIdx(0);
     }
   }, [results]);
@@ -195,12 +195,12 @@ export default function ColumnScreen(props: ColumnScreenProps) {
         }
         break;
       case 'Backspace':
-        if (query.length == 0) {
+        if (query.length === 0) {
           e.preventDefault();
           e.stopPropagation();
 
           const tags = document.querySelectorAll('.column-tag');
-          if (tags.length != 0) {
+          if (tags.length !== 0) {
             const updatedSet = new Set(selectedColumns);
             const tagName = (
               tags[tags.length - 1].getElementsByTagName(
@@ -267,7 +267,7 @@ export default function ColumnScreen(props: ColumnScreenProps) {
             {results.map((col, i) => {
               return (
                 <label
-                  className={i == focusedIdx ? 'choice focused' : 'choice'}
+                  className={i === focusedIdx ? 'choice focused' : 'choice'}
                   key={col}
                 >
                   <input

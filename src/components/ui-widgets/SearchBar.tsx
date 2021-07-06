@@ -56,7 +56,7 @@ export default function SearchBar(props: SearchProps) {
       props.onResultsChange(props.choices);
     } else {
       const results = props.choices.filter((name) => {
-        return compScore(name) == undefined ? false : true;
+        return compScore(name) === undefined ? false : true;
       });
 
       // Ik the casting is bad but the filter above guarantees that these are numbers, so its valid practice.

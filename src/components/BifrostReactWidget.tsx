@@ -111,13 +111,13 @@ export function OnBoardingWidget() {
     : useState('columnChooser');
 
   let Screen: JSX.Element;
+  const preSelectedColumns = new Set<string>();
+
   switch (screenName) {
     case 'columnChooser':
-      const preSelectedColumns = new Set<string>();
-
       querySpec.spec.encodings.forEach((encoding: FieldQuery) => {
         if (
-          encoding.channel != '?' &&
+          encoding.channel !== '?' &&
           columnChoices.includes(encoding.field as string)
         ) {
           preSelectedColumns.add(encoding.field as string);
@@ -139,14 +139,14 @@ export function OnBoardingWidget() {
             setScreenName('visualize');
           }}
           onBack={
-            suggestedGraphs.length == 0
+            suggestedGraphs.length === 0
               ? undefined
               : () => setScreenName('columnChooser')
           }
         />
       );
 
-      if (suggestedGraphs.length == 0) {
+      if (suggestedGraphs.length === 0) {
         const opt = {};
 
         const schema = build(data, opt);
@@ -161,7 +161,7 @@ export function OnBoardingWidget() {
 
         const items = vlTree.items;
 
-        if (items.length != 0) {
+        if (items.length !== 0) {
           setSuggestedGraphs(items as SuggestedGraphs);
         }
       }
@@ -181,9 +181,11 @@ export function OnBoardingWidget() {
 function VisualizationScreen({ onPrevious }: { onPrevious?: () => void }) {
   return (
     <article className="BifrostWidget" css={bifrostWidgetCss}>
-      <GridArea area="nav">
-        <NavBar onBack={onPrevious} />
-      </GridArea>
+      {onPrevious ? (
+        <GridArea area="nav">
+          <NavBar onBack={onPrevious} />
+        </GridArea>
+      ) : null}
       <GridArea area="graph">
         {onPrevious ? <Graph onBack={onPrevious} /> : <Graph />}
       </GridArea>
