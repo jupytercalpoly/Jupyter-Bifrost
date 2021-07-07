@@ -43,7 +43,7 @@ export default class VegaPandasTranslator {
                     query = `($df['${filterConfig.field}'] >= ${filterConfig.gte}) & ($df['${filterConfig.field}'] <= ${filterConfig.lte})`
                     break;
                 case "oneOf":
-                    query = `($df['${filterConfig.field}'].isin([${filterConfig.oneOf.toString()}]))`
+                    query = `($df['${filterConfig.field}'].isin([${filterConfig.oneOf.map((str: string) => `"${str}"`).toString()}]))`
                     break;
             
                 default:
@@ -58,13 +58,13 @@ export default class VegaPandasTranslator {
         const encodingVals = Object.values(encodings)
         return encodingVals.filter(encoding => encoding.hasOwnProperty("aggregate")).map((encoding) => {
             const agg = vegaAggToPd[encoding.aggregate as VegaAggregation];
+            const otherEncodedFields = encodingVals.filter(otherEncoding => otherEncoding !== encoding).map(otherEncoding => `"${otherEncoding.field}"`)
+            const pandasGroupFields = `group_fields = [${otherEncodedFields.toString()}]`
             if (typeof agg === "string") {
-               return [`group_fields = $df.columns.to_list()`,
-                `group_fields.remove("${encoding.field}")`,
+               return [pandasGroupFields,
                 `$df = $df.join($df.groupby(group_fields).agg("${agg}")["${encoding.field}"], on=group_fields, rsuffix=" ${agg}")`].join("\n")
             } else {
-                return [`group_fields = $df.columns.to_list()`,
-                `group_fields.remove("${encoding.field}")`,
+                return [pandasGroupFields,
                 `$df = ${agg(encoding)}`].join("\n");
             }
         }).join("\n")
