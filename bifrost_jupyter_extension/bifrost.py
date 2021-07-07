@@ -142,6 +142,7 @@ class BifrostWidget(DOMWidget):
                     "params": [{"name": "brush", "select": "interval"}],
                     "data": {"name": "data"},
                     "encodings": encodings,
+                    "transform": [],
                     "chooseBy": "effectiveness"
                 }
 
@@ -174,6 +175,7 @@ class BifrostWidget(DOMWidget):
                 "params": [{"name": "brush", "select": "interval"}],
                 "data": {"name": "data"},
                 "encodings": encodings,
+                "transform": [],
                 "chooseBy": "effectiveness"
             }
 
