@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/react';
 import { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
-import CustomizationTab from './Tabs/CustomizationTab';
+import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
 import { useModelState, GraphSpec } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 
