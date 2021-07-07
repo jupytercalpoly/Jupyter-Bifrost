@@ -23,7 +23,10 @@ const suggestedChartCss = css`
 
   .graph-wrapper {
     padding: 10px;
-    /* margin: 0 10px; */
+    margin: 0 10px;
+    border: 3px solid transparent;
+    border-radius: 5px;
+    transition: border-color 0.5s;
     &.selected {
       border: 10px solid ${theme.color.primary[2]};
     }
