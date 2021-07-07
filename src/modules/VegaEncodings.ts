@@ -101,9 +101,32 @@ export const vegaParamPredicatesList = [
   'valid',
 ] as const;
 
+export const vegaChartList = [
+  'arc',
+  'area',
+  'bar',
+  'box plot',
+  'circle',
+  'error band',
+  'error bar',
+  'geoshape',
+  'image',
+  'line',
+  'point',
+  'rect',
+  'rule',
+  'square',
+  'text',
+  'tick',
+  'trail',
+];
+
 export type VegaColumnType = typeof vegaColTypesList[number];
 
 export type VegaEncoding = typeof vegaEncodingList[number];
 
 export type VegaAggregation = typeof vegaAggregationList[number];
+
 export type VegaParamPredicate = typeof vegaParamPredicatesList[number];
+
+export type VegaChart = typeof vegaChartList[number];
