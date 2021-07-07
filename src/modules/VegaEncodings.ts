@@ -64,30 +64,35 @@ const vegaColTypesList = [
   'geojson',
 ] as const;
 
+// 
 export const vegaAggregationList = [
-  'count',
-  'valid',
-  'values',
-  'missing',
-  'distinct',
-  'sum',
-  'product',
-  'mean',
-  'variance',
-  'variancep',
-  'stdev',
-  'stdevp',
-  'stderr',
-  'median',
-  'q1',
-  'q3',
-  'ci0',
-  'ci1',
-  'min',
-  'max',
-  'argmin',
-  'argmax',
+// "argmax",
+// "argmin",
+// "ci0",
+// "ci1",
+"count",
+"distinct",
+"max",
+"mean",
+"median",
+"min",
+ "missing",
+ "product",
+//  "q1",
+//  "q3",
+ "stderr",
+ "stdev",
+ "stdevp",
+ "sum",
+ "valid",
+ "values",
+ "variance",
+ "variancep"
+
 ] as const;
+
+
+
 
 export const vegaParamPredicatesList = ["equal", "lt", "lte", "gt", "gte", "range", "oneOf", "valid"] as const;
 

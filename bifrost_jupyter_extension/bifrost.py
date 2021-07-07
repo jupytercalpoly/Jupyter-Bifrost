@@ -6,7 +6,7 @@
 import pandas as pd
 import random, typing
 
-from traitlets.traitlets import validate, observe
+from traitlets.traitlets import observe
 
 """
 TODO: Add module docstring

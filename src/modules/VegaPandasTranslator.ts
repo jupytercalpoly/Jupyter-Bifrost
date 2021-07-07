@@ -1,41 +1,28 @@
 
 import { vegaParamPredicatesList, VegaParamPredicate, VegaAggregation } from "./VegaEncodings";
-import { GraphSpec } from "../hooks/bifrost-model";
+import { GraphSpec, EncodingInfo } from "../hooks/bifrost-model";
 
-
-
-const DF = "$df"
 const filterTypes = new Set<string>(vegaParamPredicatesList)
 
 interface AggFunc {
-    (encoding: any, encodings: any[]): string
+    (encoding: EncodingInfo): string
 }
 const vegaAggToPd: {[vegaAgg: string]: string | AggFunc} = {
     'count': "count",
-  'valid': (encoding , encodings) => "TODO: Not implemented",
-  'values': (encoding , encodings) => "TODO: Not implemented",
-  // Look at this one again...
-  'missing': (encoding , encodings) => `$df = $df[pd.isnull($df["${encoding.field}]")]`,
-  // Not sure if we should groupby on this one.
-  'distinct': (encoding , encodings) => [`cols = $df.columns.to_list()`,
-  `$df = $df.drop_duplicates([${encodings.map(encoding => `${encoding.field}`)}])`].join("\n"),
+  'valid': (encoding) => `$df.join($df.dropna().groupby(group_fields).count()["${encoding.field}"], on=group_fields, rsuffix=" valid count")`,
+  'missing': (encoding) => `$df.join($df.groupby(group_fields)["${encoding.field}"].apply(lambda x: x.isnull().sum()), on=group_fields, rsuffix=" missing")`,
+  'distinct': (encoding) => `$df.join($df.dropna().groupby(group_fields).unique()["${encoding.field}"], on=group_fields, rsuffix=" distinct")`,
   'sum': "sum",
   'product': "prod",
   'mean': "mean",
   'variance' : 'var',
-  'variancep': (encoding , encodings) => "TODO: Not implemented",
+  'variancep': (encoding) => `$df.join($df.groupby(group_fields).var(ddof=0)["${encoding.field}"], on=group_fields, rsuffix=" population variance")`,
   'stdev': "std",
-  'stdevp': (encoding , encodings) => "TODO: Not implemented",
-  'stderr': (encoding , encodings) => "TODO: Not implemented",
+  'stdevp': (encoding) => `$df.join($df.groupby(group_fields).std(ddof=0)["${encoding.field}"], on=group_fields, rsuffix=" population std")`,
+  'stderr': (encoding) => `$df.join($df.groupby(group_fields).sem()["${encoding.field}"], on=group_fields, rsuffix=" stderr")`,
   'median': "median",
-  'q1': (encoding , encodings) => "TODO: Not implemented",
-  'q3': (encoding , encodings) => "TODO: Not implemented",
-  'ci0': (encoding , encodings) => "TODO: Not implemented",
-  'ci1': (encoding , encodings) => "TODO: Not implemented",
   'min': "min",
   'max': "max",
-  'argmin': (encoding , encodings) => "TODO: Not implemented",
-  'argmax': (encoding , encodings) => "TODO: Not implemented",
 }
 
 
@@ -46,17 +33,17 @@ export default class VegaPandasTranslator {
             let query: string;
             switch (filterType as VegaParamPredicate) {
                 case "gte":
-                    query = `(${DF}['${filterConfig.field}'] >= ${filterConfig.gte})`
+                    query = `($df['${filterConfig.field}'] >= ${filterConfig.gte})`
                     break;
                 case "lte":
-                    query = `(${DF}['${filterConfig.field}'] <= ${filterConfig.lte})`
+                    query = `($df['${filterConfig.field}'] <= ${filterConfig.lte})`
                     break;
                 case "range":
-                    // Expects number range like {range: [0, 5]}
-                    query = `(${DF}['${filterConfig.field}'] >= ${filterConfig.gte}) & (${DF}['${filterConfig.field}'] <= ${filterConfig.lte})`
+                    // Expects number range like {range: [0, 5]}.
+                    query = `($df['${filterConfig.field}'] >= ${filterConfig.gte}) & ($df['${filterConfig.field}'] <= ${filterConfig.lte})`
                     break;
                 case "oneOf":
-                    query = `(${DF}['${filterConfig.field}'].isin([${filterConfig.oneOf.toString()}]))`
+                    query = `($df['${filterConfig.field}'].isin([${filterConfig.oneOf.toString()}]))`
                     break;
             
                 default:
@@ -70,17 +57,16 @@ export default class VegaPandasTranslator {
     private getAggregations(encodings: GraphSpec["encoding"]) {
         const encodingVals = Object.values(encodings)
         return encodingVals.filter(encoding => encoding.hasOwnProperty("aggregate")).map((encoding) => {
-            let query: string;
             const agg = vegaAggToPd[encoding.aggregate as VegaAggregation];
             if (typeof agg === "string") {
-                query = 
-                [`group_fields = $df.columns.to_list()`,
+               return [`group_fields = $df.columns.to_list()`,
                 `group_fields.remove("${encoding.field}")`,
                 `$df = $df.join($df.groupby(group_fields).agg("${agg}")["${encoding.field}"], on=group_fields, rsuffix=" ${agg}")`].join("\n")
             } else {
-                query = agg(encoding, encodingVals);
+                return [`group_fields = $df.columns.to_list()`,
+                `group_fields.remove("${encoding.field}")`,
+                `$df = ${agg(encoding)}`].join("\n");
             }
-            return query;
         }).join("\n")
     }
         
