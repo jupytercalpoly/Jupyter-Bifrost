@@ -20,6 +20,13 @@ const variableTabCss = css`
   .encoding-choices {
     margin: 0;
     padding: 0;
+
+    .encoding-wrapper {
+      display: flex;
+      b {
+        margin-right: 5px;
+      }
+    }
   }
 
   .encoding-choices {
@@ -116,7 +123,11 @@ export default function VariablesTab() {
         >
           <XCircle size={20} />
         </button>
-        <b>{encoding}:</b> <span>{col.field}</span>
+        <div className="encoding-wrapper">
+          <b>{encoding}:</b>
+          <span>{col.field}</span>
+        </div>
+
         <button
           className="wrapper"
           onClick={() => openFilters(encoding as VegaEncoding)}

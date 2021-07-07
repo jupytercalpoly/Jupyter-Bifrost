@@ -89,8 +89,12 @@ export const vegaAggregationList = [
   'argmax',
 ] as const;
 
+export const vegaParamPredicatesList = ["equal", "lt", "lte", "gt", "gte", "range", "oneOf", "valid"] as const;
+
 export type VegaColumnType = typeof vegaColTypesList[number];
 
 export type VegaEncoding = typeof vegaEncodingList[number];
 
 export type VegaAggregation = typeof vegaAggregationList[number];
+export type VegaParamPredicate = typeof vegaParamPredicatesList[number];
+
