@@ -1,8 +1,8 @@
 import React from 'react';
-import { ScreenProps } from './Screen';
+import { OnboardingScreenProps } from './OnboardingScreen';
 import NavHeader from './NavHeader';
 
-export default function EncodingScreen(props: ScreenProps) {
+export default function EncodingScreen(props: OnboardingScreenProps) {
   return (
     <article className="EncodingScreen">
       <NavHeader

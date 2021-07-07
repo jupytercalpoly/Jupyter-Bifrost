@@ -4,7 +4,8 @@ import { jsx, css } from '@emotion/react';
 import React, { useState, useRef } from 'react';
 import NavHeader from './NavHeader';
 import SearchBar from '../ui-widgets/SearchBar';
-import Tag from '../ui-widgets/Tag';
+// import Tag from '../ui-widgets/Tag';
+import Pill from '../ui-widgets/Pill';
 
 import {
   QuerySpec,
@@ -32,8 +33,7 @@ const columnScreenCss = css`
     width: fit-content;
 
     &.focused {
-      border: 1px solid black;
-      background-color: grey;
+      background-color: #dedede;
     }
   }
 
@@ -72,6 +72,30 @@ const columnScreenCss = css`
     padding: 0px;
     display: flex;
     flex-wrap: wrap;
+  }
+
+  .tag-content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    /* height: 23px;
+    width: fit-content; */
+    white-space: nowrap;
+    overflow: hidden;
+    align-items: center;
+  }
+
+  .tag-content-wrapper button {
+    border: none;
+    width: 15px;
+    background-color: #dedede;
+    color: var(--jp-widgets-color);
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0px;
+  }
+
+  .tag-content-wrapper button:hover {
+    background-color: #eee;
   }
 `;
 
@@ -199,7 +223,7 @@ export default function ColumnScreen(props: ColumnScreenProps) {
           e.preventDefault();
           e.stopPropagation();
 
-          const tags = document.querySelectorAll('.column-tag');
+          const tags = document.querySelectorAll('.content-wrapper');
           if (tags.length !== 0) {
             const updatedSet = new Set(selectedColumns);
             const tagName = (
@@ -286,13 +310,13 @@ export default function ColumnScreen(props: ColumnScreenProps) {
       </section>
       <section
         className="column-tags-wrapper"
-        style={{ marginTop: '36px', width: '400px' }}
+        style={{ marginTop: '42px', width: '400px' }}
       >
         <ul className="column-tags">
           {Array.from(selectedColumns).map((column: string) => {
             return (
-              <Tag key={`tag_${column}`}>
-                <div className="tag-wrapper">
+              <Pill key={`tag_${column}`}>
+                <div className="tag-content-wrapper">
                   <span style={{ padding: '0px 5px' }}>{column}</span>
                   <button
                     className={`tagButton_${column}`}
@@ -301,7 +325,7 @@ export default function ColumnScreen(props: ColumnScreenProps) {
                     <X size={10} />
                   </button>
                 </div>
-              </Tag>
+              </Pill>
             );
           })}
         </ul>
