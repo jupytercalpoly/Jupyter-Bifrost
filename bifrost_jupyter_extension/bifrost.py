@@ -5,6 +5,9 @@
 # Distributed under the terms of the Modified BSD License.
 import pandas as pd
 import random, typing
+from importlib import import_module
+bifrost_tracing = import_module("..", "jupyter-bifrost-tracing.bifrost_tracing.bifrost_tracing.")
+df_watcher = bifrost_tracing.Watcher
 
 from traitlets.traitlets import observe
 
