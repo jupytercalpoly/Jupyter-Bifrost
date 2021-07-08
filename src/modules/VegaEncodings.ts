@@ -105,21 +105,30 @@ export const vegaChartList = [
   'arc',
   'area',
   'bar',
-  'box plot',
+  'boxplot',
   'circle',
-  'error band',
-  'error bar',
-  'geoshape',
-  'image',
+  'errorband',
+  'errorbar',
+  // 'geoshape',
+  // 'image',
   'line',
   'point',
   'rect',
-  'rule',
+  // 'rule',
   'square',
-  'text',
+  // 'text',
   'tick',
   'trail',
 ];
+
+export const vegaCategoricalChartList = [
+  'arc',
+  'bar',
+  'box',
+  'errorband',
+  'errorbar',
+];
+export const vegaQuantitativeChartList = ['area'];
 
 export type VegaColumnType = typeof vegaColTypesList[number];
 
