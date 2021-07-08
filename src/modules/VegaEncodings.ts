@@ -64,29 +64,41 @@ const vegaColTypesList = [
   'geojson',
 ] as const;
 
+//
 export const vegaAggregationList = [
+  // "argmax",
+  // "argmin",
+  // "ci0",
+  // "ci1",
   'count',
-  'valid',
-  'values',
-  'missing',
   'distinct',
-  'sum',
-  'product',
+  'max',
   'mean',
-  'variance',
-  'variancep',
+  'median',
+  'min',
+  'missing',
+  'product',
+  //  "q1",
+  //  "q3",
+  'stderr',
   'stdev',
   'stdevp',
-  'stderr',
-  'median',
-  'q1',
-  'q3',
-  'ci0',
-  'ci1',
-  'min',
-  'max',
-  'argmin',
-  'argmax',
+  'sum',
+  'valid',
+  'values',
+  'variance',
+  'variancep',
+] as const;
+
+export const vegaParamPredicatesList = [
+  'equal',
+  'lt',
+  'lte',
+  'gt',
+  'gte',
+  'range',
+  'oneOf',
+  'valid',
 ] as const;
 
 export type VegaColumnType = typeof vegaColTypesList[number];
@@ -94,3 +106,4 @@ export type VegaColumnType = typeof vegaColTypesList[number];
 export type VegaEncoding = typeof vegaEncodingList[number];
 
 export type VegaAggregation = typeof vegaAggregationList[number];
+export type VegaParamPredicate = typeof vegaParamPredicatesList[number];

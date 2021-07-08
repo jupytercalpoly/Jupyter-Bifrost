@@ -112,7 +112,9 @@ export default function ColumnScreen(props: ColumnScreenProps) {
   const data = useModelState<GraphData>('graph_data')[0];
   const setSuggestedGraphs =
     useModelState<SuggestedGraphs>('suggested_graphs')[1];
-  const [results, setResults] = useState(columnChoices);
+  const [results, setResults] = useState(
+    columnChoices.map((choice, index) => ({ choice, index }))
+  );
   const optionsRef = useRef<HTMLFieldSetElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -144,7 +146,6 @@ export default function ColumnScreen(props: ColumnScreenProps) {
       });
     }
 
-    console.log({ filteredSpecs });
     const items = filteredSpecs
       .map((spec) => recommend(spec, schema, opt).result)
       .map((res) =>
@@ -288,7 +289,7 @@ export default function ColumnScreen(props: ColumnScreenProps) {
         </NavHeader>
         <form onSubmit={(e) => e.preventDefault()}>
           <fieldset ref={optionsRef}>
-            {results.map((col, i) => {
+            {results.map(({ choice: col }, i) => {
               return (
                 <label
                   className={i === focusedIdx ? 'choice focused' : 'choice'}

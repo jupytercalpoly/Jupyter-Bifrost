@@ -6,7 +6,7 @@
 import pandas as pd
 import random, typing
 
-from traitlets.traitlets import validate, observe
+from traitlets.traitlets import observe
 
 """
 TODO: Add module docstring
@@ -39,7 +39,7 @@ class BifrostWidget(DOMWidget):
     flags = Dict({}).tag(sync=True)
     graph_data = List([]).tag(sync=True)
     graph_encodings = Dict({}).tag(sync=True)
-    df_variable_name:str = "" 
+    df_variable_name:str = Unicode("").tag(sync=True)
     output_variable: str = ""
     generate_random_dist = Int(0).tag(sync=True)
     df_columns = List([]).tag(sync=True)

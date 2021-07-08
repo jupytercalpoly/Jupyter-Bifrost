@@ -39,6 +39,7 @@ export class BifrostModel extends DOMWidgetModel {
       graph_data: [],
       suggested_graphs: [],
       flags: {},
+      df_variable_name: '',
     };
   }
 
