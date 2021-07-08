@@ -24,6 +24,10 @@ const historyCss = (theme: any) => css`
         border-left: 3px solid ${theme.color.primary[1]};
         font-weight: 700;
       }
+
+      &.temporary {
+        color: gray;
+      }
     }
   }
 `;
@@ -95,16 +99,22 @@ export default function HistoryTab() {
       />
       <ul className="history-list">
         {searchResults.map(({ choice, index }, elIndex) => {
+          const classes = [
+            ['history-el', true],
+            ['active', index === invertHistIndex(dfIndex)],
+            ['temporary', index === 0],
+          ]
+            .filter((pair) => pair[1])
+            .map((pair) => pair[0])
+            .join(' ');
+
           return (
             <li
-              className={
-                'history-el' +
-                (index === invertHistIndex(dfIndex) ? ' active' : '')
-              }
+              className={classes}
               key={index}
               onClick={() => setHistoryPosition(index)}
             >
-              {choice}
+              {(index === 0 ? '(Unsaved) ' : '') + choice}
             </li>
           );
         })}
