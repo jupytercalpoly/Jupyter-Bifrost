@@ -74,11 +74,25 @@ export default function ChartChooser(props: ChartChooserProps) {
         if (selectedIndex < suggestedGraphs.length - 1) {
           setSelectedIndex(selectedIndex + 1);
         }
+        chartChooserRef.current
+          ?.querySelector('.graph-wrapper.selected')
+          ?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'start',
+          });
         break;
       case 'ArrowLeft':
         if (selectedIndex !== 0) {
           setSelectedIndex(selectedIndex - 1);
         }
+        chartChooserRef.current
+          ?.querySelector('.graph-wrapper.selected')
+          ?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'end',
+          });
         break;
     }
   }
