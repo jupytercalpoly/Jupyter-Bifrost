@@ -1,6 +1,6 @@
 /**@jsx jsx */
 import { css, jsx } from '@emotion/react';
-import { ScreenProps } from './Screen';
+import { OnboardingScreenProps } from './OnboardingScreen';
 import NavHeader from './NavHeader';
 import { useState } from 'react';
 
@@ -42,7 +42,7 @@ const markScreenCss = css`
   }
 `;
 
-export default function MarkScreen(props: ScreenProps) {
+export default function MarkScreen(props: OnboardingScreenProps) {
   const [selectedMark, setSelectedMark] = useState('');
   return (
     <article className="MarkScreen" css={markScreenCss}>

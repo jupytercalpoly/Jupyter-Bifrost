@@ -3,10 +3,7 @@ import { jsx } from '@emotion/react';
 import { VegaLite } from 'react-vega';
 import { useModelState, GraphData, GraphSpec } from '../hooks/bifrost-model';
 
-interface GraphProps {
-  onBack: () => void;
-}
-export default function Graph(props: GraphProps) {
+export default function Graph() {
   const [selectedData, setSelectedData] = useModelState<any[]>('selected_data');
   const spec = useModelState<GraphSpec>('graph_spec')[0];
 

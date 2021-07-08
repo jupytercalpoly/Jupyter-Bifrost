@@ -4,7 +4,7 @@ export enum OnboardingScreenName {
   Encoding,
 }
 
-export interface ScreenProps {
+export interface OnboardingScreenProps {
   onNext: () => void;
   onBack?: () => void;
 }

@@ -1,27 +1,16 @@
 /** @jsx jsx */
 import { jsx, css, ThemeProvider, Global } from '@emotion/react';
 
-// import Graph from './Graph';
-import Sidebar from './Sidebar/Sidebar';
+import { useState } from 'react';
 import { WidgetModel } from '@jupyter-widgets/base';
-import { BifrostModelContext } from '../hooks/bifrost-model';
-import React, { useState } from 'react';
-import ChartChooser from './Onboarding/ChartChooser';
-import NavBar from './NavBar';
-import ColumnScreen from './Onboarding/ColumnScreen';
-import { VisualizationSpec } from 'react-vega';
-import Graph from './Graph';
+import {
+  useModelState,
+  Flags,
+  BifrostModelContext,
+} from '../hooks/bifrost-model';
 import theme from '../theme';
-
-const bifrostWidgetCss = css`
-  // Element-based styles
-  //===========================================================
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: auto 1fr;
-  grid-template-areas: 'nav sidebar' 'graph sidebar';
-  max-width: calc(100% - 64px);
-`;
+import OnboardingWidget from './Onboarding/OnboardingWidget';
+import VisualizationScreen from './VisualizationScreen';
 
 const globalStyles = (theme: any) => css`
   // Global styles for the widget
@@ -50,6 +39,7 @@ const globalStyles = (theme: any) => css`
       background: transparent;
       margin: 0;
       padding: 0;
+      margin-right: 15px;
       color: initial;
     }
   }
@@ -72,83 +62,39 @@ interface BifrostReactWidgetProps {
 }
 
 export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
-  const [screenName, setScreenName] = useState('columnChooser');
-  const [selectedSpec, setSelectedSpec] = useState<VisualizationSpec>({});
-  let Screen: JSX.Element;
-  switch (screenName) {
-    case 'columnChooser':
-      Screen = <ColumnScreen onNext={() => setScreenName('chartChooser')} />;
-      break;
-    case 'chartChooser':
-      Screen = (
-        <ChartChooser
-          onChartSelected={(data) => {
-            setSelectedSpec(data);
-            setScreenName('visualize');
-          }}
-          onBack={() => setScreenName('columnChooser')}
-        />
-      );
-      break;
-    case 'visualize':
-      Screen = (
-        <VisualizationScreen
-          spec={selectedSpec}
-          onPrevious={() => setScreenName('chartChooser')}
-        />
-      );
-      break;
-
-    default:
-      Screen = (
-        <VisualizationScreen
-          spec={selectedSpec}
-          onPrevious={() => setScreenName('chartChooser')}
-        />
-      );
-      break;
-  }
   return (
     <ThemeProvider theme={theme}>
       <BifrostModelContext.Provider value={props.model}>
-        {Screen}
         <Global styles={globalStyles} />
+        <BifrostReactWidgetDisplay />
       </BifrostModelContext.Provider>
     </ThemeProvider>
   );
 }
 
-function VisualizationScreen({
-  spec,
-  onPrevious,
-}: {
-  spec: VisualizationSpec;
-  onPrevious: () => void;
-}) {
+function BifrostReactWidgetDisplay() {
+  const flags = useModelState<Flags>('flags')[0];
+
+  const [screenName, setScreenName] = useState<string>(
+    !flags['columns_provided']
+      ? 'columnChooser'
+      : !flags['kind_provided']
+      ? 'chartChooser'
+      : 'straight_visualize'
+  );
   return (
-    <article className="BifrostWidget" css={bifrostWidgetCss}>
-      <GridArea area="nav">
-        <NavBar onBack={onPrevious} />
-      </GridArea>
-      <GridArea area="graph">
-        <Graph onBack={onPrevious} />
-      </GridArea>
-      <GridArea area="sidebar">
-        <Sidebar />
-      </GridArea>
-    </article>
+    <div
+      className="bifrost-widget-display"
+      style={{ width: 'calc(100vw - 200px)' }}
+    >
+      {screenName === 'straight_visualize' ? (
+        <VisualizationScreen />
+      ) : (
+        <OnboardingWidget
+          screenName={screenName}
+          setScreenName={setScreenName}
+        />
+      )}
+    </div>
   );
 }
-
-interface GridAreaProps {
-  area: string;
-  children?: any;
-}
-
-const GridArea = React.forwardRef<HTMLDivElement, GridAreaProps>(
-  (props, ref) => (
-    <div style={{ gridArea: props.area }} ref={ref}>
-      {props.children}
-    </div>
-  )
-);

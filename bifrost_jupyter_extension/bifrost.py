@@ -13,7 +13,7 @@ TODO: Add module docstring
 """
 import numpy as np
 from ipywidgets import DOMWidget, register
-from traitlets import Unicode, List, Int, Dict
+from traitlets import Unicode, List, Int, Dict, Bool
 from ._frontend import module_name, module_version
 from IPython.core.display import JSON, display
 import json
@@ -36,6 +36,7 @@ class BifrostWidget(DOMWidget):
     current_dataframe_index = Int(0).tag(sync=True)
     query_spec = Dict({}).tag(sync=True)
     graph_spec = Dict({}).tag(sync=True)
+    flags = Dict({}).tag(sync=True)
     graph_data = List([]).tag(sync=True)
     graph_encodings = Dict({}).tag(sync=True)
     df_variable_name:str = "" 
@@ -46,28 +47,23 @@ class BifrostWidget(DOMWidget):
     selected_mark = Unicode("").tag(sync=True)
     selected_data = List([]).tag(sync=True)
     suggested_graphs = List([]).tag(sync=True)
-    
 
-    def __init__(self, df:pd.DataFrame, kind="line", x=None, y=None, **kwargs):
+    def __init__(self, df:pd.DataFrame, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)
         self.df_history.append(df)
-
-        if not x:
-            x = df.columns[0]
-        if not y:
-            y = df.columns[1]
         self.set_trait("df_columns", list(df.columns))
         self.set_trait("selected_data", [])
-        graph_info = self.create_graph_data(self.df_history[-1], kind, x=x,y=y)
-        self.set_trait("query_spec", graph_info["spec"])
+        graph_info = self.create_graph_data(self.df_history[-1], kind=kind, x=x, y=y, color=color)
+        self.set_trait("query_spec", graph_info["query_spec"])
         self.set_trait("graph_data", graph_info["data"])
+        self.set_trait("graph_spec", graph_info["graph_spec"])
+        self.set_trait("flags", graph_info["flags"])
         
 
     @observe("graph_spec")
     def update_graph_from_cols(self, changes):
         # Vega spec is updated from the frontend. To track history, respond to these changes here.
         pass
-
 
 
     @observe("generate_random_dist")
@@ -81,10 +77,6 @@ class BifrostWidget(DOMWidget):
         self.set_trait("df_columns", list(df.columns))
         self.set_trait("graph_spec", graph_info["spec"])
         self.set_trait("graph_data", graph_info["data"])
-        # self.set_trait("df_prop", list(df.columns))
-
-
-        
 
     def create_graph_data(self, df: pd.DataFrame, kind: str = None, x:str=None, y:str=None, color:str=None) -> dict:
         """
@@ -95,45 +87,105 @@ class BifrostWidget(DOMWidget):
             "temporal": ["datetime", "timedelta[ns]"],
             "nominal": ["object", "category", "bool"]
         } # TODO add more  
-        if not x:
-            x = df.columns[0]
-
-        if not y:
-            y = df.columns[1]
 
         def map_to_graph_type(dtype: str) -> str:
-                    for graph_type, dtypes in graph_types.items():
-                        if dtype in dtypes:
-                            return graph_type
-                    return "nominal"
-        df_filter = [col for col in [x,y, color] if col]
-        graph_df = df[df_filter]
+            for graph_type, dtypes in graph_types.items():
+                if dtype in dtypes:
+                    return graph_type
+            return "nominal"
 
         data = json.loads(df.to_json(orient="records"))
-        # types = graph_df.dtypes
-        types = df.dtypes
         
-        
-        
-        types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
+        columns_provided = (x != None) and (y != None)
+        kind_provided = kind != None
 
-        query_spec = {
-            "width": 400,
-            "height": 200,
-            "mark": "?",
-            "params": [{"name": "brush", "select": "interval"}],
-            "signals": [{'name': 'tooltip'}],
-            "data": {"name": "data"},
-            "encodings": [
-                {"field": col, "type": types[col], "channel" : "?"} for col in df.columns
-            ],
-            "transform": [],
-            "chooseBy": "effectiveness"
-        }
+        graph_spec = {}
+        query_spec = {}
+
+        if columns_provided:
+            df_filter = [col for col in [x, y, color] if col]
+            graph_df = df[df_filter]
+            types = graph_df.dtypes
+            types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
+
+            if kind_provided:
+                graph_spec = {
+                    "config":{
+                        "mark": {"tooltip": True}
+                    },
+                    "width": 400,
+                    "height": 200,
+                    "mark": kind,
+                    "params": [{"name": "brush", "select": "interval"}],
+                    "data": {"name": "data"},
+                    "encoding": {
+                        encoding : {"field": col, "type": types[col]} for encoding, col in zip(["x", "y", "color"], df_filter)
+                    }
+                }
+
+                query_spec = {
+                    "config":{
+                        "mark": {"tooltip": True}
+                    },
+                    "width": 400,
+                    "height": 200,
+                    "mark": kind,
+                    "params": [{"name": "brush", "select": "interval"}],
+                    "data": {"name": "data"},
+                    "encodings": [{"field": col, "type": types[col], "channel": encoding } for encoding, col in zip(["x", "y", "color"], df_filter)],
+                    "transform": [],
+                    "chooseBy": "effectiveness"
+                }
+
+            else:
+                encodings = []
+                if x in graph_df.columns:
+                    encodings.append({"field": x, "type": types[x], "channel" : "x"})
+
+                if y in graph_df.columns:
+                    encodings.append({"field": y, "type": types[y], "channel" : "y"})
+
+                if color in graph_df.columns:
+                    encodings.append({"field": color, "type": types[color], "channel" : "color"})
+
+                query_spec = {
+                    "config":{
+                        "mark": {"tooltip": True}
+                    },
+                    "width": 400,
+                    "height": 200,
+                    "mark": "?",
+                    "params": [{"name": "brush", "select": "interval"}],
+                    "data": {"name": "data"},
+                    "encodings": encodings,
+                    "transform": [],
+                    "chooseBy": "effectiveness"
+                }
+
+        else:
+            types = df.dtypes
+            types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
+
+            if not kind_provided:
+                kind = '?'
+                
+            query_spec = {
+                "config":{
+                    "mark": {"tooltip": True}
+                },
+                "width": 400,
+                "height": 200,
+                "mark": kind,
+                "params": [{"name": "brush", "select": "interval"}],
+                "data": {"name": "data"},
+                "encodings": [{"field": col, "type": types[col], "channel" : "?"} for col in df.columns],
+                "transform": [],
+                "chooseBy": "effectiveness"
+            }
 
         # TODO: Figure out aggregation etc.
 
-        return {"data": data, "spec" :{"spec": query_spec}}
+        return {"data": data, "query_spec" :{"spec": query_spec}, "graph_spec": graph_spec, "flags": {"columns_provided": columns_provided, "kind_provided": kind_provided }}
 
 
 

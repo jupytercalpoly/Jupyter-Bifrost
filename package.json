@@ -54,7 +54,7 @@
     "watch:lib": "tsc -w",
     "watch:nbextension": "webpack --watch --mode=development",
     "watch:labextension": "jupyter labextension watch .",
-    "prepare": "husky install"
+    "prepare": "jlpm run clean && jlpm run build:prod"
   },
   "dependencies": {
     "@emotion/react": "^11.4.0",
@@ -81,6 +81,7 @@
     "@phosphor/widgets": "^1.6.0",
     "@types/jest": "^26.0.0",
     "@types/react": "^17.0.11",
+    "@types/react-tag-input": "^6.1.2",
     "@types/webpack-env": "^1.13.6",
     "@typescript-eslint/eslint-plugin": "^3.6.0",
     "@typescript-eslint/parser": "^3.6.0",
@@ -120,10 +121,9 @@
     ]
   },
   "lint-staged": {
-    "src/*.{js,jsx,ts,tsx}": [
+    "src/**/*.{js,jsx,ts,tsx}": [
       "eslint --cache --fix"
-    ],
-    "src/*.js": "eslint --cache --fix"
+    ]
   },
   "jupyterlab": {
     "extension": "lib/plugin",

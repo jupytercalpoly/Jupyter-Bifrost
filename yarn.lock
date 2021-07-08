@@ -2125,6 +2125,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-tag-input@^6.1.2":
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@types/react-tag-input/-/react-tag-input-6.1.2.tgz#5aea6abba6ad258ae0bdeed431e093f8ebda8991"
+  integrity sha512-XKKC9wftmjWiAsZ0GxDItyDbisfCqQZMGeoreg4axNTdTWWZ+BzO7eDv+Jua68d6noOqO/dM0/MsTA7LPCj58g==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react@*", "@types/react@^17.0.0", "@types/react@^17.0.11":
   version "17.0.11"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.11.tgz#67fcd0ddbf5a0b083a0f94e926c7d63f3b836451"

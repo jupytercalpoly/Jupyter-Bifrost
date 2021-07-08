@@ -6,8 +6,10 @@ import { ArrowLeft, ArrowRight } from 'react-feather';
 const headerCss = css`
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   padding: 20px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+  padding-bottom: 5px;
+  /* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); */
   background: white;
 
   .app-title {
@@ -18,7 +20,10 @@ const headerCss = css`
   }
 
   .section-title {
-    font-weight: 800;
+    font-weight: bold;
+    font-size: 28px;
+    font-style: normal;
+    margin: 0px;
   }
 
   .title-wrapper {
@@ -58,20 +63,20 @@ export default function NavHeader(props: HeaderProps) {
 }
 
 const nextButtonCss = (theme: any) => css`
-  padding: 10px;
+  padding: 0;
   background-color: ${theme.color.primary[0]};
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  width: 55px;
-  height: 55px;
+  height: 28px;
+  width: 28px;
   margin-left: 20px;
 `;
 
 function NextButton(props: { onClick: () => void }) {
   return (
     <button onClick={props.onClick} css={nextButtonCss}>
-      <ArrowRight size={35} color="white" />
+      <ArrowRight size={20} color="white" strokeWidth="4" />
     </button>
   );
 }
