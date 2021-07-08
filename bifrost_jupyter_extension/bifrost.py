@@ -103,7 +103,7 @@ class BifrostWidget(DOMWidget):
         query_spec = {}
 
         if columns_provided:
-            df_filter = [col for col in [x,y, color] if col]
+            df_filter = [col for col in [x, y, color] if col]
             graph_df = df[df_filter]
             types = graph_df.dtypes
             types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
@@ -122,15 +122,31 @@ class BifrostWidget(DOMWidget):
                         encoding : {"field": col, "type": types[col]} for encoding, col in zip(["x", "y", "color"], df_filter)
                     }
                 }
+
+                query_spec = {
+                    "config":{
+                        "mark": {"tooltip": True}
+                    },
+                    "width": 400,
+                    "height": 200,
+                    "mark": kind,
+                    "params": [{"name": "brush", "select": "interval"}],
+                    "data": {"name": "data"},
+                    "encodings": [{"field": col, "type": types[col], "channel": encoding } for encoding, col in zip(["x", "y", "color"], df_filter)],
+                    "transform": [],
+                    "chooseBy": "effectiveness"
+                }
+
             else:
                 encodings = []
-                for col in graph_df.columns:
-                    if col == x:
-                        encodings.append({"field": col, "type": types[col], "channel" : "x"})
-                    elif col == y:
-                        encodings.append({"field": col, "type": types[col], "channel" : "y"})
-                    elif col == color:
-                        encodings.append({"field": col, "type": types[col], "channel" : "color"})
+                if x in graph_df.columns:
+                    encodings.append({"field": x, "type": types[x], "channel" : "x"})
+
+                if y in graph_df.columns:
+                    encodings.append({"field": y, "type": types[y], "channel" : "y"})
+
+                if color in graph_df.columns:
+                    encodings.append({"field": color, "type": types[color], "channel" : "color"})
 
                 query_spec = {
                     "config":{
@@ -150,18 +166,6 @@ class BifrostWidget(DOMWidget):
             types = df.dtypes
             types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
 
-            encodings = []
-            for col in df.columns:
-                if col == x:
-                    encodings.append({"field": col, "type": types[col], "channel" : "x"})
-                elif col == y:
-                    encodings.append({"field": col, "type": types[col], "channel" : "y"})
-                elif col == color:
-                    encodings.append({"field": col, "type": types[col], "channel" : "color"})
-                # TODO: Add more channels in the future
-                else:
-                    encodings.append({"field": col, "type": types[col], "channel" : "?"})
-
             if not kind_provided:
                 kind = '?'
                 
@@ -174,7 +178,7 @@ class BifrostWidget(DOMWidget):
                 "mark": kind,
                 "params": [{"name": "brush", "select": "interval"}],
                 "data": {"name": "data"},
-                "encodings": encodings,
+                "encodings": [{"field": col, "type": types[col], "channel" : "?"} for col in df.columns],
                 "transform": [],
                 "chooseBy": "effectiveness"
             }

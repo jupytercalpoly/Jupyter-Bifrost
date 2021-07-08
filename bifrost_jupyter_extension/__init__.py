@@ -9,13 +9,29 @@ from ._version import __version__, version_info
 import typing
 import pandas as pd
 from IPython.core.display import display
+import sys
 
 @pd.api.extensions.register_dataframe_accessor("bifrost")
 class BifrostAccessor:
     def __init__(self, pandas_obj: typing.Union[pd.DataFrame, pd.Series]):
         self._obj = pandas_obj
 
+    @staticmethod
+    def _validate(obj, x, y, color):
+        if x is not None and x not in obj.columns:
+            raise AttributeError(f"Error !!! This DataFrame doesn't have a column: {x}.")
+        elif y is not None and y not in obj.columns:
+            raise AttributeError(f"Error !!! This DataFrame doesn't have a column: {y}.")
+        elif color is not None and color not in obj.columns:
+            raise AttributeError(f"Error !!! This DataFrame doesn't have a column: {color}.")
+
     def plot(self, kind=None, x=None, y=None, color=None) -> pd.DataFrame:
+        try:
+            self._validate(self._obj, x, y, color)
+        except AttributeError as error:
+            print(error)
+            return
+
         w = BifrostWidget(self._obj, kind, x, y, color)
         display(w)
         return w.df_history[-1]
