@@ -1,6 +1,6 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import SearchBar from '../../ui-widgets/SearchBar';
@@ -29,21 +29,49 @@ const historyCss = (theme: any) => css`
 `;
 
 export default function HistoryTab() {
-  const setSpec = useModelState<GraphSpec>('graph_spec')[1];
-  const specHistory = useModelState<GraphSpec[]>('spec_history')[0];
+  const [spec, setSpec] = useModelState<GraphSpec>('graph_spec');
+  const [specHistory, setSpecHistory] =
+    useModelState<GraphSpec[]>('spec_history');
   const [dfIndex, setDfIndex] = useModelState<number>(
     'current_dataframe_index'
   );
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setResults] = useState<string[]>([]);
-  const histDescriptions = useMemo(
-    () => generateDescriptions(specHistory),
+  const [searchResults, setResults] = useState<
+    { choice: string; index: number }[]
+  >([]);
+  const reverseHistory = useMemo(
+    () => [...specHistory].reverse(),
     [specHistory]
   );
+  const histDescriptions = useMemo(
+    () => generateDescriptions(reverseHistory),
+    [reverseHistory]
+  );
+
+  useEffect(function saveSpecOnMount() {
+    const updatedHist = specHistory.slice(0, dfIndex + 1);
+    updatedHist.push(spec);
+    setSpecHistory(updatedHist);
+    setDfIndex(updatedHist.length - 1);
+
+    return () => {
+      setSpecHistory(updatedHist.slice(0, updatedHist.length - 1));
+      if (dfIndex > updatedHist.length - 2) setDfIndex(updatedHist.length - 2);
+    };
+  }, []);
+
+  /**
+   * Preserves the spec state when the user navigates to the history tab
+   * and deletes the temporarily saved spec when the user navigates away.
+   */
+
+  function invertHistIndex(i: number) {
+    return specHistory.length - 1 - i;
+  }
 
   function setHistoryPosition(index: number) {
-    setDfIndex(index);
-    setSpec(specHistory[index]);
+    setDfIndex(invertHistIndex(index));
+    setSpec(reverseHistory[index]);
   }
 
   return (
@@ -54,7 +82,9 @@ export default function HistoryTab() {
         value={dfIndex}
         min={0}
         max={specHistory.length - 1}
-        onChange={(e) => setHistoryPosition(e.target.valueAsNumber)}
+        onChange={(e) =>
+          setHistoryPosition(invertHistIndex(e.target.valueAsNumber))
+        }
       />
 
       <SearchBar
@@ -64,14 +94,17 @@ export default function HistoryTab() {
         onResultsChange={setResults}
       />
       <ul className="history-list">
-        {searchResults.map((description, i) => {
+        {searchResults.map(({ choice, index }, elIndex) => {
           return (
             <li
-              className={'history-el' + (i === dfIndex ? ' active' : '')}
-              key={i}
-              onClick={() => setHistoryPosition(i)}
+              className={
+                'history-el' +
+                (index === invertHistIndex(dfIndex) ? ' active' : '')
+              }
+              key={index}
+              onClick={() => setHistoryPosition(index)}
             >
-              {description}
+              {choice}
             </li>
           );
         })}

@@ -50,7 +50,9 @@ const variableTabCss = css`
 export default function VariablesTab() {
   const columns = useModelState<string[]>('df_columns')[0];
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState(columns);
+  const [searchResults, setSearchResults] = useState(
+    columns.map((choice, index) => ({ choice, index }))
+  );
   const querySpec = useModelState<QuerySpec>('query_spec')[0];
   const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
   const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>('');
@@ -164,7 +166,7 @@ export default function VariablesTab() {
         placeholder="Search Columns"
       />
       <ul className="columns-list">
-        {searchResults.map((col) => {
+        {searchResults.map(({ choice: col }) => {
           return (
             <li
               className="column-el"

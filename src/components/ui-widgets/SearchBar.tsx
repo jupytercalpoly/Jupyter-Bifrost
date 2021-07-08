@@ -35,7 +35,7 @@ const searchIconCss = css`
 
 export interface SearchProps {
   choices: string[];
-  onResultsChange: (results: string[]) => void;
+  onResultsChange: (results: { choice: string; index: number }[]) => void;
   onChange: (value: string) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   value: string;
@@ -52,20 +52,26 @@ export default function SearchBar(props: SearchProps) {
         name.replace(notAlpha, '').toLowerCase(),
         normQuery
       )?.score;
+
+    const indexedChoices = props.choices.map((choice, index) => ({
+      choice,
+      index,
+    }));
     if (props.value.length === 0) {
-      props.onResultsChange(props.choices);
+      props.onResultsChange(indexedChoices);
     } else {
-      const results = props.choices.filter((name) => {
-        return compScore(name) === undefined ? false : true;
+      const results = indexedChoices.filter(({ choice }) => {
+        return compScore(choice) === undefined ? false : true;
       });
 
       // Ik the casting is bad but the filter above guarantees that these are numbers, so its valid practice.
       results.sort(
-        (a, b) => (compScore(a) as number) - (compScore(b) as number)
+        (a, b) =>
+          (compScore(a.choice) as number) - (compScore(b.choice) as number)
       );
       props.onResultsChange(results);
     }
-  }, [props.value]);
+  }, [props.value, props.choices]);
 
   return (
     <div className="searchBar" css={searchBarCss}>
