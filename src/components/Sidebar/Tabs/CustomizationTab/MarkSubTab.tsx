@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { VegaChart, vegaChartList } from '../../../../modules/VegaEncodings';
+import {
+  VegaChart,
+  vegaChartList,
+  // vegaCategoricalChartList,
+  // vegaQuantitativeChartList,
+} from '../../../../modules/VegaEncodings';
 import SearchBar from '../../../ui-widgets/SearchBar';
 import { CustomizeSubTapProps } from './CustomizationTab';
 import { GraphSpec, useModelState } from '../../../../hooks/bifrost-model';
@@ -13,6 +18,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
     data,
   }))[0];
 
+  console.log(props.spec);
   return (
     <div className="mark-options">
       <SearchBar
@@ -28,7 +34,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
         return (
           <div className={`option_${kind}`} key={kind}>
             <VegaLite spec={spec as VisualizationSpec} data={data} />
-            <span>{kind}</span>;
+            <span>{kind}</span>
           </div>
         );
       })}
