@@ -52,7 +52,7 @@ export default function HistoryTab() {
     [reverseHistory]
   );
 
-  useEffect(function saveSpecOnMount() {
+  useEffect(() => {
     const updatedHist = specHistory.slice(0, dfIndex + 1);
     updatedHist.push(spec);
     setSpecHistory(updatedHist);
@@ -60,7 +60,9 @@ export default function HistoryTab() {
 
     return () => {
       setSpecHistory(updatedHist.slice(0, updatedHist.length - 1));
-      if (dfIndex > updatedHist.length - 2) setDfIndex(updatedHist.length - 2);
+      if (dfIndex > updatedHist.length - 2) {
+        setDfIndex(updatedHist.length - 2);
+      }
     };
   }, []);
 
