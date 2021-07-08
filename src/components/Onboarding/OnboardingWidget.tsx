@@ -38,7 +38,6 @@ export default function OnboardingWidget(props: onboardingWidgetProps) {
   let Screen: JSX.Element;
   const preSelectedColumns = new Set<string>();
 
-  console.log(props.screenName);
   switch (props.screenName) {
     case 'columnChooser':
       querySpec.spec.encodings.forEach((encoding: FieldQuery) => {
