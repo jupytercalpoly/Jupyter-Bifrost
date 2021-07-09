@@ -56,7 +56,7 @@ export interface EncodingInfo {
 export type GraphSpec = VisualizationSpec & {
   width: number;
   height: number;
-  mark: string;
+  mark: string | Record<string, any>;
   encoding: Record<VegaEncoding, EncodingInfo>;
   transform: {
     [transformType: string]: any;
