@@ -138,4 +138,4 @@ export type VegaAggregation = typeof vegaAggregationList[number];
 
 export type VegaParamPredicate = typeof vegaParamPredicatesList[number];
 
-export type VegaChart = typeof vegaChartList[number];
+export type VegaMark = typeof vegaChartList[number];
