@@ -61,8 +61,8 @@ class BifrostWidget(DOMWidget):
         self.set_trait("graph_data", graph_info["data"])
         self.set_trait("graph_spec", graph_info["graph_spec"])
         self.set_trait("flags", graph_info["flags"])
-        self.set_trait("output_variable", df_watcher.plot_output)
-        self.set_trait("df_variable_name", df_watcher.bifrost_input)
+        if df_watcher.plot_output: self.set_trait("output_variable", df_watcher.plot_output)
+        if df_watcher.bifrost_input: self.set_trait("df_variable_name", df_watcher.bifrost_input)
         
 
     @observe("graph_spec")
