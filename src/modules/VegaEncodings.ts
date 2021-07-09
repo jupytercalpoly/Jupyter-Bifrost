@@ -124,11 +124,11 @@ export const vegaChartList = [
 export const vegaCategoricalChartList = [
   'arc',
   'bar',
-  'box',
+  'boxplot',
   'errorband',
   'errorbar',
 ];
-export const vegaQuantitativeChartList = ['area'];
+export const vegaTemporalChartList = ['area'];
 
 export type VegaColumnType = typeof vegaColTypesList[number];
 
