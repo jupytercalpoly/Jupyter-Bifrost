@@ -27,7 +27,7 @@ const markOptionCss = css`
   flex-direction: column;
 
   &.selected {
-    border: 5px solid ${theme.color.primary[2]};
+    border: 5px solid ${theme.color.onSelected};
 
     span {
       font-weight: bold;

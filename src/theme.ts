@@ -3,6 +3,7 @@ const theme = {
     text: ['#000'],
     background: ['#fff', '#F6F6F6'],
     primary: ['#771C79', '#AD77AF', '#E4D2E4'],
+    onSelected: '#E4D2E4',
   },
   shadow: {
     handle: '0 0 10px #781c7932',

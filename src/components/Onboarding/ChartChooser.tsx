@@ -28,7 +28,7 @@ const suggestedChartCss = css`
     border-radius: 5px;
     transition: border-color 0.5s;
     &.selected {
-      border: 10px solid ${theme.color.primary[2]};
+      border: 10px solid ${theme.color.onSelected};
     }
   }
 `;
