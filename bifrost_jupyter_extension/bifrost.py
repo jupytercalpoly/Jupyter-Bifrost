@@ -42,8 +42,8 @@ class BifrostWidget(DOMWidget):
     flags = Dict({}).tag(sync=True)
     graph_data = List([]).tag(sync=True)
     graph_encodings = Dict({}).tag(sync=True)
-    df_variable_name:str = Unicode("").tag(sync=True)
-    output_variable: str = ""
+    df_variable_name = Unicode("").tag(sync=True)
+    output_variable = Unicode("").tag(sync=True)
     generate_random_dist = Int(0).tag(sync=True)
     df_columns = List([]).tag(sync=True)
     selected_columns = List([]).tag(sync=True)
@@ -61,6 +61,8 @@ class BifrostWidget(DOMWidget):
         self.set_trait("graph_data", graph_info["data"])
         self.set_trait("graph_spec", graph_info["graph_spec"])
         self.set_trait("flags", graph_info["flags"])
+        self.set_trait("output_variable", df_watcher.plot_output)
+        self.set_trait("df_variable_name", df_watcher.bifrost_input)
         
 
     @observe("graph_spec")
