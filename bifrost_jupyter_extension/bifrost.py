@@ -124,6 +124,7 @@ class BifrostWidget(DOMWidget):
                     "mark": kind,
                     "params": [{"name": "brush", "select": "interval"}],
                     "data": {"name": "data"},
+                    "transform": [],
                     "encoding": {
                         encoding : {"field": col, "type": types[col]} for encoding, col in zip(["x", "y", "color"], df_filter)
                     }
