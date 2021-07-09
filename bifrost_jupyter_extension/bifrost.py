@@ -168,7 +168,18 @@ class BifrostWidget(DOMWidget):
 
             if not kind_provided:
                 kind = '?'
-                
+            
+            encodings = []
+            for col in df.columns:
+                if col == x:
+                    encodings.append({"field": col, "type": types[col], "channel" : "x"})
+                if col == y:
+                    encodings.append({"field": col, "type": types[col], "channel" : "y"})
+                if col == color:
+                    encodings.append({"field": col, "type": types[col], "channel" : "color"})
+                else:
+                    encodings.append({"field": col, "type": types[col], "channel" : "?"})
+
             query_spec = {
                 "config":{
                     "mark": {"tooltip": True}
@@ -178,7 +189,7 @@ class BifrostWidget(DOMWidget):
                 "mark": kind,
                 "params": [{"name": "brush", "select": "interval"}],
                 "data": {"name": "data"},
-                "encodings": [{"field": col, "type": types[col], "channel" : "?"} for col in df.columns],
+                "encodings": encodings,
                 "transform": [],
                 "chooseBy": "effectiveness"
             }
