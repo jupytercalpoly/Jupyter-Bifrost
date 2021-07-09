@@ -66,7 +66,84 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
         value={searchValue}
       />
       <ul className="mark-options" css={markOptionsListCss}>
-        {results.map(({ choice: kind }) => {
+        {results
+          .filter(({ choice: kind }) => {
+            if (vegaCategoricalChartList.includes(kind)) {
+              const x = props.spec['encoding']['x'];
+              const y = props.spec['encoding']['y'];
+              if (
+                (x['type'] === 'quantitative' && y['type'] === 'nominal') ||
+                (y['type'] === 'quantitative' && x['type'] === 'nominal')
+              ) {
+                return true;
+              } else {
+                return false;
+              }
+            } else if (vegaTemporalChartList.includes(kind)) {
+              const xType = props.spec['encoding']['x']['type'];
+              const yType = props.spec['encoding']['y']['type'];
+              if (
+                ['temporal', 'ordinal'].includes(xType) &&
+                yType === 'quantitative'
+              ) {
+                return true;
+              } else {
+                return false;
+              }
+            } else {
+              return true;
+            }
+          })
+          .map(({ choice: kind }) => {
+            const spec = produce(props.spec, (draftSpec: GraphSpec) => {
+              draftSpec['width'] = 100;
+              draftSpec['height'] = 100;
+              if (vegaCategoricalChartList.includes(kind)) {
+                const x = draftSpec.encoding['x'];
+                const y = draftSpec.encoding['y'];
+                if (kind === 'errorband') {
+                  draftSpec.mark = { type: kind, extent: 'ci', borders: true };
+                } else if (kind === 'errorbar') {
+                  draftSpec.mark = { type: kind, extent: 'ci', ticks: true };
+                } else if (kind === 'arc') {
+                  if (x['type'] === 'quantitative') {
+                    draftSpec['encoding']['theta'] = x;
+                    draftSpec['encoding']['color'] = y;
+                  } else {
+                    draftSpec['encoding']['theta'] = y;
+                    draftSpec['encoding']['color'] = x;
+                  }
+                } else if (kind === 'boxplot') {
+                  draftSpec.mark = { type: kind, extent: 'min-max' };
+                }
+              }
+              //               else if (vegaTemporalChartList.includes(kind)) {
+
+              // draftSpec.mark = kind;
+              else {
+                draftSpec.mark = kind;
+              }
+            });
+            return (
+              <li
+                className={
+                  selectedMark === kind
+                    ? `option_${kind} selected`
+                    : `option_${kind}`
+                }
+                key={kind}
+                onClick={() => handleOnClick(spec)}
+                css={markOptionCss}
+              >
+                <VegaLite
+                  spec={spec as VisualizationSpec}
+                  data={data}
+                  actions={false}
+                />
+              </li>
+            );
+          })}
+        {/* {results.map(({ choice: kind }) => {
           let shouldSkip = false;
           const spec = produce(props.spec, (draftSpec: GraphSpec) => {
             draftSpec['width'] = 100;
@@ -133,7 +210,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
               />
             </li>
           );
-        })}
+        })} */}
       </ul>
     </div>
   );
