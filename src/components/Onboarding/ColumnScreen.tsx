@@ -4,7 +4,6 @@ import { jsx, css } from '@emotion/react';
 import React, { useState, useRef } from 'react';
 import NavHeader from './NavHeader';
 import SearchBar from '../ui-widgets/SearchBar';
-// import Tag from '../ui-widgets/Tag';
 import Pill from '../ui-widgets/Pill';
 
 import {
@@ -19,10 +18,8 @@ import { recommend } from 'compassql/build/src/recommend';
 import { mapLeaves } from 'compassql/build/src/result';
 import { SpecQueryModel } from 'compassql/build/src/model';
 import { Query } from 'compassql/build/src/query/query';
-import { X } from 'react-feather';
+import { Lock, X } from 'react-feather';
 import { useEffect } from 'react';
-
-// TODO: get this from the backend
 
 const columnScreenCss = css`
   display: flex;
@@ -82,8 +79,6 @@ const columnScreenCss = css`
   .tag-content-wrapper {
     display: flex;
     justify-content: space-between;
-    /* height: 23px;
-    width: fit-content; */
     white-space: nowrap;
     overflow: hidden;
     align-items: center;
@@ -332,14 +327,17 @@ export default function ColumnScreen(props: ColumnScreenProps) {
                   className={i === focusedIdx ? 'choice focused' : 'choice'}
                   key={col}
                 >
-                  <input
-                    className={`choice_${col}`}
-                    type="checkbox"
-                    value={col}
-                    onChange={handleCheckboxChange}
-                    disabled={preSelectedColumns.has(col)}
-                    checked={selectedColumns.has(col)}
-                  />{' '}
+                  {preSelectedColumns.has(col) ? (
+                    <Lock size={15} style={{ marginRight: '6px' }} />
+                  ) : (
+                    <input
+                      className={`choice_${col}`}
+                      type="checkbox"
+                      value={col}
+                      onChange={handleCheckboxChange}
+                      checked={selectedColumns.has(col)}
+                    />
+                  )}
                   {col}
                 </label>
               );
