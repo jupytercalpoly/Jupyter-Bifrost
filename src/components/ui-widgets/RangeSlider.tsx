@@ -12,18 +12,22 @@ import { GetRailProps } from 'react-compound-slider/dist/types/Rail/types';
 import { GetHandleProps } from 'react-compound-slider/dist/types/Handles/types';
 import { GetTrackProps } from 'react-compound-slider/dist/types/Tracks/types';
 import { BifrostTheme } from '../../theme';
-import { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 
 const sliderStyle = {
   position: 'relative',
   width: '100%',
 };
 
+interface RangeUpdater {
+  (values: readonly number[]): void;
+}
+
 interface RangeSliderProps {
   domain?: [number, number];
   values?: [number, number];
   width?: number;
-  onUpdate?: ((values: readonly number[]) => void) | undefined;
+  onUpdate: RangeUpdater;
 }
 
 export default function RangeSlider({
@@ -41,45 +45,116 @@ export default function RangeSlider({
         width: ${width}px;
       `}
     >
-      <Slider
-        className="range-slider"
-        mode={3}
-        domain={domain}
-        rootStyle={sliderStyle}
-        onUpdate={onUpdate}
-        onChange={(e) => console.log('change', e)}
-        values={values}
-      >
-        <Rail>{(props) => <SliderRail {...props} />}</Rail>
-        <Handles>
-          {({ handles, getHandleProps }) => (
-            <div className="slider-handles">
-              {handles.map((handle) => (
-                <Handle
-                  key={handle.id}
-                  handle={handle}
-                  domain={domain}
-                  getHandleProps={getHandleProps}
-                />
-              ))}
-            </div>
-          )}
-        </Handles>
-        <Tracks left={false} right={false}>
-          {({ tracks, getTrackProps }) => (
-            <div className="slider-tracks">
-              {tracks.map(({ id, source, target }) => (
-                <Track
-                  key={id}
-                  source={source}
-                  target={target}
-                  getTrackProps={getTrackProps}
-                />
-              ))}
-            </div>
-          )}
-        </Tracks>
-      </Slider>
+      <RangeInputs values={values} onUpdate={onUpdate}>
+        <Slider
+          className="range-slider"
+          mode={3}
+          domain={domain}
+          rootStyle={sliderStyle}
+          onUpdate={onUpdate}
+          onChange={(e) => console.log('change', e)}
+          values={values}
+        >
+          <Rail>{(props) => <SliderRail {...props} />}</Rail>
+          <Handles>
+            {({ handles, getHandleProps }) => (
+              <div className="slider-handles">
+                {handles.map((handle) => (
+                  <Handle
+                    key={handle.id}
+                    handle={handle}
+                    domain={domain}
+                    getHandleProps={getHandleProps}
+                  />
+                ))}
+              </div>
+            )}
+          </Handles>
+          <Tracks left={false} right={false}>
+            {({ tracks, getTrackProps }) => (
+              <div className="slider-tracks">
+                {tracks.map(({ id, source, target }) => (
+                  <Track
+                    key={id}
+                    source={source}
+                    target={target}
+                    getTrackProps={getTrackProps}
+                  />
+                ))}
+              </div>
+            )}
+          </Tracks>
+        </Slider>
+      </RangeInputs>
+    </div>
+  );
+}
+
+// *******************************************************
+// Range Inputs
+// *******************************************************
+
+const rangeInputsCss = css`
+  display: flex;
+  width: 100%;
+  align-items: center;
+
+  input {
+    max-width: 50px;
+    background-color: transparent;
+    border: none;
+    margin: 0 10px;
+  }
+
+  .content {
+    width: 100%;
+  }
+`;
+interface RangeInputsProps {
+  children: React.ReactNode;
+  values: [number, number];
+  onUpdate: RangeUpdater;
+}
+
+function RangeInputs(props: RangeInputsProps) {
+  const [minInput, setMinInput] = useState(props.values[0]);
+  const [maxInput, setMaxInput] = useState(props.values[1]);
+  console.log(minInput);
+  useEffect(() => {
+    setMinInput(props.values[0]);
+    setMaxInput(props.values[1]);
+  }, props.values);
+  function handleEnter(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== 'Enter') {
+      return;
+    }
+    const el = e.target as HTMLInputElement;
+    el.blur();
+  }
+
+  return (
+    <div className="RangeInputs" css={rangeInputsCss}>
+      <input
+        value={minInput}
+        type="number"
+        name="min"
+        onChange={(e) => setMinInput(e.target.valueAsNumber)}
+        onBlur={(e) =>
+          props.onUpdate([e.target.valueAsNumber, props.values[1]])
+        }
+        onKeyPress={handleEnter}
+      />
+      <div className="content">{props.children}</div>
+      <input
+        value={maxInput}
+        type="number"
+        name="max"
+        onChange={(e) => setMaxInput(e.target.valueAsNumber)}
+        onBlur={(e) =>
+          props.onUpdate([props.values[0], e.target.valueAsNumber])
+        }
+        onKeyPress={handleEnter}
+      />
     </div>
   );
 }
@@ -147,8 +222,6 @@ function SliderRail({
     percent: null,
   });
 
-  const [pressed, setPressed] = useState(false);
-
   /**
    * Update the tooltip value
    */
@@ -169,24 +242,8 @@ function SliderRail({
    * Remove tooltip events
    */
   function onMouseLeave() {
-    if (pressed) {
-      return;
-    }
     setTooltipState({ value: null, percent: null });
     document.removeEventListener('mousemove', onMouseMove);
-  }
-
-  function onMouseDown() {
-    setPressed(true);
-    window.addEventListener(
-      'mouseup',
-      () => {
-        setPressed(false);
-        document.removeEventListener('mousemove', onMouseMove);
-        setTooltipState({ value: null, percent: null });
-      },
-      { once: true }
-    );
   }
 
   return (
@@ -198,7 +255,6 @@ function SliderRail({
         {...getRailProps({
           onMouseEnter,
           onMouseLeave,
-          onMouseDown,
         })}
       />
       <div className="rail" css={railCss} />

@@ -119,7 +119,7 @@ function QuantitativeFilters(props: FilterGroupProps) {
   return (
     <div className="filters">
       <RangeSlider
-        width={150}
+        width={300}
         domain={bounds}
         values={rangeValues}
         onUpdate={updateRange}
