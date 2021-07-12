@@ -2,8 +2,10 @@
 import { css, jsx } from '@emotion/react';
 import { useState } from 'react';
 import MarkSubTab from './MarkSubTab';
-import ScaleSubTab from './ScaleSubtab';
+import ScaleSubTab from './ScaleSubTab';
 import StyleSubTab from './StyleSubTab';
+
+import theme from '../../../../theme';
 
 import { useModelState, GraphSpec } from '../../../../hooks/bifrost-model';
 
@@ -30,7 +32,7 @@ const subTabCss = css`
 
     &.selected {
       font-weight: 800;
-      border-bottom: 2px solid #771c79;
+      border-bottom: 2px solid ${theme.color.primary.dark};
     }
   }
 `;
