@@ -6,6 +6,8 @@ import {
   vegaCategoricalChartList,
   vegaChartList,
   vegaTemporalChartList,
+  preprocessEncoding,
+  convertToCategoricalChartsEncoding,
 } from '../../../../modules/VegaEncodings';
 import SearchBar from '../../../ui-widgets/SearchBar';
 import { CustomizeSubTapProps } from './CustomizationTab';
@@ -43,6 +45,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
   const data = useModelState<PlainObject>('graph_data', (data) => ({
     data,
   }))[0];
+
   const [selectedMark, setSelectedMark] = useState<
     string | Record<string, any>
   >(props.spec.mark);
@@ -53,7 +56,11 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
       draftSpec['height'] = props.spec.height;
     });
 
-    setSelectedMark(newSpec.mark);
+    if (typeof newSpec.mark === 'object') {
+      setSelectedMark(newSpec.mark.type);
+    } else {
+      setSelectedMark(newSpec.mark);
+    }
     props.setSpec(newSpec);
   }
 
@@ -68,9 +75,13 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
       <ul className="mark-options" css={markOptionsListCss}>
         {results
           .filter(({ choice: kind }) => {
+            const spec = produce(props.spec, (draftSpec: GraphSpec) => {
+              preprocessEncoding(draftSpec);
+            });
+
             if (vegaCategoricalChartList.includes(kind)) {
-              const x = props.spec['encoding']['x'];
-              const y = props.spec['encoding']['y'];
+              const x = spec['encoding']['x'];
+              const y = spec['encoding']['y'];
               if (
                 (x['type'] === 'quantitative' && y['type'] === 'nominal') ||
                 (y['type'] === 'quantitative' && x['type'] === 'nominal')
@@ -80,8 +91,8 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
                 return false;
               }
             } else if (vegaTemporalChartList.includes(kind)) {
-              const xType = props.spec['encoding']['x']['type'];
-              const yType = props.spec['encoding']['y']['type'];
+              const xType = spec['encoding']['x']['type'];
+              const yType = spec['encoding']['y']['type'];
               if (
                 ['temporal', 'ordinal'].includes(xType) &&
                 yType === 'quantitative'
@@ -98,32 +109,15 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
             const spec = produce(props.spec, (draftSpec: GraphSpec) => {
               draftSpec['width'] = 100;
               draftSpec['height'] = 100;
-              if (vegaCategoricalChartList.includes(kind)) {
-                const x = draftSpec.encoding['x'];
-                const y = draftSpec.encoding['y'];
-                if (kind === 'errorband') {
-                  draftSpec.mark = { type: kind, extent: 'ci', borders: true };
-                } else if (kind === 'errorbar') {
-                  draftSpec.mark = { type: kind, extent: 'ci', ticks: true };
-                } else if (kind === 'arc') {
-                  if (x['type'] === 'quantitative') {
-                    draftSpec['encoding']['theta'] = x;
-                    draftSpec['encoding']['color'] = y;
-                  } else {
-                    draftSpec['encoding']['theta'] = y;
-                    draftSpec['encoding']['color'] = x;
-                  }
-                } else if (kind === 'boxplot') {
-                  draftSpec.mark = { type: kind, extent: 'min-max' };
-                }
-              }
-              //               else if (vegaTemporalChartList.includes(kind)) {
+              draftSpec.mark = kind;
 
-              // draftSpec.mark = kind;
-              else {
-                draftSpec.mark = kind;
+              preprocessEncoding(draftSpec);
+
+              if (vegaCategoricalChartList.includes(kind)) {
+                convertToCategoricalChartsEncoding(draftSpec, kind);
               }
             });
+
             return (
               <li
                 className={
@@ -143,74 +137,6 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
               </li>
             );
           })}
-        {/* {results.map(({ choice: kind }) => {
-          let shouldSkip = false;
-          const spec = produce(props.spec, (draftSpec: GraphSpec) => {
-            draftSpec['width'] = 100;
-            draftSpec['height'] = 100;
-            if (vegaCategoricalChartList.includes(kind)) {
-              const x = draftSpec.encoding['x'];
-              const y = draftSpec.encoding['y'];
-              if (
-                (x['type'] === 'quantitative' && y['type'] === 'nominal') ||
-                (y['type'] === 'quantitative' && x['type'] === 'nominal')
-              ) {
-                if (kind === 'errorband') {
-                  draftSpec.mark = { type: kind, extent: 'ci', borders: true };
-                } else if (kind === 'errorbar') {
-                  draftSpec.mark = { type: kind, extent: 'ci', ticks: true };
-                } else if (kind === 'arc') {
-                  if (x['type'] === 'quantitative') {
-                    draftSpec['encoding']['theta'] = x;
-                    draftSpec['encoding']['color'] = y;
-                  } else {
-                    draftSpec['encoding']['theta'] = y;
-                    draftSpec['encoding']['color'] = x;
-                  }
-                } else if (kind === 'boxplot') {
-                  draftSpec.mark = { type: kind, extent: 'min-max' };
-                }
-              } else {
-                shouldSkip = true;
-              }
-            } else if (vegaTemporalChartList.includes(kind)) {
-              const xType = draftSpec['encoding']['x']['type'];
-              const yType = draftSpec['encoding']['y']['type'];
-              if (
-                ['temporal', 'ordinal'].includes(xType) &&
-                yType === 'quantitative'
-              ) {
-                draftSpec.mark = kind;
-              } else {
-                shouldSkip = true;
-              }
-            } else {
-              draftSpec.mark = kind;
-            }
-          });
-          if (shouldSkip) {
-            return null;
-          }
-
-          return (
-            <li
-              className={
-                selectedMark === kind
-                  ? `option_${kind} selected`
-                  : `option_${kind}`
-              }
-              key={kind}
-              onClick={() => handleOnClick(spec)}
-              css={markOptionCss}
-            >
-              <VegaLite
-                spec={spec as VisualizationSpec}
-                data={data}
-                actions={false}
-              />
-            </li>
-          );
-        })} */}
       </ul>
     </div>
   );
