@@ -64,7 +64,7 @@ export default function NavHeader(props: HeaderProps) {
 
 const nextButtonCss = (theme: any) => css`
   padding: 0;
-  background-color: ${theme.color.primary[0]};
+  background-color: ${theme.color.primary.dark};
   border: none;
   border-radius: 50%;
   cursor: pointer;
