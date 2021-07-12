@@ -7,6 +7,7 @@ import {
   SuggestedGraphs,
   GraphData,
   QuerySpec,
+  Args,
 } from '../../hooks/bifrost-model';
 
 import { useState } from 'react';
@@ -20,11 +21,11 @@ import { build } from 'compassql/build/src/schema';
 import { recommend } from 'compassql/build/src/recommend';
 import { mapLeaves } from 'compassql/build/src/result';
 import { SpecQueryModel } from 'compassql/build/src/model';
-import { FieldQuery } from 'compassql/build/src/query/encoding';
 
 interface onboardingWidgetProps {
   screenName: string;
   setScreenName: React.Dispatch<React.SetStateAction<string>>;
+  args: Args;
 }
 
 export default function OnboardingWidget(props: onboardingWidgetProps) {
@@ -33,26 +34,15 @@ export default function OnboardingWidget(props: onboardingWidgetProps) {
     useModelState<SuggestedGraphs>('suggested_graphs');
   const querySpec = useModelState<QuerySpec>('query_spec')[0];
   const data = useModelState<GraphData>('graph_data')[0];
-  const columnChoices = useModelState<string[]>('df_columns')[0];
 
   let Screen: JSX.Element;
-  const preSelectedColumns = new Set<string>();
 
   switch (props.screenName) {
     case 'columnChooser':
-      querySpec.spec.encodings.forEach((encoding: FieldQuery) => {
-        if (
-          encoding.channel !== '?' &&
-          columnChoices.includes(encoding.field as string)
-        ) {
-          preSelectedColumns.add(encoding.field as string);
-        }
-      });
-
       Screen = (
         <ColumnScreen
           onNext={() => props.setScreenName('chartChooser')}
-          preSelectedColumns={preSelectedColumns}
+          args={props.args}
         />
       );
       break;
@@ -99,19 +89,10 @@ export default function OnboardingWidget(props: onboardingWidgetProps) {
       );
       break;
     default:
-      querySpec.spec.encodings.forEach((encoding: FieldQuery) => {
-        if (
-          encoding.channel !== '?' &&
-          columnChoices.includes(encoding.field as string)
-        ) {
-          preSelectedColumns.add(encoding.field as string);
-        }
-      });
-
       Screen = (
         <ColumnScreen
           onNext={() => props.setScreenName('chartChooser')}
-          preSelectedColumns={preSelectedColumns}
+          args={props.args}
         />
       );
       break;

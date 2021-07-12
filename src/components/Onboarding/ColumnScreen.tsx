@@ -12,6 +12,7 @@ import {
   GraphData,
   useModelState,
   SuggestedGraphs,
+  Args,
 } from '../../hooks/bifrost-model';
 import { build } from 'compassql/build/src/schema';
 import { recommend } from 'compassql/build/src/recommend';
@@ -46,6 +47,10 @@ const columnScreenCss = css`
     border: 1px solid #aaa;
     border-radius: 20%;
     margin-right: 6px;
+  }
+
+  input[type='checkbox']:disabled {
+    cursor: default;
   }
 
   input[type='checkbox']:checked {
@@ -102,7 +107,7 @@ const columnScreenCss = css`
 interface ColumnScreenProps {
   onNext: () => void;
   onBack?: () => void;
-  preSelectedColumns: Set<string>;
+  args: Args;
 }
 
 export default function ColumnScreen(props: ColumnScreenProps) {
@@ -120,9 +125,14 @@ export default function ColumnScreen(props: ColumnScreenProps) {
 
   const [focusedIdx, setFocusedIdx] = useState<number>(0);
 
-  const [selectedColumns, setSelectedColumns] = useState(
-    props.preSelectedColumns
-  );
+  const preSelectedColumns = new Set<string>();
+  for (const [_, value] of Object.entries(props.args)) {
+    if (value) {
+      preSelectedColumns.add(value as string);
+    }
+  }
+
+  const [selectedColumns, setSelectedColumns] = useState(preSelectedColumns);
   const keyPressed = { Shift: false, Enter: false };
 
   useEffect(() => {
@@ -136,14 +146,36 @@ export default function ColumnScreen(props: ColumnScreenProps) {
     const opt = {};
 
     const schema = build(data, opt);
+
     const filteredEncodings = spec.spec.encodings.filter((encoding: any) =>
       selectedColumns.has(encoding.field)
     );
+
     const filteredSpecs: Query[] = [];
-    for (let i = 0; i < filteredEncodings.length - 1; i++) {
-      filteredSpecs.push({
-        spec: { ...spec.spec, encodings: filteredEncodings.slice(i, i + 3) },
-      });
+
+    if (!props.args.x && !props.args.y) {
+      for (let i = 0; i < filteredEncodings.length - 1; i++) {
+        filteredSpecs.push({
+          spec: { ...spec.spec, encodings: filteredEncodings.slice(i, i + 3) },
+        });
+      }
+    } else {
+      if (selectedColumns.size < 3) {
+        for (const encoding of spec.spec.encodings) {
+          if ((encoding as any).channel === '?') {
+            filteredSpecs.push({
+              spec: {
+                ...spec.spec,
+                encodings: [...filteredEncodings, encoding],
+              },
+            });
+          }
+        }
+      } else {
+        filteredSpecs.push({
+          spec: { ...spec.spec, encodings: filteredEncodings },
+        });
+      }
     }
 
     const items = filteredSpecs
@@ -202,18 +234,26 @@ export default function ColumnScreen(props: ColumnScreenProps) {
           keyPressed['Enter'] = true;
           submit();
         } else {
-          if (columnChoices.includes(query)) {
-            const updatedSet = new Set(selectedColumns);
-            updatedSet.add(query);
-            setSelectedColumns(updatedSet);
-          } else {
-            const choice = optionsRef.current?.querySelector(
-              '.choice.focused input'
-            ) as HTMLInputElement;
+          const choice = optionsRef.current?.querySelector(
+            '.choice.focused input'
+          ) as HTMLInputElement;
 
-            if (choice) {
+          if (choice && !preSelectedColumns.has(choice.value)) {
+            if (columnChoices.includes(query)) {
               const updatedSet = new Set(selectedColumns);
-              updatedSet.add(choice.value);
+              if (updatedSet.has(query)) {
+                updatedSet.delete(query);
+              } else {
+                updatedSet.add(query);
+              }
+              setSelectedColumns(updatedSet);
+            } else {
+              const updatedSet = new Set(selectedColumns);
+              if (updatedSet.has(choice.value)) {
+                updatedSet.delete(choice.value);
+              } else {
+                updatedSet.add(choice.value);
+              }
               setSelectedColumns(updatedSet);
             }
           }
@@ -224,16 +264,13 @@ export default function ColumnScreen(props: ColumnScreenProps) {
           e.preventDefault();
           e.stopPropagation();
 
-          const tags = document.querySelectorAll('.content-wrapper');
-          if (tags.length !== 0) {
-            const updatedSet = new Set(selectedColumns);
-            const tagName = (
-              tags[tags.length - 1].getElementsByTagName(
-                'span'
-              )[0] as HTMLSpanElement
-            ).textContent;
+          const choice = optionsRef.current?.querySelector(
+            '.choice.focused input'
+          ) as HTMLInputElement;
 
-            tagName && updatedSet.delete(tagName);
+          if (choice && !preSelectedColumns.has(choice.value)) {
+            const updatedSet = new Set(selectedColumns);
+            updatedSet.delete(choice.value);
             setSelectedColumns(updatedSet);
           }
         }
@@ -300,6 +337,7 @@ export default function ColumnScreen(props: ColumnScreenProps) {
                     type="checkbox"
                     value={col}
                     onChange={handleCheckboxChange}
+                    disabled={preSelectedColumns.has(col)}
                     checked={selectedColumns.has(col)}
                   />{' '}
                   {col}

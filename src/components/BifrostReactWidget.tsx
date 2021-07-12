@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { WidgetModel } from '@jupyter-widgets/base';
 import {
   useModelState,
-  Flags,
+  Args,
   BifrostModelContext,
 } from '../hooks/bifrost-model';
 import theme from '../theme';
@@ -73,12 +73,12 @@ export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
 }
 
 function BifrostReactWidgetDisplay() {
-  const flags = useModelState<Flags>('flags')[0];
+  const args = useModelState<Args>('args')[0];
 
   const [screenName, setScreenName] = useState<string>(
-    !flags['columns_provided']
+    !(args['x'] && args['y'])
       ? 'columnChooser'
-      : !flags['kind_provided']
+      : !args['kind']
       ? 'chartChooser'
       : 'straight_visualize'
   );
@@ -93,6 +93,7 @@ function BifrostReactWidgetDisplay() {
         <OnboardingWidget
           screenName={screenName}
           setScreenName={setScreenName}
+          args={args}
         />
       )}
     </div>
