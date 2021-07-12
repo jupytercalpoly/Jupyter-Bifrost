@@ -22,7 +22,7 @@ const screenCss = (theme: BifrostTheme) => css`
 
   h1 {
     .encoding {
-      color: ${theme.color.primary[0]};
+      color: ${theme.color.primary.dark};
     }
   }
 
