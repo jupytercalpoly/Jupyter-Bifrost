@@ -56,7 +56,7 @@ export default function CustomizationTab() {
           {subTabs.map((subtab) => {
             return (
               <li
-                className={subtab == selectedTab ? 'selected' : ''}
+                className={subtab === selectedTab ? 'selected' : ''}
                 onClick={() => setSelectedTab(subtab)}
                 key={subtab}
               >
