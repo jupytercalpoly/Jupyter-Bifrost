@@ -94,6 +94,9 @@ export default function ChartChooser(props: ChartChooserProps) {
             inline: 'end',
           });
         break;
+      case 'Backspace':
+        props.onBack && props.onBack();
+        break;
     }
   }
 
