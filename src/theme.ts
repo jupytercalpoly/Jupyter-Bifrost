@@ -11,7 +11,9 @@ const theme = {
 
 export type BifrostTheme = typeof theme;
 declare module '@emotion/react' {
-  export type Theme = BifrostTheme;
+  export interface Theme extends BifrostTheme {
+    _: any;
+  }
 }
 
 export default theme;
