@@ -4,13 +4,15 @@ import produce from 'immer';
 import { useMemo } from 'react';
 import { ArrowLeft } from 'react-feather';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
+import { BifrostTheme } from '../../../theme';
 import {
   VegaEncoding,
   vegaAggregationList,
 } from '../../../modules/VegaEncodings';
 import { isFunction } from '../../../modules/utils';
+import RangeSlider from '../../ui-widgets/RangeSlider';
 
-const screenCss = (theme: any) => css`
+const screenCss = (theme: BifrostTheme) => css`
   position: absolute;
   top: 0;
   background-color: ${theme.color.background[0]};
@@ -22,6 +24,9 @@ const screenCss = (theme: any) => css`
     .encoding {
       color: ${theme.color.primary[0]};
     }
+  }
+
+  h2 {
   }
 `;
 
@@ -55,6 +60,7 @@ export default function FilterScreen(props: FilterScreenProps) {
         <span className="encoding">{props.encoding}</span>{' '}
         <span className="column">{columnInfo.field}</span>
       </h1>
+      <h2>Filters</h2>
       <Filters encoding={props.encoding} />
     </article>
   );
@@ -68,8 +74,7 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const bounds = useMemo(getBounds, [graphData]);
-  const currentMin = getFilterVal('gte') || bounds[0];
-  const currentMax = getFilterVal('lte') || bounds[1];
+  const rangeValues = getFilterVal<[number, number]>('range');
 
   function getBounds(): [number, number] {
     return graphData.reduce(
@@ -87,12 +92,12 @@ function QuantitativeFilters(props: FilterGroupProps) {
     );
   }
 
-  function updateFilter(type: string, val: number) {
-    const newSpec = updateSpecFilter(graphSpec, props.encoding, type, val);
-    setGraphSpec(newSpec);
-  }
+  // function updateFilter(type: string, val: number) {
+  //   const newSpec = updateSpecFilter(graphSpec, props.encoding, type, val);
+  //   setGraphSpec(newSpec);
+  // }
 
-  function getFilterVal(type: string): number | undefined {
+  function getFilterVal<T>(type: string): T {
     return graphSpec.transform.find(
       (f) => f.filter.field === field && type in f.filter
     )?.filter[type];
@@ -106,31 +111,19 @@ function QuantitativeFilters(props: FilterGroupProps) {
     setGraphSpec(newSpec);
   }
 
+  function updateRange(range: readonly number[]) {
+    const newSpec = updateSpecFilter(graphSpec, props.encoding, 'range', range);
+    setGraphSpec(newSpec);
+  }
+
   return (
     <div className="filters">
-      <label>
-        Min
-        <input
-          type="range"
-          value={currentMin}
-          min={bounds[0]}
-          max={bounds[1]}
-          step={(bounds[1] - bounds[0]) / 100}
-          onChange={(e) => updateFilter('gte', e.target.valueAsNumber)}
-        />
-      </label>
-
-      <label>
-        Max:
-        <input
-          type="range"
-          value={currentMax}
-          min={bounds[0]}
-          max={bounds[1]}
-          step={(bounds[1] - bounds[0]) / 100}
-          onChange={(e) => updateFilter('lte', e.target.valueAsNumber)}
-        />
-      </label>
+      <RangeSlider
+        width={150}
+        domain={bounds}
+        values={rangeValues}
+        onUpdate={updateRange}
+      />
 
       <label>
         Aggregation:{' '}

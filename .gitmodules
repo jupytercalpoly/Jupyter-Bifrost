@@ -1,0 +1,3 @@
+[submodule "jupyter-bifrost-tracing"]
+	path = jupyter-bifrost-tracing
+	url = https://github.com/jupytercalpoly/jupyter-bifrost-tracing.git
