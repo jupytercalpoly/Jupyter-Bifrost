@@ -36,7 +36,7 @@ class BifrostWidget(DOMWidget):
     current_dataframe_index = Int(0).tag(sync=True)
     query_spec = Dict({}).tag(sync=True)
     graph_spec = Dict({}).tag(sync=True)
-    args = Dict({}).tag(sync=True)
+    plot_function_args = Dict({}).tag(sync=True)
     graph_data = List([]).tag(sync=True)
     graph_encodings = Dict({}).tag(sync=True)
     df_variable_name:str = Unicode("").tag(sync=True)
@@ -57,7 +57,7 @@ class BifrostWidget(DOMWidget):
         self.set_trait("query_spec", graph_info["query_spec"])
         self.set_trait("graph_data", graph_info["data"])
         self.set_trait("graph_spec", graph_info["graph_spec"])
-        self.set_trait("args", graph_info["args"])
+        self.set_trait("plot_function_args", graph_info["args"])
         
 
     @observe("graph_spec")

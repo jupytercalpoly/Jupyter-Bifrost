@@ -30,7 +30,7 @@ type ModelStateName =
   | 'selected_mark'
   | 'graph_data'
   | 'suggested_graphs'
-  | 'args';
+  | 'plot_function_args';
 
 interface ModelCallback {
   (model: WidgetModel, event: Backbone.EventHandler): void;

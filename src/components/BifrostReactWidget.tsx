@@ -73,7 +73,7 @@ export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
 }
 
 function BifrostReactWidgetDisplay() {
-  const args = useModelState<Args>('args')[0];
+  const args = useModelState<Args>('plot_function_args')[0];
 
   const [screenName, setScreenName] = useState<string>(
     !(args['x'] && args['y'])
