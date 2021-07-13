@@ -1,7 +1,7 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ArrowLeft } from 'react-feather';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import { BifrostTheme } from '../../../theme';
@@ -74,7 +74,14 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const bounds = useMemo(getBounds, [graphData]);
-  const rangeValues = getFilterVal<[number, number]>('range');
+  const ranges = getRanges();
+  console.log({ graphSpec, ranges });
+
+  useEffect(() => {
+    if (!ranges.length) {
+      updateRange(bounds, 0);
+    }
+  }, []);
 
   function getBounds(): [number, number] {
     return graphData.reduce(
@@ -92,16 +99,33 @@ function QuantitativeFilters(props: FilterGroupProps) {
     );
   }
 
-  // function updateFilter(type: string, val: number) {
-  //   const newSpec = updateSpecFilter(graphSpec, props.encoding, type, val);
-  //   setGraphSpec(newSpec);
-  // }
-
-  function getFilterVal<T>(type: string): T {
-    return graphSpec.transform.find(
-      (f) => f.filter.field === field && type in f.filter
-    )?.filter[type];
+  function getRanges(): [number, number][] {
+    const type = 'range';
+    return graphSpec.transform
+      .filter((f) => f.filter.field === field && type in f.filter)
+      .map((t) => t.filter[type]);
   }
+
+  // function deleteRange(occurrence: number) {
+  //   let index = -1;
+  //   let foundCount = 0;
+  //   for (let i = 0; i < graphSpec.transform.length; i++) {
+  //     let t = graphSpec.transform[i];
+  //     if (t.filter.field === field && 'range' in t.filter) foundCount++;
+  //     if (foundCount === occurrence) {
+  //       index = i;
+  //       break;
+  //     }
+  //   }
+  //   const filterFound = index !== -1;
+  //   if (filterFound) {
+  //     let newSpec = produce(
+  //       graphSpec,
+  //       (gs) => void gs.transform.splice(index, 1)
+  //     );
+  //     setGraphSpec(newSpec);
+  //   }
+  // }
 
   function updateAggregation(aggregation: string) {
     const newSpec = produce(graphSpec, (gs) => {
@@ -111,19 +135,30 @@ function QuantitativeFilters(props: FilterGroupProps) {
     setGraphSpec(newSpec);
   }
 
-  function updateRange(range: readonly number[]) {
-    const newSpec = updateSpecFilter(graphSpec, props.encoding, 'range', range);
+  function updateRange(range: readonly number[], index: number) {
+    const newSpec = updateSpecFilter(
+      graphSpec,
+      props.encoding,
+      'range',
+      range,
+      index + 1
+    );
     setGraphSpec(newSpec);
   }
 
   return (
     <div className="filters">
-      <RangeSlider
-        width={300}
-        domain={bounds}
-        values={rangeValues}
-        onUpdate={updateRange}
-      />
+      {ranges.map((r, i) => (
+        <RangeSlider
+          width={300}
+          domain={bounds}
+          values={r}
+          onUpdate={(update) => updateRange(update, i)}
+        />
+      ))}
+      <button onClick={() => updateRange(bounds, ranges.length)}>
+        add range
+      </button>
 
       <label>
         Aggregation:{' '}
@@ -196,16 +231,36 @@ function CategoricalFilters(props: FilterGroupProps) {
   );
 }
 
+/**
+ *
+ * @param graphSpec The Vega Graph Spec that will be the basis for the new filter.
+ * @param encoding Encoding variable target of the filter.
+ * @param type Type of filter.
+ * @param val Filter value to be applied to the graph.
+ * @param occurrence If several of the same type of filters, identifies the desired instance by index. Defaults to first (1).
+ * @returns Updated spec.
+ */
 function updateSpecFilter<T>(
   graphSpec: GraphSpec,
   encoding: VegaEncoding,
   type: string,
-  val: T | ((currentVal: T | null) => T)
+  val: T | ((currentVal: T | null) => T),
+  occurrence = 1
 ) {
   const { field } = graphSpec.encoding[encoding];
-  const index = graphSpec.transform.findIndex(
-    (t) => t.filter.field === field && type in t.filter
-  );
+
+  let index = -1;
+  let foundCount = 0;
+  for (let i = 0; i < graphSpec.transform.length; i++) {
+    const t = graphSpec.transform[i];
+    if (t.filter.field === field && type in t.filter) {
+      foundCount++;
+    }
+    if (foundCount === occurrence) {
+      index = i;
+      break;
+    }
+  }
   const filterFound = index !== -1;
   let value: T;
   if (isFunction(val)) {
