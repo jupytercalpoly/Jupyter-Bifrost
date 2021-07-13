@@ -2,7 +2,7 @@
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
 import { useEffect, useMemo } from 'react';
-import { ArrowLeft } from 'react-feather';
+import { ArrowLeft, X, Sliders } from 'react-feather';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import { BifrostTheme } from '../../../theme';
 import {
@@ -27,6 +27,17 @@ const screenCss = (theme: BifrostTheme) => css`
   }
 
   h2 {
+  }
+
+  .close-slider {
+    display: inline-block;
+    margin-left: 5px;
+  }
+
+  .add-range {
+    margin: 10px 0;
+    margin-left: 10px;
+    color: ${theme.color.primary[0]};
   }
 `;
 
@@ -75,7 +86,6 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const bounds = useMemo(getBounds, [graphData]);
   const ranges = getRanges();
-  console.log({ graphSpec, ranges });
 
   useEffect(() => {
     if (!ranges.length) {
@@ -101,31 +111,42 @@ function QuantitativeFilters(props: FilterGroupProps) {
 
   function getRanges(): [number, number][] {
     const type = 'range';
-    return graphSpec.transform
-      .filter((f) => f.filter.field === field && type in f.filter)
-      .map((t) => t.filter[type]);
+    return (
+      graphSpec.transform
+        .find(
+          (f) =>
+            'or' in f.filter &&
+            f.filter.or[0]?.field === field &&
+            type in f.filter.or[0]
+        )
+        ?.filter.or.map((f: any) => f[type]) || []
+    );
   }
 
-  // function deleteRange(occurrence: number) {
-  //   let index = -1;
-  //   let foundCount = 0;
-  //   for (let i = 0; i < graphSpec.transform.length; i++) {
-  //     let t = graphSpec.transform[i];
-  //     if (t.filter.field === field && 'range' in t.filter) foundCount++;
-  //     if (foundCount === occurrence) {
-  //       index = i;
-  //       break;
-  //     }
-  //   }
-  //   const filterFound = index !== -1;
-  //   if (filterFound) {
-  //     let newSpec = produce(
-  //       graphSpec,
-  //       (gs) => void gs.transform.splice(index, 1)
-  //     );
-  //     setGraphSpec(newSpec);
-  //   }
-  // }
+  function deleteRange(index: number) {
+    const newSpec = produce(graphSpec, (gs) => {
+      const compoundIdx = gs.transform.findIndex(
+        (f) =>
+          'or' in f.filter &&
+          f.filter.or[0]?.field === field &&
+          'range' in f.filter.or[0]
+      );
+
+      if (compoundIdx === -1) {
+        return;
+      }
+      const ranges = gs.transform[compoundIdx].filter.or;
+      if (ranges.length === 1) {
+        // Delete entire compound block
+        gs.transform.splice(compoundIdx, 1);
+      } else {
+        // Delete range in compound block
+        ranges.splice(index, 1);
+      }
+    });
+
+    setGraphSpec(newSpec);
+  }
 
   function updateAggregation(aggregation: string) {
     const newSpec = produce(graphSpec, (gs) => {
@@ -148,18 +169,6 @@ function QuantitativeFilters(props: FilterGroupProps) {
 
   return (
     <div className="filters">
-      {ranges.map((r, i) => (
-        <RangeSlider
-          width={300}
-          domain={bounds}
-          values={r}
-          onUpdate={(update) => updateRange(update, i)}
-        />
-      ))}
-      <button onClick={() => updateRange(bounds, ranges.length)}>
-        add range
-      </button>
-
       <label>
         Aggregation:{' '}
         <select
@@ -171,6 +180,28 @@ function QuantitativeFilters(props: FilterGroupProps) {
           ))}
         </select>
       </label>
+      {ranges.map((r, i) => (
+        <div style={{ display: 'flex' }}>
+          <RangeSlider
+            width={300}
+            domain={bounds}
+            values={r}
+            onUpdate={(update) => updateRange(update, i)}
+          />
+          <button
+            className="close-slider wrapper"
+            onClick={() => deleteRange(i)}
+          >
+            <X size={20} />
+          </button>
+        </div>
+      ))}
+      <button
+        className="wrapper block add-range"
+        onClick={() => updateRange(bounds, ranges.length)}
+      >
+        + <Sliders />
+      </button>
     </div>
   );
 }
@@ -251,9 +282,26 @@ function updateSpecFilter<T>(
 
   let index = -1;
   let foundCount = 0;
-  for (let i = 0; i < graphSpec.transform.length; i++) {
-    const t = graphSpec.transform[i];
-    if (t.filter.field === field && type in t.filter) {
+  const isCompound = type === 'range';
+  let compoundIndex = -1;
+  let transforms: any;
+
+  if (isCompound) {
+    compoundIndex = graphSpec.transform.findIndex(
+      (t) =>
+        'or' in t.filter &&
+        t.filter.or[0]?.field === field &&
+        type in t.filter.or[0]
+    );
+    transforms =
+      compoundIndex !== -1 ? graphSpec.transform[compoundIndex].filter.or : [];
+  } else {
+    transforms = graphSpec.transform.map((t) => t.filter);
+  }
+
+  for (let i = 0; i < transforms.length; i++) {
+    const t = transforms[i];
+    if (t.field === field && type in t) {
       foundCount++;
     }
     if (foundCount === occurrence) {
@@ -264,30 +312,40 @@ function updateSpecFilter<T>(
   const filterFound = index !== -1;
   let value: T;
   if (isFunction(val)) {
-    const currentVal = filterFound
-      ? graphSpec.transform[index].filter[type]
-      : null;
+    const currentVal = filterFound ? transforms[index][type] : null;
     value = val(currentVal);
   } else {
     value = val;
   }
-
-  let newSpec: GraphSpec;
-  if (filterFound) {
-    // Filter exists
-    newSpec = produce(graphSpec, (gs) => {
-      gs.transform[index].filter[type] = value;
-    });
-  } else {
-    // Create Filter
-    newSpec = produce(graphSpec, (gs) => {
-      gs.transform.push({
-        filter: {
+  const newSpec = produce(graphSpec, (gs) => {
+    if (isCompound) {
+      if (filterFound) {
+        // Filter exists in compound
+        gs.transform[compoundIndex].filter.or[index][type] = value;
+      } else if (compoundIndex !== -1) {
+        // Compound exists but not filter
+        gs.transform[compoundIndex].filter.or.push({
           field,
           [type]: value,
-        },
-      });
-    });
-  }
+        });
+      } else {
+        // Compound doesn't exist. Create the compound.
+        gs.transform.push({ filter: { or: [{ field, range: value }] } });
+      }
+    } else {
+      if (filterFound) {
+        // Filter exists
+        gs.transform[index].filter[type] = value;
+      } else {
+        // Create Filter
+        gs.transform.push({
+          filter: {
+            field,
+            [type]: value,
+          },
+        });
+      }
+    }
+  });
   return newSpec;
 }

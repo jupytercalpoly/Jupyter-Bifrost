@@ -56,6 +56,11 @@ const globalStyles = (theme: any) => css`
       }
     }
 
+    &.block {
+      display: block;
+    }
+  }
+
     h1 {
       font-size: 35px;
       font-weight: 800;

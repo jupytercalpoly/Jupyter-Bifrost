@@ -52,7 +52,6 @@ export default function RangeSlider({
           domain={domain}
           rootStyle={sliderStyle}
           onUpdate={onUpdate}
-          onChange={(e) => console.log('change', e)}
           values={values}
         >
           <Rail>{(props) => <SliderRail {...props} />}</Rail>
@@ -119,7 +118,6 @@ interface RangeInputsProps {
 function RangeInputs(props: RangeInputsProps) {
   const [minInput, setMinInput] = useState(props.values[0]);
   const [maxInput, setMaxInput] = useState(props.values[1]);
-  console.log(minInput);
   useEffect(() => {
     setMinInput(props.values[0]);
     setMaxInput(props.values[1]);

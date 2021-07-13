@@ -15,6 +15,26 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 // Import the CSS
 import '../css/widget.css';
 
+const bifrostModelPropDefaults = {
+  spec_history: [],
+  output_variable: '',
+  df_variable_name: '',
+  current_dataframe_index: 0,
+  graph_spec: {},
+  query_spec: {},
+  graph_encodings: {},
+  generate_random_dist: 0,
+  df_columns: [],
+  selected_data: [],
+  selected_columns: [],
+  selected_mark: '',
+  graph_data: [],
+  suggested_graphs: [],
+  flags: {},
+};
+
+export type ModelStateName = keyof typeof bifrostModelPropDefaults;
+
 export class BifrostModel extends DOMWidgetModel {
   defaults() {
     return {
@@ -25,21 +45,7 @@ export class BifrostModel extends DOMWidgetModel {
       _view_name: BifrostModel.view_name,
       _view_module: BifrostModel.view_module,
       _view_module_version: BifrostModel.view_module_version,
-      spec_history: [],
-      output_variable: '',
-      df_variable_name: '',
-      current_dataframe_index: 0,
-      graph_spec: {},
-      query_spec: {},
-      graph_encodings: {},
-      generate_random_dist: 0,
-      df_columns: [],
-      selected_data: [],
-      selected_columns: [],
-      selected_mark: '',
-      graph_data: [],
-      suggested_graphs: [],
-      plot_function_args: {},
+      ...bifrostModelPropDefaults,
     };
   }
 

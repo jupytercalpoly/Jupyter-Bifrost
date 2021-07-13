@@ -35,7 +35,7 @@ const vegaAggToPd: { [vegaAgg: string]: string | AggFunc } = {
 };
 
 export default class VegaPandasTranslator {
-  private getQueryFromFilter(filterConfig: any) {
+  private getQueryFromFilter(filterConfig: any): string {
     return Object.keys(filterConfig)
       .filter((key) => filterTypes.has(key))
       .map((filterType) => {
@@ -49,7 +49,7 @@ export default class VegaPandasTranslator {
             break;
           case 'range':
             // Expects number range like {range: [0, 5]}.
-            query = `($df['${filterConfig.field}'] >= ${filterConfig.gte}) & ($df['${filterConfig.field}'] <= ${filterConfig.lte})`;
+            query = `($df['${filterConfig.field}'] >= ${filterConfig.range[0]}) & ($df['${filterConfig.field}'] <= ${filterConfig.range[1]})`;
             break;
           case 'oneOf':
             query = `($df['${filterConfig.field}'].isin([${filterConfig.oneOf
@@ -62,6 +62,24 @@ export default class VegaPandasTranslator {
             break;
         }
         return query;
+      })
+      .join('&');
+  }
+
+  private getFilterFromTransform(transform: GraphSpec['transform']) {
+    return transform
+      .map((t) => {
+        if ('or' in t.filter) {
+          // Handle compound query ex. "and", "or", "not"
+          const compFilters = t.filter.or.map(this.getQueryFromFilter);
+          let query = compFilters.join('|');
+          if (compFilters.length > 1) {
+            query = '(' + query + ')';
+          }
+          return query;
+        } else {
+          return this.getQueryFromFilter(t.filter);
+        }
       })
       .join('&');
   }
@@ -90,9 +108,7 @@ export default class VegaPandasTranslator {
 
   convertSpecToCode(spec: GraphSpec) {
     // Filters
-    const filterQuery = spec.transform
-      .map((filterObj) => this.getQueryFromFilter(filterObj.filter))
-      .join('&');
+    const filterQuery = this.getFilterFromTransform(spec.transform);
     const filteredDs = filterQuery.length ? `$df = $df[${filterQuery}]` : '';
     // Aggregators
     const aggregations = this.getAggregations(spec.encoding);

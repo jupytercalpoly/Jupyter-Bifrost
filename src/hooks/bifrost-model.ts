@@ -5,6 +5,10 @@ import { Query } from 'compassql/build/src/query/query';
 import { ResultTree } from 'compassql/build/src/result';
 import { TopLevel, FacetedUnitSpec } from 'vega-lite/build/src/spec';
 import { VegaColumnType, VegaEncoding } from '../modules/VegaEncodings';
+import { ModelStateName } from '../widget';
+
+// CONTEXT
+//============================================================================================
 export const BifrostModelContext = createContext<WidgetModel | undefined>(
   undefined
 );
@@ -13,24 +17,6 @@ const noop = (a: any) => a;
 
 // TYPES AND INTERFACES
 //============================================================================================
-
-type ModelStateName =
-  | 'df_history'
-  | 'spec_history'
-  | 'current_dataframe_index'
-  | 'graph_spec'
-  | 'query_spec'
-  | 'df_variable_name'
-  | 'output_variable'
-  | 'generate_random_dist'
-  | 'df_columns'
-  | 'graph_encodings'
-  | 'selected_data'
-  | 'selected_columns'
-  | 'selected_mark'
-  | 'graph_data'
-  | 'suggested_graphs'
-  | 'plot_function_args';
 
 interface ModelCallback {
   (model: WidgetModel, event: Backbone.EventHandler): void;
