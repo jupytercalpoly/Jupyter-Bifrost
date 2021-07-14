@@ -39,7 +39,7 @@ class BifrostWidget(DOMWidget):
     current_dataframe_index = Int(0).tag(sync=True)
     query_spec = Dict({}).tag(sync=True)
     graph_spec = Dict({}).tag(sync=True)
-    flags = Dict({}).tag(sync=True)
+    plot_function_args = Dict({}).tag(sync=True)
     graph_data = List([]).tag(sync=True)
     graph_encodings = Dict({}).tag(sync=True)
     df_variable_name = Unicode("").tag(sync=True)
@@ -60,7 +60,7 @@ class BifrostWidget(DOMWidget):
         self.set_trait("query_spec", graph_info["query_spec"])
         self.set_trait("graph_data", graph_info["data"])
         self.set_trait("graph_spec", graph_info["graph_spec"])
-        self.set_trait("flags", graph_info["flags"])
+        self.set_trait("plot_function_args", graph_info["args"])
         if df_watcher.plot_output: self.set_trait("output_variable", df_watcher.plot_output)
         if df_watcher.bifrost_input: self.set_trait("df_variable_name", df_watcher.bifrost_input)
         
@@ -101,13 +101,14 @@ class BifrostWidget(DOMWidget):
 
         data = json.loads(df.to_json(orient="records"))
         
-        columns_provided = (x != None) and (y != None)
+        x_provided = (x != None)
+        y_provided = (y != None)
         kind_provided = kind != None
 
         graph_spec = {}
         query_spec = {}
 
-        if columns_provided:
+        if x_provided and y_provided:
             df_filter = [col for col in [x, y, color] if col]
             graph_df = df[df_filter]
             types = graph_df.dtypes
@@ -166,14 +167,27 @@ class BifrostWidget(DOMWidget):
                     "transform": [],
                     "chooseBy": "effectiveness"
                 }
-
         else:
             types = df.dtypes
             types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
 
             if not kind_provided:
                 kind = '?'
-                
+
+            encodings = []
+
+            if x in df.columns:
+                encodings.append({"field": x, "type": types[x], "channel" : "x"})
+
+            if y in df.columns:
+                encodings.append({"field": y, "type": types[y], "channel" : "y"})
+
+            if color in df.columns:
+                encodings.append({"field": color, "type": types[color], "channel" : "color"})
+
+            for col in set(df.columns) - set({x, y, color}):                
+                encodings.append({"field": col, "type": types[col], "channel" : "?"})
+
             query_spec = {
                 "config":{
                     "mark": {"tooltip": True}
@@ -183,14 +197,14 @@ class BifrostWidget(DOMWidget):
                 "mark": kind,
                 "params": [{"name": "brush", "select": "interval"}],
                 "data": {"name": "data"},
-                "encodings": [{"field": col, "type": types[col], "channel" : "?"} for col in df.columns],
+                "encodings": encodings,
                 "transform": [],
                 "chooseBy": "effectiveness"
             }
 
         # TODO: Figure out aggregation etc.
 
-        return {"data": data, "query_spec" :{"spec": query_spec}, "graph_spec": graph_spec, "flags": {"columns_provided": columns_provided, "kind_provided": kind_provided }}
+        return {"data": data, "query_spec" :{"spec": query_spec}, "graph_spec": graph_spec, "args": {"x": x, "y": y, "color": color, "kind": None if kind == "?" else kind}}
 
 
 

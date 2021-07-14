@@ -94,6 +94,9 @@ export default function ChartChooser(props: ChartChooserProps) {
             inline: 'end',
           });
         break;
+      case 'Backspace':
+        props.onBack && props.onBack();
+        break;
     }
   }
 
@@ -119,7 +122,11 @@ export default function ChartChooser(props: ChartChooserProps) {
             key={`spec_${i}`}
             onClick={() => setSelectedIndex(i)}
           >
-            <VegaLite spec={spec as VisualizationSpec} data={data} />
+            <VegaLite
+              spec={spec as VisualizationSpec}
+              data={data}
+              actions={false}
+            />
             <div
               className="graph-info"
               style={{

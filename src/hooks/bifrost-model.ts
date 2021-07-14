@@ -30,7 +30,7 @@ type ModelStateName =
   | 'selected_mark'
   | 'graph_data'
   | 'suggested_graphs'
-  | 'flags';
+  | 'plot_function_args';
 
 interface ModelCallback {
   (model: WidgetModel, event: Backbone.EventHandler): void;
@@ -64,9 +64,11 @@ export type GraphSpec = VisualizationSpec & {
   data: { name: string };
 };
 
-export type Flags = {
-  columns_provided: boolean;
-  kind_provided: boolean;
+export type Args = {
+  x: string;
+  y: string;
+  color: string;
+  kind: string;
 };
 
 // HOOKS
