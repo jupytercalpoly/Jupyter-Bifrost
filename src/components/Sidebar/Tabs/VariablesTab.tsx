@@ -46,7 +46,8 @@ const variableTabCss = css`
     }
   }
 `;
-// const possibleEncodings: Encoding[] = ['x', 'y', 'color'];
+const sortedEncodingList = [...vegaEncodingList];
+sortedEncodingList.sort();
 export default function VariablesTab() {
   const columns = useModelState<string[]>('df_columns')[0];
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,7 +152,7 @@ export default function VariablesTab() {
       <ul className="encoding-list">{encodingList}</ul>
       {showEncodings && (
         <ul className="encoding-choices">
-          {vegaEncodingList.map((encoding) => (
+          {sortedEncodingList.map((encoding) => (
             <Pill onClick={() => addEncoding(encoding)}>
               <span style={{ padding: '3px 10px' }}>{encoding}</span>
             </Pill>
