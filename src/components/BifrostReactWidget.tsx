@@ -22,7 +22,7 @@ const globalStyles = (theme: any) => css`
   button {
     cursor: pointer;
     transition: transform 0.4s;
-    background-color: ${theme.color.primary[0]};
+    background-color: ${theme.color.primary.dark};
     color: white;
     font-weight: 700;
     padding: 10px 15px;
