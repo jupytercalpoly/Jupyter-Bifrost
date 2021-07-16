@@ -5,8 +5,6 @@ import VisualizationScreen from '../VisualizationScreen';
 import {
   useModelState,
   SuggestedGraphs,
-  GraphData,
-  QuerySpec,
   Args,
 } from '../../hooks/bifrost-model';
 
@@ -31,9 +29,9 @@ interface onboardingWidgetProps {
 export default function OnboardingWidget(props: onboardingWidgetProps) {
   const setSelectedSpec = useState<VisualizationSpec>({})[1];
   const [suggestedGraphs, setSuggestedGraphs] =
-    useModelState<SuggestedGraphs>('suggested_graphs');
-  const querySpec = useModelState<QuerySpec>('query_spec')[0];
-  const data = useModelState<GraphData>('graph_data')[0];
+    useModelState('suggested_graphs');
+  const querySpec = useModelState('query_spec')[0];
+  const data = useModelState('graph_data')[0];
 
   let Screen: JSX.Element;
 

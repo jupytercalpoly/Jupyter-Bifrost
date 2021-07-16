@@ -33,12 +33,9 @@ const historyCss = (theme: any) => css`
 `;
 
 export default function HistoryTab() {
-  const [spec, setSpec] = useModelState<GraphSpec>('graph_spec');
-  const [specHistory, setSpecHistory] =
-    useModelState<GraphSpec[]>('spec_history');
-  const [dfIndex, setDfIndex] = useModelState<number>(
-    'current_dataframe_index'
-  );
+  const [spec, setSpec] = useModelState('graph_spec');
+  const [specHistory, setSpecHistory] = useModelState('spec_history');
+  const [dfIndex, setDfIndex] = useModelState('current_dataframe_index');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setResults] = useState<
     { choice: string; index: number }[]

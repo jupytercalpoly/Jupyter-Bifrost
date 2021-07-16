@@ -5,15 +5,13 @@ import { Query } from 'compassql/build/src/query/query';
 import { ResultTree } from 'compassql/build/src/result';
 import { TopLevel, FacetedUnitSpec } from 'vega-lite/build/src/spec';
 import { VegaColumnType, VegaEncoding } from '../modules/VegaEncodings';
-import { ModelStateName } from '../widget';
+import { ModelState } from '../widget';
 
 // CONTEXT
 //============================================================================================
 export const BifrostModelContext = createContext<WidgetModel | undefined>(
   undefined
 );
-
-const noop = (a: any) => a;
 
 // TYPES AND INTERFACES
 //============================================================================================
@@ -27,7 +25,7 @@ export type SuggestedGraphs = (
   | ResultTree<TopLevel<FacetedUnitSpec<string>>>
 )[];
 
-export type GraphData = PlainObject;
+export type GraphData = PlainObject[];
 export type QuerySpec = Query;
 
 export interface EncodingInfo {
@@ -66,22 +64,27 @@ export type Args = {
  * @param mutation optional mutator that is run on the Python model value before setting the JavaScript state.
  * @returns model state and set state function.
  */
-export function useModelState<T>(
-  name: ModelStateName,
-  mutation: (val: any) => T = noop
-): [T, (val: T, options?: any) => void] {
+export function useModelState<K extends keyof ModelState, M>(
+  name: K,
+  mutation?: (val: ModelState[K]) => M
+): [
+  M extends undefined ? M : ModelState[K],
+  (val: ModelState[K], options?: any) => void
+] {
   const model = useModel();
-  const [state, setState] = useState<T>(mutation(model?.get(name)));
+  const [state, setState] = useState<M extends undefined ? M : ModelState[K]>(
+    mutation ? mutation(model?.get(name)) : model?.get(name)
+  );
 
   useModelEvent(
     `change:${name}`,
     (model) => {
-      setState(mutation(model.get(name)));
+      setState(mutation ? mutation(model?.get(name)) : model?.get(name));
     },
     [name]
   );
 
-  function updateModel(val: T, options?: any) {
+  function updateModel(val: ModelState[K], options?: any) {
     model?.set(name, val);
     model?.save_changes();
   }

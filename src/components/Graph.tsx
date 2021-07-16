@@ -1,11 +1,11 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import { VegaLite } from 'react-vega';
-import { useModelState, GraphData, GraphSpec } from '../hooks/bifrost-model';
+import { PlainObject, VegaLite } from 'react-vega';
+import { useModelState } from '../hooks/bifrost-model';
 
 export default function Graph() {
-  const [selectedData, setSelectedData] = useModelState<any[]>('selected_data');
-  const spec = useModelState<GraphSpec>('graph_spec')[0];
+  const [selectedData, setSelectedData] = useModelState('selected_data');
+  const spec = useModelState('graph_spec')[0];
 
   function handleBrush(...args: any) {
     console.log(args);
@@ -14,14 +14,18 @@ export default function Graph() {
 
   console.log(selectedData);
 
-  const data = useModelState<GraphData>('graph_data', (data) => ({ data }))[0];
+  const data = useModelState('graph_data', (data) => ({ data }))[0];
 
   // multiple signals can be added by adding a new field
   const signalListeners = { brush: handleBrush };
 
   return (
     <div>
-      <VegaLite spec={spec} data={data} signalListeners={signalListeners} />
+      <VegaLite
+        spec={spec}
+        data={data as unknown as PlainObject}
+        signalListeners={signalListeners}
+      />
     </div>
   );
 }

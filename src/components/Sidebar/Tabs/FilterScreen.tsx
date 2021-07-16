@@ -58,7 +58,7 @@ interface FilterScreenProps {
 }
 
 export default function FilterScreen(props: FilterScreenProps) {
-  const [graphSpec] = useModelState<GraphSpec>('graph_spec');
+  const [graphSpec] = useModelState('graph_spec');
   const columnInfo = graphSpec.encoding[props.encoding];
   const Filters = filterMap[columnInfo.type];
 
@@ -77,11 +77,9 @@ export default function FilterScreen(props: FilterScreenProps) {
   );
 }
 
-type GraphData<T> = { [col: string]: T }[];
-
 function QuantitativeFilters(props: FilterGroupProps) {
-  const [graphData] = useModelState<GraphData<number>>('graph_data');
-  const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
+  const [graphData] = useModelState('graph_data');
+  const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const bounds = useMemo(getBounds, [graphData]);
@@ -96,7 +94,7 @@ function QuantitativeFilters(props: FilterGroupProps) {
   function getBounds(): [number, number] {
     return graphData.reduce(
       (minMax, cur) => {
-        const val = cur[field];
+        const val = cur[field] as number;
         if (minMax[0] > val) {
           minMax[0] = val;
         }
@@ -207,14 +205,14 @@ function QuantitativeFilters(props: FilterGroupProps) {
 }
 
 function CategoricalFilters(props: FilterGroupProps) {
-  const [graphData] = useModelState<GraphData<string>>('graph_data');
-  const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
+  const [graphData] = useModelState('graph_data');
+  const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const categories = useMemo(getCategories, []);
 
   function getCategories() {
     const { field } = graphSpec.encoding[props.encoding];
     const categorySet = graphData.reduce((categories, row) => {
-      categories.add(row[field]);
+      categories.add(row[field] as string);
       return categories;
     }, new Set<string>());
 

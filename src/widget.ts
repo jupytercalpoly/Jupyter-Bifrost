@@ -9,6 +9,13 @@ import {
 import React from 'react';
 import ReactDOM from 'react-dom';
 import BifrostReactWidget from './components/BifrostReactWidget';
+import {
+  GraphSpec,
+  GraphData,
+  SuggestedGraphs,
+  QuerySpec,
+  Args,
+} from './hooks/bifrost-model';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
@@ -16,24 +23,25 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 import '../css/widget.css';
 
 const bifrostModelPropDefaults = {
-  spec_history: [],
+  spec_history: [] as GraphSpec[],
   output_variable: '',
   df_variable_name: '',
   current_dataframe_index: 0,
-  graph_spec: {},
-  query_spec: {},
+  graph_spec: {} as GraphSpec,
+  query_spec: {} as QuerySpec,
   graph_encodings: {},
   generate_random_dist: 0,
-  df_columns: [],
-  selected_data: [],
+  df_columns: [] as string[],
+  selected_data: [] as any[],
   selected_columns: [],
   selected_mark: '',
-  graph_data: [],
-  suggested_graphs: [],
+  graph_data: {} as GraphData,
+  suggested_graphs: [] as SuggestedGraphs,
   flags: {},
+  plot_function_args: {} as Args,
 };
 
-export type ModelStateName = keyof typeof bifrostModelPropDefaults;
+export type ModelState = typeof bifrostModelPropDefaults;
 
 export class BifrostModel extends DOMWidgetModel {
   defaults() {

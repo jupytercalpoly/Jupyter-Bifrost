@@ -203,7 +203,6 @@ class BifrostWidget(DOMWidget):
                 "chooseBy": "effectiveness"
             }
 
-        # TODO: Figure out aggregation etc.
 
         return {"data": data, "query_spec" :{"spec": query_spec}, "graph_spec": graph_spec, "args": {"x": x, "y": y, "color": color, "kind": None if kind == "?" else kind}}
 

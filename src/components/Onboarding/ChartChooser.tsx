@@ -2,11 +2,7 @@
 import { jsx, css } from '@emotion/react';
 import { useState, useRef, useEffect } from 'react';
 import { PlainObject, VegaLite, VisualizationSpec } from 'react-vega';
-import {
-  useModelState,
-  SuggestedGraphs,
-  GraphSpec,
-} from '../../hooks/bifrost-model';
+import { useModelState, GraphSpec } from '../../hooks/bifrost-model';
 import NavHeader from './NavHeader';
 import theme from '../../theme';
 
@@ -39,12 +35,12 @@ interface ChartChooserProps {
 }
 
 export default function ChartChooser(props: ChartChooserProps) {
-  const suggestedGraphs = useModelState<SuggestedGraphs>('suggested_graphs')[0];
-  const data = useModelState<PlainObject>('graph_data', (data) => ({
+  const suggestedGraphs = useModelState('suggested_graphs')[0];
+  const data = useModelState('graph_data', (data) => ({
     data,
   }))[0];
-  const setGraphSpec = useModelState<GraphSpec>('graph_spec')[1];
-  const setOpHistory = useModelState<GraphSpec[]>('spec_history')[1];
+  const setGraphSpec = useModelState('graph_spec')[1];
+  const setOpHistory = useModelState('spec_history')[1];
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const chartChooserRef = useRef<HTMLElement>(null);
 
@@ -124,7 +120,7 @@ export default function ChartChooser(props: ChartChooserProps) {
           >
             <VegaLite
               spec={spec as VisualizationSpec}
-              data={data}
+              data={data as unknown as PlainObject}
               actions={false}
             />
             <div
