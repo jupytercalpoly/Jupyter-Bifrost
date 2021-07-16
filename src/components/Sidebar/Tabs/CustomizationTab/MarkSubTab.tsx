@@ -125,7 +125,6 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
                 convertToCategoricalChartsEncoding(draftSpec, kind);
               }
             });
-            console.log(spec);
             return (
               <li
                 className={
