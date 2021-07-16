@@ -76,7 +76,10 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
         {results
           .filter(({ choice: kind }) => {
             const channels = Object.keys(props.spec.encoding);
-            if (channels.length === 0) {
+            if (
+              channels.length === 0 ||
+              (!('x' in props.spec.encoding) && !('y' in props.spec.encoding))
+            ) {
               return false;
             }
 
@@ -85,13 +88,6 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
               ('y' in props.spec.encoding && !('x' in props.spec.encoding))
             ) {
               return !(kind === 'arc');
-            }
-
-            if (
-              !('x' in props.spec.encoding) &&
-              !('y' in props.spec.encoding)
-            ) {
-              return false;
             }
 
             const spec = produce(props.spec, (draftSpec: GraphSpec) => {
