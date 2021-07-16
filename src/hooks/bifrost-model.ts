@@ -64,22 +64,16 @@ export type Args = {
  * @param mutation optional mutator that is run on the Python model value before setting the JavaScript state.
  * @returns model state and set state function.
  */
-export function useModelState<K extends keyof ModelState, M>(
-  name: K,
-  mutation?: (val: ModelState[K]) => M
-): [
-  M extends undefined ? M : ModelState[K],
-  (val: ModelState[K], options?: any) => void
-] {
+export function useModelState<K extends keyof ModelState>(
+  name: K
+): [ModelState[K], (val: ModelState[K], options?: any) => void] {
   const model = useModel();
-  const [state, setState] = useState<M extends undefined ? M : ModelState[K]>(
-    mutation ? mutation(model?.get(name)) : model?.get(name)
-  );
+  const [state, setState] = useState<ModelState[K]>(model?.get(name));
 
   useModelEvent(
     `change:${name}`,
     (model) => {
-      setState(mutation ? mutation(model?.get(name)) : model?.get(name));
+      setState(model?.get(name));
     },
     [name]
   );
