@@ -18,7 +18,15 @@ const screenCss = (theme: BifrostTheme) => css`
   background-color: ${theme.color.background[0]};
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
+
+  .filter-contents {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+  }
+  nav {
+    padding-bottom: 5px;
+  }
 
   h1 {
     .encoding {
@@ -27,6 +35,10 @@ const screenCss = (theme: BifrostTheme) => css`
   }
 
   h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 20px;
   }
 
   .close-slider {
@@ -64,15 +76,18 @@ export default function FilterScreen(props: FilterScreenProps) {
 
   return (
     <article css={screenCss}>
-      <button className="wrapper" onClick={props.onBack}>
-        <ArrowLeft />
-      </button>
-      <h1>
-        <span className="encoding">{props.encoding}</span>{' '}
-        <span className="column">{columnInfo.field}</span>
-      </h1>
-      <h2>Filters</h2>
-      <Filters encoding={props.encoding} />
+      <nav>
+        <button className="wrapper" onClick={props.onBack}>
+          <ArrowLeft />
+        </button>
+      </nav>
+      <div className="filter-contents">
+        <h1>
+          <span className="encoding">{props.encoding}</span>{' '}
+          <span className="column">{columnInfo.field}</span>
+        </h1>
+        <Filters encoding={props.encoding} />
+      </div>
     </article>
   );
 }
@@ -82,7 +97,7 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
-  const bounds = useMemo(getBounds, [graphData]);
+  const bounds = useMemo(getBounds, [graphData, currentAggregation]);
   const ranges = getRanges();
 
   useEffect(() => {
@@ -167,17 +182,18 @@ function QuantitativeFilters(props: FilterGroupProps) {
 
   return (
     <div className="filters">
-      <label>
-        Aggregation:{' '}
-        <select
-          value={currentAggregation}
-          onChange={(e) => updateAggregation(e.target.value)}
-        >
-          {['none', ...vegaAggregationList].map((aggregation) => (
-            <option value={aggregation}>{aggregation}</option>
-          ))}
-        </select>
-      </label>
+      <h2>Aggregate</h2>
+      <select
+        value={currentAggregation}
+        onChange={(e) => updateAggregation(e.target.value)}
+      >
+        {['none', ...vegaAggregationList].map((aggregation) => (
+          <option value={aggregation}>{aggregation}</option>
+        ))}
+      </select>
+
+      <h2>Filter</h2>
+
       {ranges.map((r, i) => (
         <div style={{ display: 'flex' }}>
           <RangeSlider
@@ -247,16 +263,23 @@ function CategoricalFilters(props: FilterGroupProps) {
   }
 
   return (
-    <ul style={{ listStyle: 'none' }}>
-      {categories.map((category) => (
-        <li key={category}>
-          <label className="choice">
-            <input type="checkbox" value={category} onChange={selectCategory} />{' '}
-            {category}
-          </label>
-        </li>
-      ))}
-    </ul>
+    <div>
+      <h2>Categories</h2>
+      <ul style={{ listStyle: 'none' }}>
+        {categories.map((category) => (
+          <li key={category}>
+            <label className="choice">
+              <input
+                type="checkbox"
+                value={category}
+                onChange={selectCategory}
+              />{' '}
+              {category}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

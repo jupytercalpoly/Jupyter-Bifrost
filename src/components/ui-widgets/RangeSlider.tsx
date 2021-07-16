@@ -48,7 +48,7 @@ export default function RangeSlider({
       <RangeInputs values={values} onUpdate={onUpdate}>
         <Slider
           className="range-slider"
-          mode={3}
+          mode={1}
           domain={domain}
           rootStyle={sliderStyle}
           onUpdate={onUpdate}
@@ -122,6 +122,19 @@ function RangeInputs(props: RangeInputsProps) {
     setMinInput(props.values[0]);
     setMaxInput(props.values[1]);
   }, props.values);
+
+  function onSubmit() {
+    let min = minInput;
+    let max = maxInput;
+    if (minInput > maxInput) {
+      max = minInput;
+      min = maxInput;
+      setMinInput(min);
+      setMaxInput(max);
+    }
+    props.onUpdate([min, max]);
+  }
+
   function handleEnter(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== 'Enter') {
       return;
@@ -133,24 +146,20 @@ function RangeInputs(props: RangeInputsProps) {
   return (
     <div className="RangeInputs" css={rangeInputsCss}>
       <input
-        value={minInput}
+        value={minInput.toFixed(2)}
         type="number"
         name="min"
         onChange={(e) => setMinInput(e.target.valueAsNumber)}
-        onBlur={(e) =>
-          props.onUpdate([e.target.valueAsNumber, props.values[1]])
-        }
+        onBlur={onSubmit}
         onKeyPress={handleEnter}
       />
       <div className="content">{props.children}</div>
       <input
-        value={maxInput}
+        value={maxInput.toFixed(2)}
         type="number"
         name="max"
         onChange={(e) => setMaxInput(e.target.valueAsNumber)}
-        onBlur={(e) =>
-          props.onUpdate([props.values[0], e.target.valueAsNumber])
-        }
+        onBlur={onSubmit}
         onKeyPress={handleEnter}
       />
     </div>
