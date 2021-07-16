@@ -2,7 +2,11 @@ const theme = {
   color: {
     text: ['#000'],
     background: ['#fff', '#F6F6F6'],
-    primary: ['#771C79', '#AD77AF', '#E4D2E4'],
+    primary: {
+      dark: '#771C79',
+      standard: '#AD77AF',
+      light: '#E4D2E4',
+    },
   },
   shadow: {
     handle: '0 0 10px #781c7932',

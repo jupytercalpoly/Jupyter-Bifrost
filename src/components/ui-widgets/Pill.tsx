@@ -27,7 +27,7 @@ const pillCss = css`
 `;
 
 const activeCss = (theme: any) => css`
-  background-color: ${theme.color.primary[0]};
+  background-color: ${theme.color.primary.dark};
   color: white;
   svg {
     color: white;

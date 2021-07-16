@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/react';
 import { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
-import CustomizationTab from './Tabs/CustomizationTab';
+import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
 import { useModelState, GraphSpec } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 
@@ -49,6 +49,7 @@ const tabBarCss = css`
     list-style: none;
     padding: 0;
     margin: 0;
+    justify-content: space-between;
   }
   li {
     padding: 15px 30px;
@@ -59,6 +60,8 @@ const tabBarCss = css`
 
     border: 1px solid #d4d4d4;
     border-bottom: none;
+    width: calc(100% / 3);
+    text-align: center;
 
     &.selected {
       font-weight: 800;

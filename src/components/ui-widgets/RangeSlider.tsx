@@ -119,7 +119,7 @@ const railCss = (theme: BifrostTheme) => css`
   transform: translate(0%, -50%);
   border-radius: 7px;
   cursor: pointer;
-  background: ${theme.color.primary[2]};
+  background: ${theme.color.primary.light};
 `;
 
 const tooltipRailCss = css`
@@ -233,11 +233,11 @@ function Handle({
     height: 15px;
 
     border-radius: 50%;
-    border: 1px solid ${theme.color.primary[0]};
+    border: 1px solid ${theme.color.primary.dark};
     box-shadow: ${theme.shadow.handle};
     background-color: ${disabled
-      ? theme.color.primary[2]
-      : theme.color.primary[1]};
+      ? theme.color.primary.light
+      : theme.color.primary.standard};
   `;
 
   return (
@@ -278,7 +278,7 @@ function Track({
         transform: translate(0%, -50%);
         height: 7px;
         z-index: 1;
-        background-color: ${theme.color.primary[2]};
+        background-color: ${theme.color.primary.light};
         border-radius: 7px;
         cursor: pointer;
         left: ${source.percent}%;
