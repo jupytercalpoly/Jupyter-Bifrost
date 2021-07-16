@@ -75,6 +75,25 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
       <ul className="mark-options" css={markOptionsListCss}>
         {results
           .filter(({ choice: kind }) => {
+            const channels = Object.keys(props.spec.encoding);
+            if (channels.length === 0) {
+              return false;
+            }
+
+            if (
+              ('x' in props.spec.encoding && !('y' in props.spec.encoding)) ||
+              ('y' in props.spec.encoding && !('x' in props.spec.encoding))
+            ) {
+              return !(kind === 'arc');
+            }
+
+            if (
+              !('x' in props.spec.encoding) &&
+              !('y' in props.spec.encoding)
+            ) {
+              return false;
+            }
+
             const spec = produce(props.spec, (draftSpec: GraphSpec) => {
               preprocessEncoding(draftSpec);
             });
@@ -82,25 +101,18 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
             if (vegaCategoricalChartList.includes(kind)) {
               const x = spec['encoding']['x'];
               const y = spec['encoding']['y'];
-              if (
+              return (
                 (x['type'] === 'quantitative' && y['type'] === 'nominal') ||
                 (y['type'] === 'quantitative' && x['type'] === 'nominal')
-              ) {
-                return true;
-              } else {
-                return false;
-              }
+              );
             } else if (vegaTemporalChartList.includes(kind)) {
               const xType = spec['encoding']['x']['type'];
               const yType = spec['encoding']['y']['type'];
-              if (
+
+              return (
                 ['temporal', 'ordinal'].includes(xType) &&
                 yType === 'quantitative'
-              ) {
-                return true;
-              } else {
-                return false;
-              }
+              );
             } else {
               return true;
             }
@@ -117,7 +129,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
                 convertToCategoricalChartsEncoding(draftSpec, kind);
               }
             });
-
+            console.log(spec);
             return (
               <li
                 className={
