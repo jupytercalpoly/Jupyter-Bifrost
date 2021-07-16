@@ -1,8 +1,15 @@
 /** @jsx jsx */
+<<<<<<< HEAD
 import { jsx, css } from '@emotion/react';
 import { VegaLite } from 'react-vega';
+=======
+import { jsx } from '@emotion/react';
+// import { VegaLite } from 'react-vega';
+>>>>>>> 06de7db (Started working on clicking axis to change variable)
 import { useModelState } from '../hooks/bifrost-model';
 import { deleteSpecFilter, updateSpecFilter } from '../modules/VegaFilters';
+import { useEffect, useRef } from 'react';
+import Vega from './BifrostVega';
 
 const graphCss = css`
   .vega-embed.has-actions {
@@ -17,6 +24,34 @@ export default function Graph() {
   const [selectedData, setSelectedData] = useModelState('selected_data');
   const [spec, setSpec] = useModelState('graph_spec');
   const [graphBounds, setGraphBounds] = useModelState('graph_bounds');
+  const data = useModelState('graph_data')[0];
+  const graphData = { data };
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!wrapperRef.current) {
+      return;
+    }
+    const wrapper = wrapperRef.current;
+
+    const axisLabels = wrapper.querySelectorAll('.mark-group.role-axis');
+    console.log(axisLabels);
+
+    function logTest() {
+      console.log('clicked');
+    }
+    // debugger;
+
+    axisLabels.forEach((axisTitle) => {
+      axisTitle.addEventListener('click', logTest);
+    });
+
+    return () =>
+      void axisLabels.forEach((axisTitle) => {
+        axisTitle.removeEventListener('click', logTest);
+      });
+  }, [wrapperRef.current, spec, graphData]);
 
   function handleBrush(...args: any) {
     setSelectedData(args);
@@ -74,22 +109,24 @@ export default function Graph() {
     setGraphBounds({});
   }
 
-  const data = useModelState('graph_data')[0];
-  const graphData = { data };
-
   // multiple signals can be added by adding a new field
   const signalListeners = { brush: handleBrush };
 
   return (
+<<<<<<< HEAD
     <div css={graphCss} onDoubleClick={resetBrushView}>
+=======
+    <div ref={wrapperRef} onDoubleClick={resetBrushView}>
+>>>>>>> 06de7db (Started working on clicking axis to change variable)
       <div
         onMouseUp={updateGraphBounds}
         onMouseLeave={() => setSelectedData(['brush', {}])}
       >
-        <VegaLite
+        <Vega
           spec={spec}
           data={graphData}
           signalListeners={signalListeners}
+          renderer={'svg'}
         />
       </div>
     </div>
