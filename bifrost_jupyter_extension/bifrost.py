@@ -138,8 +138,8 @@ class BifrostWidget(DOMWidget):
                 "config":{
                     "mark": {"tooltip": True}
                 },
-                "width": 400,
-                "height": 200,
+                "width": 550,
+                "height": 405,
                 "mark": kind,
                 "params": [{"name": "brush", "select": "interval"}],
                 "data": {"name": "data"},
