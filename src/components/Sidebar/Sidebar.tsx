@@ -4,7 +4,7 @@ import { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
-import { useModelState, GraphSpec } from '../../hooks/bifrost-model';
+import { useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 
 const sidebarCss = css`

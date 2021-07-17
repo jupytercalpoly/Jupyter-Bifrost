@@ -49,7 +49,7 @@ const screenCss = (theme: BifrostTheme) => css`
   .add-range {
     margin: 10px 0;
     margin-left: 10px;
-    color: ${theme.color.primary[0]};
+    color: ${theme.color.primary.dark};
   }
 `;
 

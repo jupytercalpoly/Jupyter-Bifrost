@@ -48,7 +48,7 @@ const subtabMapping: {
 export default function CustomizationTab() {
   const subTabs = ['Mark', 'Scale', 'Style'];
   const [selectedTab, setSelectedTab] = useState<string>(subTabs[0]);
-  const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
+  const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const TabContents = subtabMapping[selectedTab];
 
   return (

@@ -12,7 +12,7 @@ import {
 import SearchBar from '../../../ui-widgets/SearchBar';
 import { CustomizeSubTapProps } from './CustomizationTab';
 import { GraphSpec, useModelState } from '../../../../hooks/bifrost-model';
-import { PlainObject, VegaLite, VisualizationSpec } from 'react-vega';
+import { VegaLite, VisualizationSpec } from 'react-vega';
 import produce from 'immer';
 import theme from '../../../../theme';
 
@@ -42,9 +42,9 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
   const [results, setResults] = useState(
     vegaChartList.map((choice, index) => ({ choice, index }))
   );
-  const data = useModelState<PlainObject>('graph_data', (data) => ({
-    data,
-  }))[0];
+  const graphData = useModelState('graph_data')[0];
+
+  const data = { data: graphData };
 
   const [selectedMark, setSelectedMark] = useState<
     string | Record<string, any>
