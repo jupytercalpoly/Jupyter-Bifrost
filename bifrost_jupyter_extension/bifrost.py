@@ -50,17 +50,21 @@ class BifrostWidget(DOMWidget):
     selected_mark = Unicode("").tag(sync=True)
     selected_data = List([]).tag(sync=True)
     suggested_graphs = List([]).tag(sync=True)
+    column_types = Dict({}).tag(sync=True)
 
     def __init__(self, df:pd.DataFrame, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)
         self.df_history.append(df)
         self.set_trait("df_columns", list(df.columns))
         self.set_trait("selected_data", [])
-        graph_info = self.create_graph_data(self.df_history[-1], kind=kind, x=x, y=y, color=color)
+        data = self.get_data(df)
+        column_types = self.get_column_types(df)
+        graph_info = self.create_graph_data(df, data, column_types, kind=kind, x=x, y=y, color=color)
         self.set_trait("query_spec", graph_info["query_spec"])
         self.set_trait("graph_data", graph_info["data"])
         self.set_trait("graph_spec", graph_info["graph_spec"])
         self.set_trait("plot_function_args", graph_info["args"])
+        self.set_trait("column_types", column_types)
         if df_watcher.plot_output: self.set_trait("output_variable", df_watcher.plot_output)
         if df_watcher.bifrost_input: self.set_trait("df_variable_name", df_watcher.bifrost_input)
         
@@ -83,10 +87,12 @@ class BifrostWidget(DOMWidget):
         self.set_trait("graph_spec", graph_info["spec"])
         self.set_trait("graph_data", graph_info["data"])
 
-    def create_graph_data(self, df: pd.DataFrame, kind: str = None, x:str=None, y:str=None, color:str=None) -> dict:
-        """
-            Converts a dataframe into a Vega Lite Graph JSON string.
-        """
+
+    def get_data(self, df: pd.DataFrame):
+        return json.loads(df.to_json(orient="records"))
+
+
+    def get_column_types(self, df: pd.DataFrame):
         graph_types = {
             "quantitative": ["int64", "float64"],
             "temporal": ["datetime", "timedelta[ns]"],
@@ -99,7 +105,15 @@ class BifrostWidget(DOMWidget):
                     return graph_type
             return "nominal"
 
-        data = json.loads(df.to_json(orient="records"))
+        types = df.dtypes
+        types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
+        return types
+
+
+    def create_graph_data(self, df: pd.DataFrame, data: dict, types: dict, kind: str = None, x:str=None, y:str=None, color:str=None) -> dict:
+        """
+            Converts a dataframe into a Vega Lite Graph JSON string.
+        """
         
         x_provided = (x != None)
         y_provided = (y != None)
@@ -110,9 +124,7 @@ class BifrostWidget(DOMWidget):
 
         if x_provided and y_provided:
             df_filter = [col for col in [x, y, color] if col]
-            graph_df = df[df_filter]
-            types = graph_df.dtypes
-            types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
+            # graph_df = df[df_filter]
 
             if kind_provided:
                 graph_spec = {
@@ -144,34 +156,31 @@ class BifrostWidget(DOMWidget):
                     "chooseBy": "effectiveness"
                 }
 
-            else:
-                encodings = []
-                if x in graph_df.columns:
-                    encodings.append({"field": x, "type": types[x], "channel" : "x"})
+            # else:
+            #     encodings = []
+            #     if x in graph_df.columns:
+            #         encodings.append({"field": x, "type": types[x], "channel" : "x"})
 
-                if y in graph_df.columns:
-                    encodings.append({"field": y, "type": types[y], "channel" : "y"})
+            #     if y in graph_df.columns:
+            #         encodings.append({"field": y, "type": types[y], "channel" : "y"})
 
-                if color in graph_df.columns:
-                    encodings.append({"field": color, "type": types[color], "channel" : "color"})
+            #     if color in graph_df.columns:
+            #         encodings.append({"field": color, "type": types[color], "channel" : "color"})
 
-                query_spec = {
-                    "config":{
-                        "mark": {"tooltip": True}
-                    },
-                    "width": 400,
-                    "height": 200,
-                    "mark": "?",
-                    "params": [{"name": "brush", "select": "interval"}],
-                    "data": {"name": "data"},
-                    "encodings": encodings,
-                    "transform": [],
-                    "chooseBy": "effectiveness"
-                }
+            #     query_spec = {
+            #         "config":{
+            #             "mark": {"tooltip": True}
+            #         },
+            #         "width": 400,
+            #         "height": 200,
+            #         "mark": "?",
+            #         "params": [{"name": "brush", "select": "interval"}],
+            #         "data": {"name": "data"},
+            #         "encodings": encodings,
+            #         "transform": [],
+            #         "chooseBy": "effectiveness"
+            #     }
         else:
-            types = df.dtypes
-            types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
-
             if not kind_provided:
                 kind = '?'
 
@@ -186,8 +195,8 @@ class BifrostWidget(DOMWidget):
             if color in df.columns:
                 encodings.append({"field": color, "type": types[color], "channel" : "color"})
 
-            for col in set(df.columns) - set({x, y, color}):                
-                encodings.append({"field": col, "type": types[col], "channel" : "?"})
+            # for col in set(df.columns) - set({x, y, color}):                
+            #     encodings.append({"field": col, "type": types[col], "channel" : "?"})
 
             query_spec = {
                 "config":{
