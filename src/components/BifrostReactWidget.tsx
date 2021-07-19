@@ -97,10 +97,7 @@ function BifrostReactWidgetDisplay() {
       : 'straight_visualize'
   );
   return (
-    <div
-      className="bifrost-widget-display"
-      style={{ width: 'calc(100vw - 200px)' }}
-    >
+    <div className="bifrost-widget-display">
       {screenName === 'straight_visualize' ? (
         <VisualizationScreen />
       ) : (

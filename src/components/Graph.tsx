@@ -21,12 +21,6 @@ export default function Graph() {
   const signalListeners = { brush: handleBrush };
 
   return (
-    <div>
-      <VegaLite
-        spec={spec}
-        data={graphData}
-        signalListeners={signalListeners}
-      />
-    </div>
+    <VegaLite spec={spec} data={graphData} signalListeners={signalListeners} />
   );
 }
