@@ -18,6 +18,7 @@ import { SpecQueryModel } from 'compassql/build/src/model';
 import { Query } from 'compassql/build/src/query/query';
 import { Lock, X } from 'react-feather';
 import { useEffect } from 'react';
+import { EncodingQuery } from 'compassql/build/src/query/encoding';
 
 const columnScreenCss = css`
   display: flex;
@@ -106,9 +107,11 @@ interface ColumnScreenProps {
 export default function ColumnScreen(props: ColumnScreenProps) {
   const [query, setQuery] = useState('');
   const columnChoices = useModelState('df_columns')[0];
+  const columnTypes = useModelState('column_types')[0];
   const spec = useModelState('query_spec')[0];
   const data = useModelState('graph_data')[0];
   const setSuggestedGraphs = useModelState('suggested_graphs')[1];
+
   const [results, setResults] = useState(
     columnChoices.map((choice, index) => ({ choice, index }))
   );
@@ -139,38 +142,44 @@ export default function ColumnScreen(props: ColumnScreenProps) {
 
     const schema = build(data, opt);
 
-    const filteredEncodings = spec.spec.encodings.filter((encoding: any) =>
-      selectedColumns.has(encoding.field)
-    );
+    const selectedEncodings = Array.from(selectedColumns).map((column) => {
+      if (preSelectedColumns.has(column)) {
+        return spec.spec.encodings.filter(
+          (encoding: any) => encoding['field'] === column
+        )[0];
+      }
+      return {
+        field: column,
+        type: columnTypes[column],
+        channel: '?',
+      } as EncodingQuery;
+    });
 
-    const filteredSpecs: Query[] = [];
+    const preRecommendedSpecs: Query[] = [];
+    if (selectedEncodings.length > 3) {
+      const fixedEncoding = selectedEncodings.filter(
+        (encoding) => encoding.channel !== '?'
+      );
+      const nonFixedEncoding = selectedEncodings.filter(
+        (encoding) => encoding.channel === '?'
+      );
 
-    if (!props.args.x && !props.args.y) {
-      for (let i = 0; i < filteredEncodings.length - 1; i++) {
-        filteredSpecs.push({
-          spec: { ...spec.spec, encodings: filteredEncodings.slice(i, i + 3) },
+      for (let i = 0; i < nonFixedEncoding.length - 1; i++) {
+        const encodings = [
+          ...fixedEncoding,
+          ...nonFixedEncoding.slice(i, i + 2),
+        ];
+        preRecommendedSpecs.push({
+          spec: { ...spec.spec, encodings: encodings },
         });
       }
     } else {
-      if (selectedColumns.size < 3) {
-        for (const encoding of spec.spec.encodings) {
-          if ((encoding as any).channel === '?') {
-            filteredSpecs.push({
-              spec: {
-                ...spec.spec,
-                encodings: [...filteredEncodings, encoding],
-              },
-            });
-          }
-        }
-      } else {
-        filteredSpecs.push({
-          spec: { ...spec.spec, encodings: filteredEncodings },
-        });
-      }
+      preRecommendedSpecs.push({
+        spec: { ...spec.spec, encodings: selectedEncodings },
+      });
     }
 
-    const items = filteredSpecs
+    const recommendedSpecs = preRecommendedSpecs
       .map((spec) => recommend(spec, schema, opt).result)
       .map((res) =>
         mapLeaves(res, (item: SpecQueryModel) => {
@@ -182,11 +191,11 @@ export default function ColumnScreen(props: ColumnScreenProps) {
       .map((leaves) => leaves.items)
       .flat();
 
-    if (!items.length) {
+    if (!recommendedSpecs.length) {
       return;
     }
 
-    setSuggestedGraphs(items as SuggestedGraphs);
+    setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
     props.onNext();
   }
 

@@ -15,6 +15,7 @@ import {
   SuggestedGraphs,
   QuerySpec,
   Args,
+  EncodingInfo,
 } from './hooks/bifrost-model';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
@@ -39,6 +40,7 @@ const bifrostModelPropDefaults = {
   suggested_graphs: [] as SuggestedGraphs,
   flags: {},
   plot_function_args: {} as Args,
+  column_types: {} as Record<EncodingInfo['field'], EncodingInfo['type']>,
 };
 
 export type ModelState = typeof bifrostModelPropDefaults;
