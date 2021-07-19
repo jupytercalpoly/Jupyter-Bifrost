@@ -3,11 +3,7 @@ import { jsx, css, ThemeProvider, Global } from '@emotion/react';
 
 import { useState } from 'react';
 import { WidgetModel } from '@jupyter-widgets/base';
-import {
-  useModelState,
-  Args,
-  BifrostModelContext,
-} from '../hooks/bifrost-model';
+import { useModelState, BifrostModelContext } from '../hooks/bifrost-model';
 import theme from '../theme';
 import OnboardingWidget from './Onboarding/OnboardingWidget';
 import VisualizationScreen from './VisualizationScreen';
@@ -56,6 +52,11 @@ const globalStyles = (theme: any) => css`
       }
     }
 
+    &.block {
+      display: block;
+    }
+  }
+
     h1 {
       font-size: 35px;
       font-weight: 800;
@@ -86,7 +87,7 @@ export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
 }
 
 function BifrostReactWidgetDisplay() {
-  const args = useModelState<Args>('plot_function_args')[0];
+  const args = useModelState('plot_function_args')[0];
 
   const [screenName, setScreenName] = useState<string>(
     !(args['x'] && args['y'])

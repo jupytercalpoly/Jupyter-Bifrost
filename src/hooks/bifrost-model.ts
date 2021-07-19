@@ -5,32 +5,16 @@ import { Query } from 'compassql/build/src/query/query';
 import { ResultTree } from 'compassql/build/src/result';
 import { TopLevel, FacetedUnitSpec } from 'vega-lite/build/src/spec';
 import { VegaColumnType, VegaEncoding } from '../modules/VegaEncodings';
+import { ModelState } from '../widget';
+
+// CONTEXT
+//============================================================================================
 export const BifrostModelContext = createContext<WidgetModel | undefined>(
   undefined
 );
 
-const noop = (a: any) => a;
-
 // TYPES AND INTERFACES
 //============================================================================================
-
-type ModelStateName =
-  | 'df_history'
-  | 'spec_history'
-  | 'current_dataframe_index'
-  | 'graph_spec'
-  | 'query_spec'
-  | 'df_variable_name'
-  | 'output_variable'
-  | 'generate_random_dist'
-  | 'df_columns'
-  | 'graph_encodings'
-  | 'selected_data'
-  | 'selected_columns'
-  | 'selected_mark'
-  | 'graph_data'
-  | 'suggested_graphs'
-  | 'plot_function_args';
 
 interface ModelCallback {
   (model: WidgetModel, event: Backbone.EventHandler): void;
@@ -41,7 +25,7 @@ export type SuggestedGraphs = (
   | ResultTree<TopLevel<FacetedUnitSpec<string>>>
 )[];
 
-export type GraphData = PlainObject;
+export type GraphData = PlainObject[];
 export type QuerySpec = Query;
 
 export interface EncodingInfo {
@@ -80,22 +64,21 @@ export type Args = {
  * @param mutation optional mutator that is run on the Python model value before setting the JavaScript state.
  * @returns model state and set state function.
  */
-export function useModelState<T>(
-  name: ModelStateName,
-  mutation: (val: any) => T = noop
-): [T, (val: T, options?: any) => void] {
+export function useModelState<K extends keyof ModelState>(
+  name: K
+): [ModelState[K], (val: ModelState[K], options?: any) => void] {
   const model = useModel();
-  const [state, setState] = useState<T>(mutation(model?.get(name)));
+  const [state, setState] = useState<ModelState[K]>(model?.get(name));
 
   useModelEvent(
     `change:${name}`,
     (model) => {
-      setState(mutation(model.get(name)));
+      setState(model?.get(name));
     },
     [name]
   );
 
-  function updateModel(val: T, options?: any) {
+  function updateModel(val: ModelState[K], options?: any) {
     model?.set(name, val);
     model?.save_changes();
   }

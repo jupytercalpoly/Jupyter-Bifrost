@@ -4,7 +4,7 @@ import { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
-import { useModelState, GraphSpec } from '../../hooks/bifrost-model';
+import { useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 
 const sidebarCss = css`
@@ -110,10 +110,10 @@ const actionBarCss = css`
 `;
 
 function ActionBar() {
-  const [opHistory, setOpHistory] = useModelState<GraphSpec[]>('spec_history');
-  const spec = useModelState<GraphSpec>('graph_spec')[0];
-  const [index, setIndex] = useModelState<number>('current_dataframe_index');
-  const [dataframeName] = useModelState<string>('df_variable_name');
+  const [opHistory, setOpHistory] = useModelState('spec_history');
+  const spec = useModelState('graph_spec')[0];
+  const [index, setIndex] = useModelState('current_dataframe_index');
+  const [dataframeName] = useModelState('df_variable_name');
 
   function exportCode() {
     const translator = new VegaPandasTranslator();

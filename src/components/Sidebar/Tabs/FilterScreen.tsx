@@ -1,8 +1,8 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
-import { useMemo } from 'react';
-import { ArrowLeft } from 'react-feather';
+import { useEffect, useMemo } from 'react';
+import { ArrowLeft, X, Sliders } from 'react-feather';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import { BifrostTheme } from '../../../theme';
 import {
@@ -18,7 +18,15 @@ const screenCss = (theme: BifrostTheme) => css`
   background-color: ${theme.color.background[0]};
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
+
+  .filter-contents {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+  }
+  nav {
+    padding-bottom: 5px;
+  }
 
   h1 {
     .encoding {
@@ -27,6 +35,21 @@ const screenCss = (theme: BifrostTheme) => css`
   }
 
   h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+
+  .close-slider {
+    display: inline-block;
+    margin-left: 5px;
+  }
+
+  .add-range {
+    margin: 10px 0;
+    margin-left: 10px;
+    color: ${theme.color.primary.dark};
   }
 `;
 
@@ -47,39 +70,46 @@ interface FilterScreenProps {
 }
 
 export default function FilterScreen(props: FilterScreenProps) {
-  const [graphSpec] = useModelState<GraphSpec>('graph_spec');
+  const [graphSpec] = useModelState('graph_spec');
   const columnInfo = graphSpec.encoding[props.encoding];
   const Filters = filterMap[columnInfo.type];
 
   return (
     <article css={screenCss}>
-      <button className="wrapper" onClick={props.onBack}>
-        <ArrowLeft />
-      </button>
-      <h1>
-        <span className="encoding">{props.encoding}</span>{' '}
-        <span className="column">{columnInfo.field}</span>
-      </h1>
-      <h2>Filters</h2>
-      <Filters encoding={props.encoding} />
+      <nav>
+        <button className="wrapper" onClick={props.onBack}>
+          <ArrowLeft />
+        </button>
+      </nav>
+      <div className="filter-contents">
+        <h1>
+          <span className="encoding">{props.encoding}</span>{' '}
+          <span className="column">{columnInfo.field}</span>
+        </h1>
+        <Filters encoding={props.encoding} />
+      </div>
     </article>
   );
 }
 
-type GraphData<T> = { [col: string]: T }[];
-
 function QuantitativeFilters(props: FilterGroupProps) {
-  const [graphData] = useModelState<GraphData<number>>('graph_data');
-  const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
+  const [graphData] = useModelState('graph_data');
+  const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
-  const bounds = useMemo(getBounds, [graphData]);
-  const rangeValues = getFilterVal<[number, number]>('range');
+  const bounds = useMemo(getBounds, [graphData, currentAggregation]);
+  const ranges = getRanges();
+
+  useEffect(() => {
+    if (!ranges.length) {
+      updateRange(bounds, 0);
+    }
+  }, []);
 
   function getBounds(): [number, number] {
     return graphData.reduce(
       (minMax, cur) => {
-        const val = cur[field];
+        const val = cur[field] as number;
         if (minMax[0] > val) {
           minMax[0] = val;
         }
@@ -92,15 +122,43 @@ function QuantitativeFilters(props: FilterGroupProps) {
     );
   }
 
-  // function updateFilter(type: string, val: number) {
-  //   const newSpec = updateSpecFilter(graphSpec, props.encoding, type, val);
-  //   setGraphSpec(newSpec);
-  // }
+  function getRanges(): [number, number][] {
+    const type = 'range';
+    return (
+      graphSpec.transform
+        .find(
+          (f) =>
+            'or' in f.filter &&
+            f.filter.or[0]?.field === field &&
+            type in f.filter.or[0]
+        )
+        ?.filter.or.map((f: any) => f[type]) || []
+    );
+  }
 
-  function getFilterVal<T>(type: string): T {
-    return graphSpec.transform.find(
-      (f) => f.filter.field === field && type in f.filter
-    )?.filter[type];
+  function deleteRange(index: number) {
+    const newSpec = produce(graphSpec, (gs) => {
+      const compoundIdx = gs.transform.findIndex(
+        (f) =>
+          'or' in f.filter &&
+          f.filter.or[0]?.field === field &&
+          'range' in f.filter.or[0]
+      );
+
+      if (compoundIdx === -1) {
+        return;
+      }
+      const ranges = gs.transform[compoundIdx].filter.or;
+      if (ranges.length === 1) {
+        // Delete entire compound block
+        gs.transform.splice(compoundIdx, 1);
+      } else {
+        // Delete range in compound block
+        ranges.splice(index, 1);
+      }
+    });
+
+    setGraphSpec(newSpec);
   }
 
   function updateAggregation(aggregation: string) {
@@ -111,44 +169,66 @@ function QuantitativeFilters(props: FilterGroupProps) {
     setGraphSpec(newSpec);
   }
 
-  function updateRange(range: readonly number[]) {
-    const newSpec = updateSpecFilter(graphSpec, props.encoding, 'range', range);
+  function updateRange(range: readonly number[], index: number) {
+    const newSpec = updateSpecFilter(
+      graphSpec,
+      props.encoding,
+      'range',
+      range,
+      index + 1
+    );
     setGraphSpec(newSpec);
   }
 
   return (
     <div className="filters">
-      <RangeSlider
-        width={150}
-        domain={bounds}
-        values={rangeValues}
-        onUpdate={updateRange}
-      />
+      <h2>Aggregate</h2>
+      <select
+        value={currentAggregation}
+        onChange={(e) => updateAggregation(e.target.value)}
+      >
+        {['none', ...vegaAggregationList].map((aggregation) => (
+          <option value={aggregation}>{aggregation}</option>
+        ))}
+      </select>
 
-      <label>
-        Aggregation:{' '}
-        <select
-          value={currentAggregation}
-          onChange={(e) => updateAggregation(e.target.value)}
-        >
-          {['none', ...vegaAggregationList].map((aggregation) => (
-            <option value={aggregation}>{aggregation}</option>
-          ))}
-        </select>
-      </label>
+      <h2>Filter</h2>
+
+      {ranges.map((r, i) => (
+        <div style={{ display: 'flex' }}>
+          <RangeSlider
+            width={300}
+            domain={bounds}
+            values={r}
+            onUpdate={(update) => updateRange(update, i)}
+          />
+          <button
+            className="close-slider wrapper"
+            onClick={() => deleteRange(i)}
+          >
+            <X size={20} />
+          </button>
+        </div>
+      ))}
+      <button
+        className="wrapper block add-range"
+        onClick={() => updateRange(bounds, ranges.length)}
+      >
+        + <Sliders />
+      </button>
     </div>
   );
 }
 
 function CategoricalFilters(props: FilterGroupProps) {
-  const [graphData] = useModelState<GraphData<string>>('graph_data');
-  const [graphSpec, setGraphSpec] = useModelState<GraphSpec>('graph_spec');
+  const [graphData] = useModelState('graph_data');
+  const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const categories = useMemo(getCategories, []);
 
   function getCategories() {
     const { field } = graphSpec.encoding[props.encoding];
     const categorySet = graphData.reduce((categories, row) => {
-      categories.add(row[field]);
+      categories.add(row[field] as string);
       return categories;
     }, new Set<string>());
 
@@ -183,56 +263,110 @@ function CategoricalFilters(props: FilterGroupProps) {
   }
 
   return (
-    <ul style={{ listStyle: 'none' }}>
-      {categories.map((category) => (
-        <li key={category}>
-          <label className="choice">
-            <input type="checkbox" value={category} onChange={selectCategory} />{' '}
-            {category}
-          </label>
-        </li>
-      ))}
-    </ul>
+    <div>
+      <h2>Categories</h2>
+      <ul style={{ listStyle: 'none' }}>
+        {categories.map((category) => (
+          <li key={category}>
+            <label className="choice">
+              <input
+                type="checkbox"
+                value={category}
+                onChange={selectCategory}
+              />{' '}
+              {category}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
+/**
+ *
+ * @param graphSpec The Vega Graph Spec that will be the basis for the new filter.
+ * @param encoding Encoding variable target of the filter.
+ * @param type Type of filter.
+ * @param val Filter value to be applied to the graph.
+ * @param occurrence If several of the same type of filters, identifies the desired instance by index. Defaults to first (1).
+ * @returns Updated spec.
+ */
 function updateSpecFilter<T>(
   graphSpec: GraphSpec,
   encoding: VegaEncoding,
   type: string,
-  val: T | ((currentVal: T | null) => T)
+  val: T | ((currentVal: T | null) => T),
+  occurrence = 1
 ) {
   const { field } = graphSpec.encoding[encoding];
-  const index = graphSpec.transform.findIndex(
-    (t) => t.filter.field === field && type in t.filter
-  );
+
+  let index = -1;
+  let foundCount = 0;
+  const isCompound = type === 'range';
+  let compoundIndex = -1;
+  let transforms: any;
+
+  if (isCompound) {
+    compoundIndex = graphSpec.transform.findIndex(
+      (t) =>
+        'or' in t.filter &&
+        t.filter.or[0]?.field === field &&
+        type in t.filter.or[0]
+    );
+    transforms =
+      compoundIndex !== -1 ? graphSpec.transform[compoundIndex].filter.or : [];
+  } else {
+    transforms = graphSpec.transform.map((t) => t.filter);
+  }
+
+  for (let i = 0; i < transforms.length; i++) {
+    const t = transforms[i];
+    if (t.field === field && type in t) {
+      foundCount++;
+    }
+    if (foundCount === occurrence) {
+      index = i;
+      break;
+    }
+  }
   const filterFound = index !== -1;
   let value: T;
   if (isFunction(val)) {
-    const currentVal = filterFound
-      ? graphSpec.transform[index].filter[type]
-      : null;
+    const currentVal = filterFound ? transforms[index][type] : null;
     value = val(currentVal);
   } else {
     value = val;
   }
-
-  let newSpec: GraphSpec;
-  if (filterFound) {
-    // Filter exists
-    newSpec = produce(graphSpec, (gs) => {
-      gs.transform[index].filter[type] = value;
-    });
-  } else {
-    // Create Filter
-    newSpec = produce(graphSpec, (gs) => {
-      gs.transform.push({
-        filter: {
+  const newSpec = produce(graphSpec, (gs) => {
+    if (isCompound) {
+      if (filterFound) {
+        // Filter exists in compound
+        gs.transform[compoundIndex].filter.or[index][type] = value;
+      } else if (compoundIndex !== -1) {
+        // Compound exists but not filter
+        gs.transform[compoundIndex].filter.or.push({
           field,
           [type]: value,
-        },
-      });
-    });
-  }
+        });
+      } else {
+        // Compound doesn't exist. Create the compound.
+        gs.transform.push({ filter: { or: [{ field, range: value }] } });
+      }
+    } else {
+      if (filterFound) {
+        // Filter exists
+        gs.transform[index].filter[type] = value;
+      } else {
+        // Create Filter
+        gs.transform.push({
+          filter: {
+            field,
+            [type]: value,
+          },
+        });
+      }
+    }
+  });
   return newSpec;
 }

@@ -7,8 +7,6 @@ import SearchBar from '../ui-widgets/SearchBar';
 import Pill from '../ui-widgets/Pill';
 
 import {
-  QuerySpec,
-  GraphData,
   useModelState,
   SuggestedGraphs,
   Args,
@@ -107,11 +105,10 @@ interface ColumnScreenProps {
 
 export default function ColumnScreen(props: ColumnScreenProps) {
   const [query, setQuery] = useState('');
-  const columnChoices = useModelState<string[]>('df_columns')[0];
-  const spec = useModelState<QuerySpec>('query_spec')[0];
-  const data = useModelState<GraphData>('graph_data')[0];
-  const setSuggestedGraphs =
-    useModelState<SuggestedGraphs>('suggested_graphs')[1];
+  const columnChoices = useModelState('df_columns')[0];
+  const spec = useModelState('query_spec')[0];
+  const data = useModelState('graph_data')[0];
+  const setSuggestedGraphs = useModelState('suggested_graphs')[1];
   const [results, setResults] = useState(
     columnChoices.map((choice, index) => ({ choice, index }))
   );
