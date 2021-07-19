@@ -121,6 +121,17 @@ class BifrostWidget(DOMWidget):
 
         graph_spec = {}
         query_spec = {}
+        query_spec_template = {
+                "config":{
+                    "mark": {"tooltip": True}
+                },
+                "width": 400,
+                "height": 200,
+                "params": [{"name": "brush", "select": "interval"}],
+                "data": {"name": "data"},
+                "transform": [],
+                "chooseBy": "effectiveness"
+            }
 
         if x_provided and y_provided and kind_provided:
             graph_spec = {
@@ -139,17 +150,9 @@ class BifrostWidget(DOMWidget):
             }
 
         query_spec = {
-            "config":{
-                "mark": {"tooltip": True}
-            },
-            "width": 400,
-            "height": 200,
+            **query_spec_template,
             "mark": kind if kind_provided else "?",
-            "params": [{"name": "brush", "select": "interval"}],
-            "data": {"name": "data"},
             "encodings": [{"field": col, "type": types[col], "channel": encoding } for encoding, col in zip(["x", "y", "color"],  [x, y, color]) if col],
-            "transform": [],
-            "chooseBy": "effectiveness"
         }
 
         # TODO: Figure out aggregation etc.
