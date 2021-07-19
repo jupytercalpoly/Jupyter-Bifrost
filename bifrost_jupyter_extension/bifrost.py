@@ -107,6 +107,17 @@ class BifrostWidget(DOMWidget):
 
         graph_spec = {}
         query_spec = {}
+        query_spec_template = {
+                "config":{
+                    "mark": {"tooltip": True}
+                },
+                "width": 400,
+                "height": 200,
+                "params": [{"name": "brush", "select": "interval"}],
+                "data": {"name": "data"},
+                "transform": [],
+                "chooseBy": "effectiveness"
+            }
 
         if x_provided and y_provided:
             df_filter = [col for col in [x, y, color] if col]
@@ -119,8 +130,9 @@ class BifrostWidget(DOMWidget):
                     "config":{
                         "mark": {"tooltip": True}
                     },
-                    "width": 400,
-                    "height": 200,
+                    
+                    "width": 550,
+                    "height": 405,
                     "mark": kind,
                     "params": [{"name": "brush", "select": "interval"}],
                     "data": {"name": "data"},
@@ -131,17 +143,9 @@ class BifrostWidget(DOMWidget):
                 }
 
                 query_spec = {
-                    "config":{
-                        "mark": {"tooltip": True}
-                    },
-                    "width": 400,
-                    "height": 200,
+                    **query_spec_template,
                     "mark": kind,
-                    "params": [{"name": "brush", "select": "interval"}],
-                    "data": {"name": "data"},
                     "encodings": [{"field": col, "type": types[col], "channel": encoding } for encoding, col in zip(["x", "y", "color"], df_filter)],
-                    "transform": [],
-                    "chooseBy": "effectiveness"
                 }
 
             else:
@@ -156,17 +160,9 @@ class BifrostWidget(DOMWidget):
                     encodings.append({"field": color, "type": types[color], "channel" : "color"})
 
                 query_spec = {
-                    "config":{
-                        "mark": {"tooltip": True}
-                    },
-                    "width": 400,
-                    "height": 200,
+                    **query_spec_template,
                     "mark": "?",
-                    "params": [{"name": "brush", "select": "interval"}],
-                    "data": {"name": "data"},
                     "encodings": encodings,
-                    "transform": [],
-                    "chooseBy": "effectiveness"
                 }
         else:
             types = df.dtypes
@@ -190,17 +186,9 @@ class BifrostWidget(DOMWidget):
                 encodings.append({"field": col, "type": types[col], "channel" : "?"})
 
             query_spec = {
-                "config":{
-                    "mark": {"tooltip": True}
-                },
-                "width": 400,
-                "height": 200,
+                **query_spec_template,
                 "mark": kind,
-                "params": [{"name": "brush", "select": "interval"}],
-                "data": {"name": "data"},
                 "encodings": encodings,
-                "transform": [],
-                "chooseBy": "effectiveness"
             }
 
 

@@ -5,6 +5,7 @@ import { VegaLite, VisualizationSpec } from 'react-vega';
 import { useModelState, GraphSpec } from '../../hooks/bifrost-model';
 import NavHeader from './NavHeader';
 import theme from '../../theme';
+import produce from 'immer';
 
 const suggestedChartCss = css`
   width: 100vw;
@@ -54,7 +55,11 @@ export default function ChartChooser(props: ChartChooserProps) {
       return;
     }
 
-    const spec = suggestedGraphs[selectedIndex] as GraphSpec;
+    const spec = produce(suggestedGraphs[selectedIndex] as GraphSpec, (gs) => {
+      // Resize the spec to fit a single graph view
+      gs.height = 405;
+      gs.width = 550;
+    });
     setGraphSpec(spec);
     setOpHistory([spec]);
     props.onChartSelected(spec);

@@ -9,6 +9,7 @@ import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 
 const sidebarCss = css`
   width: 100%;
+  max-width: 600px;
   height: 100%;
 
   .sidebar-content {
