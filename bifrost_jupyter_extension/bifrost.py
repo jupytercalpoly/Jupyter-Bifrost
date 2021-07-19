@@ -122,83 +122,8 @@ class BifrostWidget(DOMWidget):
         graph_spec = {}
         query_spec = {}
 
-        if x_provided and y_provided:
-            df_filter = [col for col in [x, y, color] if col]
-            # graph_df = df[df_filter]
-
-            if kind_provided:
-                graph_spec = {
-                    "config":{
-                        "mark": {"tooltip": True}
-                    },
-                    "width": 400,
-                    "height": 200,
-                    "mark": kind,
-                    "params": [{"name": "brush", "select": "interval"}],
-                    "data": {"name": "data"},
-                    "transform": [],
-                    "encoding": {
-                        encoding : {"field": col, "type": types[col]} for encoding, col in zip(["x", "y", "color"], df_filter)
-                    }
-                }
-
-                query_spec = {
-                    "config":{
-                        "mark": {"tooltip": True}
-                    },
-                    "width": 400,
-                    "height": 200,
-                    "mark": kind,
-                    "params": [{"name": "brush", "select": "interval"}],
-                    "data": {"name": "data"},
-                    "encodings": [{"field": col, "type": types[col], "channel": encoding } for encoding, col in zip(["x", "y", "color"], df_filter)],
-                    "transform": [],
-                    "chooseBy": "effectiveness"
-                }
-
-            # else:
-            #     encodings = []
-            #     if x in graph_df.columns:
-            #         encodings.append({"field": x, "type": types[x], "channel" : "x"})
-
-            #     if y in graph_df.columns:
-            #         encodings.append({"field": y, "type": types[y], "channel" : "y"})
-
-            #     if color in graph_df.columns:
-            #         encodings.append({"field": color, "type": types[color], "channel" : "color"})
-
-            #     query_spec = {
-            #         "config":{
-            #             "mark": {"tooltip": True}
-            #         },
-            #         "width": 400,
-            #         "height": 200,
-            #         "mark": "?",
-            #         "params": [{"name": "brush", "select": "interval"}],
-            #         "data": {"name": "data"},
-            #         "encodings": encodings,
-            #         "transform": [],
-            #         "chooseBy": "effectiveness"
-            #     }
-        else:
-            if not kind_provided:
-                kind = '?'
-
-            encodings = []
-
-            if x in df.columns:
-                encodings.append({"field": x, "type": types[x], "channel" : "x"})
-
-            if y in df.columns:
-                encodings.append({"field": y, "type": types[y], "channel" : "y"})
-
-            if color in df.columns:
-                encodings.append({"field": color, "type": types[color], "channel" : "color"})
-
-            # for col in set(df.columns) - set({x, y, color}):                
-            #     encodings.append({"field": col, "type": types[col], "channel" : "?"})
-
-            query_spec = {
+        if x_provided and y_provided and kind_provided:
+            graph_spec = {
                 "config":{
                     "mark": {"tooltip": True}
                 },
@@ -207,13 +132,29 @@ class BifrostWidget(DOMWidget):
                 "mark": kind,
                 "params": [{"name": "brush", "select": "interval"}],
                 "data": {"name": "data"},
-                "encodings": encodings,
                 "transform": [],
-                "chooseBy": "effectiveness"
+                "encoding": {
+                    encoding : {"field": col, "type": types[col]} for encoding, col in zip(["x", "y", "color"], [x, y, color]) if col
+                }
             }
 
+        query_spec = {
+            "config":{
+                "mark": {"tooltip": True}
+            },
+            "width": 400,
+            "height": 200,
+            "mark": kind if kind_provided else "?",
+            "params": [{"name": "brush", "select": "interval"}],
+            "data": {"name": "data"},
+            "encodings": [{"field": col, "type": types[col], "channel": encoding } for encoding, col in zip(["x", "y", "color"],  [x, y, color]) if col],
+            "transform": [],
+            "chooseBy": "effectiveness"
+        }
 
-        return {"data": data, "query_spec" :{"spec": query_spec}, "graph_spec": graph_spec, "args": {"x": x, "y": y, "color": color, "kind": None if kind == "?" else kind}}
+        # TODO: Figure out aggregation etc.
+
+        return {"data": data, "query_spec" :{"spec": query_spec}, "graph_spec": graph_spec, "args": {"x": x, "y": y, "color": color, "kind": kind}}
 
 
 
