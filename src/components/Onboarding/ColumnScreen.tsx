@@ -10,7 +10,6 @@ import {
   useModelState,
   SuggestedGraphs,
   Args,
-  EncodingInfo,
 } from '../../hooks/bifrost-model';
 import { build } from 'compassql/build/src/schema';
 import { recommend } from 'compassql/build/src/recommend';
@@ -108,8 +107,7 @@ interface ColumnScreenProps {
 export default function ColumnScreen(props: ColumnScreenProps) {
   const [query, setQuery] = useState('');
   const columnChoices = useModelState('df_columns')[0];
-  const columnTypes =
-    useModelState<Record<string, EncodingInfo['type']>>('column_types')[0];
+  const columnTypes = useModelState('column_types')[0];
   const spec = useModelState('query_spec')[0];
   const data = useModelState('graph_data')[0];
   const setSuggestedGraphs = useModelState('suggested_graphs')[1];

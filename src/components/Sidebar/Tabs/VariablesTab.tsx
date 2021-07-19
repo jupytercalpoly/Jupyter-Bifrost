@@ -45,8 +45,7 @@ const sortedEncodingList = [...vegaEncodingList];
 sortedEncodingList.sort();
 export default function VariablesTab() {
   const columns = useModelState('df_columns')[0];
-  const column_types =
-    useModelState<Record<string, EncodingInfo['type']>>('column_types')[0];
+  const column_types = useModelState('column_types')[0];
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(
     columns.map((choice, index) => ({ choice, index }))
