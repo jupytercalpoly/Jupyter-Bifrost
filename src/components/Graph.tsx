@@ -1,18 +1,23 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
+import { useCallback } from 'react';
 import { VegaLite } from 'react-vega';
+import { debounce } from 'debounce';
 import { useModelState } from '../hooks/bifrost-model';
 
+const brushDelay = 300;
+
 export default function Graph() {
-  const [selectedData, setSelectedData] = useModelState('selected_data');
+  const setSelectedData = useModelState('selected_data')[1];
+  const selectDataDebounced = useCallback(
+    debounce(setSelectedData, brushDelay),
+    [setSelectedData]
+  );
   const spec = useModelState('graph_spec')[0];
 
   function handleBrush(...args: any) {
-    console.log(args);
-    setSelectedData(args);
+    selectDataDebounced(args);
   }
-
-  console.log(selectedData);
 
   const data = useModelState('graph_data')[0];
   const graphData = { data };

@@ -3,14 +3,14 @@ import { jsx, css } from '@emotion/react';
 import produce from 'immer';
 import { useEffect, useMemo } from 'react';
 import { ArrowLeft, X, Sliders } from 'react-feather';
-import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
+import { useModelState } from '../../../hooks/bifrost-model';
 import { BifrostTheme } from '../../../theme';
 import {
   VegaEncoding,
   vegaAggregationList,
 } from '../../../modules/VegaEncodings';
-import { isFunction } from '../../../modules/utils';
 import RangeSlider from '../../ui-widgets/RangeSlider';
+import { updateSpecFilter } from '../../../modules/VegaFilters';
 
 const screenCss = (theme: BifrostTheme) => css`
   position: absolute;
@@ -175,7 +175,7 @@ function QuantitativeFilters(props: FilterGroupProps) {
       props.encoding,
       'range',
       range,
-      index + 1
+      { occurrence: index + 1 }
     );
     setGraphSpec(newSpec);
   }
@@ -223,16 +223,25 @@ function QuantitativeFilters(props: FilterGroupProps) {
 function CategoricalFilters(props: FilterGroupProps) {
   const [graphData] = useModelState('graph_data');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+  const { field } = graphSpec.encoding[props.encoding];
   const categories = useMemo(getCategories, []);
+  const selectedCategories = useMemo(getSelectedCategories, [graphSpec]);
 
   function getCategories() {
-    const { field } = graphSpec.encoding[props.encoding];
     const categorySet = graphData.reduce((categories, row) => {
       categories.add(row[field] as string);
       return categories;
     }, new Set<string>());
 
     return Array.from(categorySet);
+  }
+
+  function getSelectedCategories() {
+    const type = 'oneOf';
+    const filteredCategories = graphSpec.transform.find(
+      (f) => 'field' in f.filter && f.filter.field === field && type in f.filter
+    )?.filter[type] as string[] | undefined;
+    return new Set(filteredCategories || categories);
   }
 
   function updateFilter(
@@ -272,6 +281,7 @@ function CategoricalFilters(props: FilterGroupProps) {
               <input
                 type="checkbox"
                 value={category}
+                checked={selectedCategories.has(category)}
                 onChange={selectCategory}
               />{' '}
               {category}
@@ -281,92 +291,4 @@ function CategoricalFilters(props: FilterGroupProps) {
       </ul>
     </div>
   );
-}
-
-/**
- *
- * @param graphSpec The Vega Graph Spec that will be the basis for the new filter.
- * @param encoding Encoding variable target of the filter.
- * @param type Type of filter.
- * @param val Filter value to be applied to the graph.
- * @param occurrence If several of the same type of filters, identifies the desired instance by index. Defaults to first (1).
- * @returns Updated spec.
- */
-function updateSpecFilter<T>(
-  graphSpec: GraphSpec,
-  encoding: VegaEncoding,
-  type: string,
-  val: T | ((currentVal: T | null) => T),
-  occurrence = 1
-) {
-  const { field } = graphSpec.encoding[encoding];
-
-  let index = -1;
-  let foundCount = 0;
-  const isCompound = type === 'range';
-  let compoundIndex = -1;
-  let transforms: any;
-
-  if (isCompound) {
-    compoundIndex = graphSpec.transform.findIndex(
-      (t) =>
-        'or' in t.filter &&
-        t.filter.or[0]?.field === field &&
-        type in t.filter.or[0]
-    );
-    transforms =
-      compoundIndex !== -1 ? graphSpec.transform[compoundIndex].filter.or : [];
-  } else {
-    transforms = graphSpec.transform.map((t) => t.filter);
-  }
-
-  for (let i = 0; i < transforms.length; i++) {
-    const t = transforms[i];
-    if (t.field === field && type in t) {
-      foundCount++;
-    }
-    if (foundCount === occurrence) {
-      index = i;
-      break;
-    }
-  }
-  const filterFound = index !== -1;
-  let value: T;
-  if (isFunction(val)) {
-    const currentVal = filterFound ? transforms[index][type] : null;
-    value = val(currentVal);
-  } else {
-    value = val;
-  }
-  const newSpec = produce(graphSpec, (gs) => {
-    if (isCompound) {
-      if (filterFound) {
-        // Filter exists in compound
-        gs.transform[compoundIndex].filter.or[index][type] = value;
-      } else if (compoundIndex !== -1) {
-        // Compound exists but not filter
-        gs.transform[compoundIndex].filter.or.push({
-          field,
-          [type]: value,
-        });
-      } else {
-        // Compound doesn't exist. Create the compound.
-        gs.transform.push({ filter: { or: [{ field, range: value }] } });
-      }
-    } else {
-      if (filterFound) {
-        // Filter exists
-        gs.transform[index].filter[type] = value;
-      } else {
-        // Create Filter
-        gs.transform.push({
-          filter: {
-            field,
-            [type]: value,
-          },
-        });
-      }
-    }
-  });
-  return newSpec;
 }

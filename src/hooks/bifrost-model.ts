@@ -55,6 +55,7 @@ export type Args = {
   kind: string;
 };
 
+export type SelectionData = [string, { [field: string]: [number, number] }];
 // HOOKS
 //============================================================================================
 

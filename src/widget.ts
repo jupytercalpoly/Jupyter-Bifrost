@@ -16,6 +16,7 @@ import {
   QuerySpec,
   Args,
   EncodingInfo,
+  SelectionData,
 } from './hooks/bifrost-model';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
@@ -33,7 +34,7 @@ const bifrostModelPropDefaults = {
   graph_encodings: {},
   generate_random_dist: 0,
   df_columns: [] as string[],
-  selected_data: [] as any[],
+  selected_data: ['', {}] as SelectionData,
   selected_columns: [],
   selected_mark: '',
   graph_data: {} as GraphData,

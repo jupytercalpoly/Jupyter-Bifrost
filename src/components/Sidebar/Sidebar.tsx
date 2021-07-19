@@ -6,6 +6,8 @@ import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
 import { useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
+import { updateSpecFilter } from '../../modules/VegaFilters';
+import { VegaEncoding } from '../../modules/VegaEncodings';
 
 const sidebarCss = css`
   width: 100%;
@@ -112,7 +114,8 @@ const actionBarCss = css`
 
 function ActionBar() {
   const [opHistory, setOpHistory] = useModelState('spec_history');
-  const spec = useModelState('graph_spec')[0];
+  const [spec, setSpec] = useModelState('graph_spec');
+  const [selectedData] = useModelState('selected_data');
   const [index, setIndex] = useModelState('current_dataframe_index');
   const [dataframeName] = useModelState('df_variable_name');
 
@@ -125,8 +128,32 @@ function ActionBar() {
   }
 
   function applyGraphChanges() {
+    const brushIsActive = Object.keys(selectedData[1]).length;
+    let snapshotSpec = spec;
+    if (brushIsActive) {
+      // Assign the ranges to the spec
+      snapshotSpec = Object.keys(selectedData[1]).reduce((newSpec, field) => {
+        const [encoding, fieldInfo] =
+          Object.entries(spec.encoding).find(
+            ([_, info]) => info.field === field
+          ) || [];
+        const type = fieldInfo.type as string;
+        if (!encoding) {
+          return newSpec;
+        }
+        return updateSpecFilter(
+          newSpec,
+          encoding as VegaEncoding,
+          type === 'quantitative' ? 'range' : 'oneOf',
+          selectedData[1][field],
+          { compoundOperator: 'and' }
+        );
+      }, spec);
+
+      setSpec(snapshotSpec);
+    }
     const newHist = opHistory.slice(0, index + 1);
-    newHist.push(spec);
+    newHist.push(snapshotSpec);
     setOpHistory(newHist);
     setIndex(newHist.length - 1);
   }
