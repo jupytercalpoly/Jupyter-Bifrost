@@ -45,7 +45,7 @@ const sortedEncodingList = [...vegaEncodingList];
 sortedEncodingList.sort();
 export default function VariablesTab() {
   const columns = useModelState('df_columns')[0];
-  const column_types = useModelState('column_types')[0];
+  const columnTypes = useModelState('column_types')[0];
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(
     columns.map((choice, index) => ({ choice, index }))
@@ -59,7 +59,7 @@ export default function VariablesTab() {
     if (activeEncoding === '') {
       return;
     }
-    const dtype = column_types[column];
+    const dtype = columnTypes[column];
 
     const newSpec = produce(graphSpec, (gs) => {
       if (gs.encoding[activeEncoding]) {
