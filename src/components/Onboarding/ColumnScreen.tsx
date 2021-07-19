@@ -143,6 +143,11 @@ export default function ColumnScreen(props: ColumnScreenProps) {
     const schema = build(data, opt);
 
     const selectedEncodings = Array.from(selectedColumns).map((column) => {
+      if (preSelectedColumns.has(column)) {
+        return spec.spec.encodings.filter(
+          (encoding: any) => encoding['field'] === column
+        )[0];
+      }
       return {
         field: column,
         type: columnTypes[column],
@@ -151,30 +156,27 @@ export default function ColumnScreen(props: ColumnScreenProps) {
     });
 
     const preRecommendedSpecs: Query[] = [];
+    if (selectedEncodings.length > 3) {
+      const fixedEncoding = selectedEncodings.filter(
+        (encoding) => encoding.channel !== '?'
+      );
+      const nonFixedEncoding = selectedEncodings.filter(
+        (encoding) => encoding.channel === '?'
+      );
 
-    if (!props.args.x && !props.args.y) {
-      for (let i = 0; i < selectedEncodings.length - 1; i++) {
+      for (let i = 0; i < nonFixedEncoding.length - 1; i++) {
+        const encodings = [
+          ...fixedEncoding,
+          ...nonFixedEncoding.slice(i, i + 2),
+        ];
         preRecommendedSpecs.push({
-          spec: { ...spec.spec, encodings: selectedEncodings.slice(i, i + 3) },
+          spec: { ...spec.spec, encodings: encodings },
         });
       }
     } else {
-      if (selectedColumns.size < 3) {
-        for (const encoding of spec.spec.encodings) {
-          if ((encoding as any).channel === '?') {
-            preRecommendedSpecs.push({
-              spec: {
-                ...spec.spec,
-                encodings: [...selectedEncodings, encoding],
-              },
-            });
-          }
-        }
-      } else {
-        preRecommendedSpecs.push({
-          spec: { ...spec.spec, encodings: selectedEncodings },
-        });
-      }
+      preRecommendedSpecs.push({
+        spec: { ...spec.spec, encodings: selectedEncodings },
+      });
     }
 
     const recommendedSpecs = preRecommendedSpecs
