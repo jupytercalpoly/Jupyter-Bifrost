@@ -76,7 +76,6 @@ export default function ChartChooser(props: ChartChooserProps) {
         chartChooserRef.current
           ?.querySelector('.graph-wrapper.selected')
           ?.scrollIntoView({
-            behavior: 'smooth',
             block: 'nearest',
             inline: 'start',
           });
@@ -88,7 +87,6 @@ export default function ChartChooser(props: ChartChooserProps) {
         chartChooserRef.current
           ?.querySelector('.graph-wrapper.selected')
           ?.scrollIntoView({
-            behavior: 'smooth',
             block: 'nearest',
             inline: 'end',
           });
