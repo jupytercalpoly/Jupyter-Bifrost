@@ -19,9 +19,10 @@ import theme from '../../../../theme';
 const markOptionsListCss = css`
   display: flex;
   flex-wrap: wrap;
-  overflow: scroll;
+  overflow-y: scroll;
   list-style: none;
   padding: 0px;
+  max-height: 250px;
 `;
 
 const markOptionCss = css`
@@ -65,10 +66,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
   }
 
   return (
-    <div
-      className="mark-options-wrapper"
-      style={{ height: '100%', width: '100%' }}
-    >
+    <div className="mark-sub-tab" style={{ height: '100%', width: '100%' }}>
       <SearchBar
         choices={vegaChartList}
         onResultsChange={setResults}

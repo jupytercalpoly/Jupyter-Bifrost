@@ -10,10 +10,9 @@ const bifrostWidgetCss = css`
   // Element-based styles
   //===========================================================
   display: grid;
-  grid-template-columns: 675px minmax(450px, 600px);
+  grid-template-columns: 1fr minmax(450px, 600px);
   grid-template-rows: auto 1fr;
   grid-template-areas: 'nav sidebar' 'graph sidebar';
-  max-width: calc(100% - 64px);
   height: 100%;
   max-height: 541px;
 
