@@ -19,8 +19,9 @@ import theme from '../../../../theme';
 const markOptionsListCss = css`
   display: flex;
   flex-wrap: wrap;
-  overflow: scroll;
+  overflow-y: scroll;
   list-style: none;
+  height: 215px;
   padding: 0px;
 `;
 
