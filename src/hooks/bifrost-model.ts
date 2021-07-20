@@ -42,6 +42,7 @@ export type GraphSpec = VisualizationSpec & {
   height: number;
   mark: string | Record<string, any>;
   encoding: Record<VegaEncoding, EncodingInfo>;
+  params: any[];
   transform: {
     [transformType: string]: any;
   }[];
@@ -55,7 +56,10 @@ export type Args = {
   kind: string;
 };
 
-export type SelectionData = [string, { [field: string]: [number, number] }];
+export type SelectionData = [
+  string,
+  { [field: string]: [number, number] | string[] }
+];
 // HOOKS
 //============================================================================================
 

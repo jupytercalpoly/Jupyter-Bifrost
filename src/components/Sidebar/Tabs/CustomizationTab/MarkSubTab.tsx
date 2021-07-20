@@ -55,6 +55,12 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
     const newSpec = produce(spec, (draftSpec: GraphSpec) => {
       draftSpec['width'] = props.spec.width;
       draftSpec['height'] = props.spec.height;
+
+      if (draftSpec.mark === 'bar') {
+        draftSpec.params[0].select = { type: 'interval', encodings: ['x'] };
+      } else {
+        draftSpec.params[0].select = 'interval';
+      }
     });
 
     if (typeof newSpec.mark === 'object') {

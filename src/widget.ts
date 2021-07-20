@@ -38,6 +38,7 @@ const bifrostModelPropDefaults = {
   selected_columns: [],
   selected_mark: '',
   graph_data: {} as GraphData,
+  graph_bounds: {} as SelectionData[1],
   suggested_graphs: [] as SuggestedGraphs,
   flags: {},
   plot_function_args: {} as Args,

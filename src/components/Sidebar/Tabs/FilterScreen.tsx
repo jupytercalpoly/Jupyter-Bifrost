@@ -98,8 +98,10 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const bounds = useMemo(getBounds, [graphData, currentAggregation]);
+  console.log({ bounds });
   const ranges = getRanges();
 
+  // Initialize a slider if one doesn't exist
   useEffect(() => {
     if (!ranges.length) {
       updateRange(bounds, 0);
@@ -170,13 +172,9 @@ function QuantitativeFilters(props: FilterGroupProps) {
   }
 
   function updateRange(range: readonly number[], index: number) {
-    const newSpec = updateSpecFilter(
-      graphSpec,
-      props.encoding,
-      'range',
-      range,
-      { occurrence: index + 1 }
-    );
+    const newSpec = updateSpecFilter(graphSpec, field, 'range', range, {
+      occurrence: index + 1,
+    });
     setGraphSpec(newSpec);
   }
 
@@ -250,7 +248,7 @@ function CategoricalFilters(props: FilterGroupProps) {
   ) {
     const newSpec = updateSpecFilter<string[]>(
       graphSpec,
-      props.encoding,
+      field,
       type,
       setCategory
     );
