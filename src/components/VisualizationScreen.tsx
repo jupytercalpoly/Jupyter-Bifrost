@@ -14,6 +14,8 @@ const bifrostWidgetCss = css`
   grid-template-rows: auto 1fr;
   grid-template-areas: 'nav sidebar' 'graph sidebar';
   max-width: calc(100% - 64px);
+  height: 100%;
+  max-height: 541px;
 
   @media screen and (max-width: 1300px) {
     display: block;

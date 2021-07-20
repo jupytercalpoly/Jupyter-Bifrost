@@ -8,14 +8,11 @@ import theme from '../../theme';
 import produce from 'immer';
 
 const suggestedChartCss = css`
-  width: 100vw;
-
   .suggestedCharts {
     padding: 20px;
     padding-left: 40px;
     display: flex;
     overflow: scroll;
-    width: 85%;
   }
 
   .graph-wrapper {

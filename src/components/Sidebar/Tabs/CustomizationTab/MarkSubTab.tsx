@@ -65,7 +65,10 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
   }
 
   return (
-    <div className="mark-options-wrapper" style={{ width: '100%' }}>
+    <div
+      className="mark-options-wrapper"
+      style={{ height: '100%', width: '100%' }}
+    >
       <SearchBar
         choices={vegaChartList}
         onResultsChange={setResults}

@@ -11,12 +11,15 @@ const sidebarCss = css`
   width: 100%;
   max-width: 600px;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .sidebar-content {
     border: 2px solid #e4e4e4;
     border-top: none;
     border-bottom: none;
     padding: 10px;
+    overflow: auto;
   }
 `;
 const tabMapping: { [name: string]: () => jsx.JSX.Element } = {
@@ -46,6 +49,7 @@ export default function Sidebar() {
 
 const tabBarCss = css`
   ul {
+    position: sticky;
     display: flex;
     list-style: none;
     padding: 0;

@@ -17,6 +17,7 @@ export interface CustomizeSubTapProps {
 //TODO: factor out this css to global tab css
 const subTabCss = css`
   ul {
+    position: sticky;
     display: flex;
     justify-content: space-between;
     list-style: none;

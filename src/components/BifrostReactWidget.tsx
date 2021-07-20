@@ -12,6 +12,11 @@ const globalStyles = (theme: any) => css`
   // Global styles for the widget
   //===========================================================
   .bifrost-widget {
+    width: calc(100vw - 200px);
+    height: 100%;
+    max-height: fit-content;
+    overflow: auto;
+
     * {
       box-sizing: border-box;
     }
@@ -96,7 +101,10 @@ function BifrostReactWidgetDisplay() {
       : 'straight_visualize'
   );
   return (
-    <div className="bifrost-widget-display">
+    <div
+      className="bifrost-widget-display"
+      style={{ height: '100%', width: '100%' }}
+    >
       {screenName === 'straight_visualize' ? (
         <VisualizationScreen />
       ) : (
