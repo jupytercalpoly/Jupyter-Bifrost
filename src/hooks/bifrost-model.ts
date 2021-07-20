@@ -38,8 +38,8 @@ export interface EncodingInfo {
 }
 
 export type GraphSpec = VisualizationSpec & {
-  width: number | string;
-  height: number | string;
+  width: number;
+  height: number;
   mark: string | Record<string, any>;
   encoding: Record<VegaEncoding, EncodingInfo>;
   transform: {

@@ -49,7 +49,6 @@ export default function Sidebar() {
 
 const tabBarCss = css`
   ul {
-    position: sticky;
     display: flex;
     list-style: none;
     padding: 0;
