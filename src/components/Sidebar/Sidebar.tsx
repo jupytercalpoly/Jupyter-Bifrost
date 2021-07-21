@@ -112,7 +112,7 @@ const actionBarCss = css`
 
 function ActionBar() {
   const [opHistory, setOpHistory] = useModelState('spec_history');
-  const spec = useModelState('graph_spec')[0];
+  const [spec] = useModelState('graph_spec');
   const [index, setIndex] = useModelState('current_dataframe_index');
   const [dataframeName] = useModelState('df_variable_name');
 

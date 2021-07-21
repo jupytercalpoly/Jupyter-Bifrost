@@ -19,8 +19,9 @@ import theme from '../../../../theme';
 const markOptionsListCss = css`
   display: flex;
   flex-wrap: wrap;
-  overflow: scroll;
+  overflow-y: scroll;
   list-style: none;
+  height: 215px;
   padding: 0px;
 `;
 
@@ -54,6 +55,12 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
     const newSpec = produce(spec, (draftSpec: GraphSpec) => {
       draftSpec['width'] = props.spec.width;
       draftSpec['height'] = props.spec.height;
+
+      if (draftSpec.mark === 'bar') {
+        draftSpec.params[0].select = { type: 'interval', encodings: ['x'] };
+      } else {
+        draftSpec.params[0].select = 'interval';
+      }
     });
 
     if (typeof newSpec.mark === 'object') {
