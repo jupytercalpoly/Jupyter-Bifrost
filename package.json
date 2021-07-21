@@ -82,6 +82,8 @@
     "@jupyterlab/builder": "^3.0.0",
     "@phosphor/application": "^1.6.0",
     "@phosphor/widgets": "^1.6.0",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.0.0",
     "@types/jest": "^26.0.0",
     "@types/node": "^15.12.2",
     "@types/react": "^17.0.11",

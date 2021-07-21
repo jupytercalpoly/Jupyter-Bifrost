@@ -8,12 +8,16 @@ import { createTestModel } from './utils';
 
 import { BifrostModel, BifrostView } from '..';
 
-describe('Example', () => {
+import BifrostReactWidget from '../components/BifrostReactWidget';
+
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+
+describe('Widget wrapping classes', () => {
   describe('BifrostModel', () => {
     it('should be createable', () => {
       const model = createTestModel(BifrostModel);
       expect(model).toBeInstanceOf(BifrostModel);
-      console.log('spec', model.get('query_spec'));
       expect(model.get('query_spec')).toBeInstanceOf(Object);
     });
   });
@@ -30,5 +34,13 @@ describe('Example', () => {
       });
       expect(view).toBeInstanceOf(BifrostView);
     });
+  });
+});
+
+describe('Bifrost React Widget', () => {
+  it('Should be renderable and the title of the column screen should be visible.', () => {
+    const model = createTestModel(BifrostModel);
+    render(BifrostReactWidget({ model }));
+    screen.getByText('Select Columns');
   });
 });
