@@ -105,7 +105,6 @@ export default function VariablesTab() {
       setShowEncodings(false);
     });
     setGraphSpec(newSpec);
-    saveSpecToHistory(newSpec);
     setActiveEncoding(encoding);
   }
 

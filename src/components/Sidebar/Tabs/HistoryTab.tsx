@@ -124,11 +124,10 @@ export default function HistoryTab() {
 
 function generateDescriptions(hist: GraphSpec[]) {
   return hist.map((spec) => {
-    const field = {
-      x: spec.encoding.x.field,
-      y: spec.encoding.y.field,
-    };
+    const fieldString = Object.values(spec.encoding)
+      .map((info) => info.field)
+      .join(' vs ');
     const mark = spec.mark;
-    return `${field.x} vs ${field.y} ${mark} chart`;
+    return `${fieldString} ${mark} chart`;
   });
 }

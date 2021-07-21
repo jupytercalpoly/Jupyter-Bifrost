@@ -5,6 +5,11 @@ interface SpecHistoryOptions {
   saveOnDismount?: boolean;
 }
 
+/**
+ * Keeps track of history and saves Graph Specs.
+ * @param options Adaptations to how saving state should be handled
+ * @returns a function that can manually save a graph spec to history
+ */
 export default function useSpecHistory(
   options: SpecHistoryOptions = { saveOnDismount: false }
 ) {
@@ -27,7 +32,6 @@ export default function useSpecHistory(
    * @param spec Graph Spec to save
    */
   function save(spec?: GraphSpec) {
-    console.log('Save called');
     if (!hasChanged && !spec) {
       return;
     }
@@ -36,7 +40,6 @@ export default function useSpecHistory(
     setOpHistory(newHist);
     setIndex(newHist.length - 1);
     setOriginalSpec(graphSpec);
-    console.log('Spec saved');
   }
 
   saveRef.current = save;
