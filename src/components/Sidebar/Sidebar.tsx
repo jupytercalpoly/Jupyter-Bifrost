@@ -6,7 +6,6 @@ import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
 import { useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
-import useSpecHistory from '../../hooks/useSpecHistory';
 
 const sidebarCss = css`
   width: 100%;
@@ -114,7 +113,6 @@ const actionBarCss = css`
 function ActionBar() {
   const spec = useModelState('graph_spec')[0];
   const [dataframeName] = useModelState('df_variable_name');
-  const saveSpec = useSpecHistory();
 
   function exportCode() {
     const translator = new VegaPandasTranslator();
@@ -127,9 +125,6 @@ function ActionBar() {
   return (
     <nav className="action-bar" css={actionBarCss}>
       <ul>
-        <li>
-          <button onClick={() => saveSpec()}>Apply Changes</button>
-        </li>
         <li>
           <button onClick={exportCode}>Export Code</button>
         </li>
