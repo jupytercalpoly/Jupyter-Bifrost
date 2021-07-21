@@ -17,7 +17,9 @@ export default function useSpecHistory(
 
   useEffect(() => {
     setOriginalSpec(graphSpec);
-    return () => void options.saveOnDismount && saveRef.current();
+    return () => {
+      options.saveOnDismount && saveRef.current();
+    };
   }, []);
 
   /**
@@ -26,7 +28,7 @@ export default function useSpecHistory(
    */
   function save(spec?: GraphSpec) {
     console.log('Save called');
-    if (!hasChanged) {
+    if (!hasChanged && !spec) {
       return;
     }
     const newHist = opHistory.slice(0, index + 1);
