@@ -66,7 +66,6 @@ const tabBarCss = css`
     border-bottom: none;
     width: calc(100% / 3);
     text-align: center;
-    overflow-x: auto;
 
     &.selected {
       font-weight: 800;
