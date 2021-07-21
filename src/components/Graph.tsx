@@ -1,8 +1,17 @@
 /** @jsx jsx */
-import { jsx } from '@emotion/react';
+import { jsx, css } from '@emotion/react';
 import { VegaLite } from 'react-vega';
 import { useModelState } from '../hooks/bifrost-model';
 
+const graphCss = css`
+  .vega-embed.has-actions {
+    details {
+      position: absolute;
+      top: -28px;
+      left: 75px;
+    }
+  }
+`;
 export default function Graph() {
   const [selectedData, setSelectedData] = useModelState('selected_data');
   const spec = useModelState('graph_spec')[0];
@@ -21,6 +30,12 @@ export default function Graph() {
   const signalListeners = { brush: handleBrush };
 
   return (
-    <VegaLite spec={spec} data={graphData} signalListeners={signalListeners} />
+    <div css={graphCss}>
+      <VegaLite
+        spec={spec}
+        data={graphData}
+        signalListeners={signalListeners}
+      />
+    </div>
   );
 }
