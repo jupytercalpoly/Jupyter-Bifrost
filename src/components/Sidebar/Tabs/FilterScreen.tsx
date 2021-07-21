@@ -74,11 +74,7 @@ export default function FilterScreen(props: FilterScreenProps) {
   const [graphSpec] = useModelState('graph_spec');
   const columnInfo = graphSpec.encoding[props.encoding];
   const Filters = filterMap[columnInfo.type];
-  const saveSpec = useSpecHistory();
-
-  useEffect(() => {
-    return () => void saveSpec();
-  }, []);
+  useSpecHistory({ saveOnDismount: true });
 
   return (
     <article css={screenCss}>
