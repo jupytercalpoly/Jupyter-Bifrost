@@ -43,6 +43,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
   const [results, setResults] = useState(
     vegaChartList.map((choice, index) => ({ choice, index }))
   );
+
   const graphData = useModelState('graph_data')[0];
 
   const data = { data: graphData };

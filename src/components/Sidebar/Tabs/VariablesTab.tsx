@@ -4,6 +4,7 @@ import produce from 'immer';
 import { useState } from 'react';
 import { Filter, PlusCircle, XCircle } from 'react-feather';
 import { EncodingInfo, useModelState } from '../../../hooks/bifrost-model';
+import useSpecHistory from '../../../hooks/useSpecHistory';
 import { VegaEncoding, vegaEncodingList } from '../../../modules/VegaEncodings';
 import Pill from '../../ui-widgets/Pill';
 import SearchBar from '../../ui-widgets/SearchBar';
@@ -54,6 +55,7 @@ export default function VariablesTab() {
   const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>('');
   const [showEncodings, setShowEncodings] = useState(false);
   const [filterEncoding, setFilterEncoding] = useState<VegaEncoding | ''>('');
+  const saveSpecToHistory = useSpecHistory();
 
   const updateEncodings = (column: string) => {
     if (activeEncoding === '') {
@@ -72,8 +74,8 @@ export default function VariablesTab() {
         type: dtype,
       };
     });
-
     setGraphSpec(newSpec);
+    saveSpecToHistory(newSpec);
   };
 
   function deleteEncoding(encoding: VegaEncoding) {
@@ -84,6 +86,7 @@ export default function VariablesTab() {
       delete gs.encoding[encoding];
     });
     setGraphSpec(newSpec);
+    saveSpecToHistory(newSpec);
   }
 
   function openFilters(encoding: VegaEncoding) {
@@ -102,6 +105,7 @@ export default function VariablesTab() {
       setShowEncodings(false);
     });
     setGraphSpec(newSpec);
+    saveSpecToHistory(newSpec);
     setActiveEncoding(encoding);
   }
 

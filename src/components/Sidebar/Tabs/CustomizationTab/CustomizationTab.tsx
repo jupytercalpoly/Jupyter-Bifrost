@@ -8,6 +8,7 @@ import StyleSubTab from './StyleSubTab';
 import theme from '../../../../theme';
 
 import { useModelState, GraphSpec } from '../../../../hooks/bifrost-model';
+import useSpecHistory from '../../../../hooks/useSpecHistory';
 
 export interface CustomizeSubTapProps {
   spec: GraphSpec;
@@ -50,6 +51,12 @@ export default function CustomizationTab() {
   const [selectedTab, setSelectedTab] = useState<string>(subTabs[0]);
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const TabContents = subtabMapping[selectedTab];
+  const saveSpec = useSpecHistory();
+
+  function updateGraphSpec(spec: GraphSpec) {
+    saveSpec(spec);
+    setGraphSpec(spec);
+  }
 
   return (
     <div className="customize">
@@ -69,7 +76,7 @@ export default function CustomizationTab() {
         </ul>
       </section>
       <section>
-        <TabContents spec={graphSpec} setSpec={setGraphSpec} />
+        <TabContents spec={graphSpec} setSpec={updateGraphSpec} />
       </section>
     </div>
   );

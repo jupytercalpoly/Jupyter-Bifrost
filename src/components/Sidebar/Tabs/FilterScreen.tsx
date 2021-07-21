@@ -11,6 +11,7 @@ import {
 } from '../../../modules/VegaEncodings';
 import RangeSlider from '../../ui-widgets/RangeSlider';
 import { updateSpecFilter } from '../../../modules/VegaFilters';
+import useSpecHistory from '../../../hooks/useSpecHistory';
 
 const screenCss = (theme: BifrostTheme) => css`
   position: absolute;
@@ -73,6 +74,11 @@ export default function FilterScreen(props: FilterScreenProps) {
   const [graphSpec] = useModelState('graph_spec');
   const columnInfo = graphSpec.encoding[props.encoding];
   const Filters = filterMap[columnInfo.type];
+  const saveSpec = useSpecHistory();
+
+  useEffect(() => {
+    return () => void saveSpec();
+  }, []);
 
   return (
     <article css={screenCss}>
