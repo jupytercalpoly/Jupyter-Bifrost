@@ -17,6 +17,7 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/no-empty-function': 'warn',
     '@typescript-eslint/quotes': [
       'error',
       'single',
