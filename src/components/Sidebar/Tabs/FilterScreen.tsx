@@ -10,8 +10,8 @@ import {
   vegaAggregationList,
 } from '../../../modules/VegaEncodings';
 import RangeSlider from '../../ui-widgets/RangeSlider';
-import { updateSpecFilter } from '../../../modules/VegaFilters';
 import useSpecHistory from '../../../hooks/useSpecHistory';
+import { updateSpecFilter, getBounds } from '../../../modules/VegaFilters';
 
 const screenCss = (theme: BifrostTheme) => css`
   position: absolute;
@@ -56,7 +56,6 @@ const screenCss = (theme: BifrostTheme) => css`
 
 interface FilterGroupProps {
   encoding: VegaEncoding;
-  onAxis: Boolean;
 }
 
 export const filterMap: {
@@ -91,7 +90,7 @@ export default function FilterScreen(props: FilterScreenProps) {
           <span className="encoding">{props.encoding}</span>{' '}
           <span className="column">{columnInfo.field}</span>
         </h1>
-        <Filters encoding={props.encoding} onAxis={false} />
+        <Filters encoding={props.encoding} />
       </div>
     </article>
   );
@@ -111,22 +110,6 @@ function QuantitativeFilters(props: FilterGroupProps) {
       updateRange(bounds, 0);
     }
   }, []);
-
-  function getBounds(): [number, number] {
-    return graphData.reduce(
-      (minMax, cur) => {
-        const val = cur[field] as number;
-        if (minMax[0] > val) {
-          minMax[0] = val;
-        }
-        if (minMax[1] < val) {
-          minMax[1] = val;
-        }
-        return minMax;
-      },
-      [Infinity, -Infinity]
-    );
-  }
 
   function getRanges(): [number, number][] {
     const type = 'range';
@@ -184,21 +167,19 @@ function QuantitativeFilters(props: FilterGroupProps) {
 
   return (
     <div className="filters">
-      {props.onAxis ? null : (
-        <div>
-          <h2>Aggregate</h2>
-          <select
-            value={currentAggregation}
-            onChange={(e) => updateAggregation(e.target.value)}
-          >
-            {['none', ...vegaAggregationList].map((aggregation) => (
-              <option value={aggregation}>{aggregation}</option>
-            ))}
-          </select>
+      <div>
+        <h2>Aggregate</h2>
+        <select
+          value={currentAggregation}
+          onChange={(e) => updateAggregation(e.target.value)}
+        >
+          {['none', ...vegaAggregationList].map((aggregation) => (
+            <option value={aggregation}>{aggregation}</option>
+          ))}
+        </select>
 
-          <h2>Filter</h2>
-        </div>
-      )}
+        <h2>Filter</h2>
+      </div>
 
       {ranges.map((r, i) => (
         <div style={{ display: 'flex' }}>

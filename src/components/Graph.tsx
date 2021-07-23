@@ -51,7 +51,6 @@ export default function Graph(props: GraphProps) {
   const graphData = { data };
 
   function handleBrush(...args: any) {
-    console.log(args);
     setSelectedData(args);
   }
 
@@ -191,7 +190,6 @@ export default function Graph(props: GraphProps) {
           return spec.encoding[channel as VegaEncoding].field === clickedBox;
         })[0] as VegaEncoding;
 
-        console.log(clickedAxis === channel ? '' : channel);
         return clickedAxis === channel ? '' : channel;
       });
     }
@@ -227,7 +225,6 @@ export default function Graph(props: GraphProps) {
     view.addEventListener('click', handleClickOnAxis);
     view.addEventListener('mouseover', handleMouseOverOnAxis);
   }
-  console.log({ clickedAxis });
   return (
     <div ref={wrapperRef} css={graphCss} onDoubleClick={resetBrushView}>
       <div
@@ -242,11 +239,6 @@ export default function Graph(props: GraphProps) {
           onNewView={onNewView}
         />
       </div>
-      {console.log(
-        spec.encoding[clickedAxis as VegaEncoding],
-        clickedAxis,
-        spec
-      )}
       {clickedAxis !== '' &&
         !['nominal', 'oridnal'].includes(
           spec.encoding[clickedAxis as VegaEncoding].type
@@ -278,8 +270,6 @@ function AxisRangeSlider({
   const bounds = useMemo(() => getBounds(graphData, field), [field]);
   const range = getRange();
 
-  console.log(graphSpec);
-
   // Initialize a slider if one doesn't exist
   useEffect(() => {
     if (!range) {
@@ -299,9 +289,12 @@ function AxisRangeSlider({
   }
 
   function updateRange(range: readonly number[]) {
-    console.log(range);
-    const newSpec = updateSpecFilter(graphSpec, field, 'range', range);
-    console.log(newSpec);
+    let newRange = range.slice();
+    if (range[0] > range[1]) {
+      newRange = [range[1], range[0]];
+    }
+    const newSpec = updateSpecFilter(graphSpec, field, 'range', newRange);
+
     setGraphSpec(newSpec);
   }
 
@@ -318,8 +311,6 @@ function AxisRangeSlider({
 
   const width = axis === 'y' ? 470 : 640;
 
-  console.log(axis, graphSpec);
-  console.log(range, bounds);
   return (
     <div style={axisStyles}>
       <RangeSlider
@@ -329,6 +320,7 @@ function AxisRangeSlider({
         onUpdate={(update) => updateRange(update)}
         vertical={axis === 'y'}
         reversed={axis === 'y'}
+        onAxis={true}
       />
     </div>
   );
