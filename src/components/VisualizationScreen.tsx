@@ -26,6 +26,7 @@ export default function VisualizationScreen({
 }: {
   onPrevious?: () => void;
 }) {
+  const sidebarRef = React.useRef<HTMLDivElement>(null);
   return (
     <article className="BifrostWidget" css={bifrostWidgetCss}>
       {onPrevious ? (
@@ -34,9 +35,9 @@ export default function VisualizationScreen({
         </GridArea>
       ) : null}
       <GridArea area="graph">
-        <Graph />
+        <Graph sideBarRef={sidebarRef} />
       </GridArea>
-      <GridArea area="sidebar">
+      <GridArea area="sidebar" ref={sidebarRef}>
         <Sidebar />
       </GridArea>
     </article>

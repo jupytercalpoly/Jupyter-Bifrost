@@ -71,7 +71,9 @@
     "react-compound-slider": "^3.3.1",
     "react-dom": "^17.0.2",
     "react-feather": "^2.0.9",
+    "react-vega": "^7.4.3",
     "vega": "^5.20.2",
+    "vega-embed": "^6.18.2",
     "vega-lite": "^5.1.0",
     "vega-lite-api": "^5.0.0"
   },
@@ -108,7 +110,6 @@
     "mkdirp": "^0.5.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
-    "react-vega": "^7.4.3",
     "rimraf": "^2.6.2",
     "sass": "^1.35.1",
     "sass-loader": "^12.1.0",

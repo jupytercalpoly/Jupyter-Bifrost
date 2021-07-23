@@ -56,9 +56,10 @@ const screenCss = (theme: BifrostTheme) => css`
 
 interface FilterGroupProps {
   encoding: VegaEncoding;
+  onAxis: Boolean;
 }
 
-const filterMap: {
+export const filterMap: {
   [type: string]: (props: FilterGroupProps) => jsx.JSX.Element;
 } = {
   quantitative: QuantitativeFilters,
@@ -72,7 +73,9 @@ interface FilterScreenProps {
 
 export default function FilterScreen(props: FilterScreenProps) {
   const [graphSpec] = useModelState('graph_spec');
+  console.log(props.encoding);
   const columnInfo = graphSpec.encoding[props.encoding];
+  console.log(columnInfo);
   const Filters = filterMap[columnInfo.type];
   useSpecHistory({ saveOnDismount: true });
 
@@ -88,7 +91,7 @@ export default function FilterScreen(props: FilterScreenProps) {
           <span className="encoding">{props.encoding}</span>{' '}
           <span className="column">{columnInfo.field}</span>
         </h1>
-        <Filters encoding={props.encoding} />
+        <Filters encoding={props.encoding} onAxis={false} />
       </div>
     </article>
   );
@@ -181,17 +184,21 @@ function QuantitativeFilters(props: FilterGroupProps) {
 
   return (
     <div className="filters">
-      <h2>Aggregate</h2>
-      <select
-        value={currentAggregation}
-        onChange={(e) => updateAggregation(e.target.value)}
-      >
-        {['none', ...vegaAggregationList].map((aggregation) => (
-          <option value={aggregation}>{aggregation}</option>
-        ))}
-      </select>
+      {props.onAxis ? null : (
+        <div>
+          <h2>Aggregate</h2>
+          <select
+            value={currentAggregation}
+            onChange={(e) => updateAggregation(e.target.value)}
+          >
+            {['none', ...vegaAggregationList].map((aggregation) => (
+              <option value={aggregation}>{aggregation}</option>
+            ))}
+          </select>
 
-      <h2>Filter</h2>
+          <h2>Filter</h2>
+        </div>
+      )}
 
       {ranges.map((r, i) => (
         <div style={{ display: 'flex' }}>
