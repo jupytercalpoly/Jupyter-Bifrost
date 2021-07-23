@@ -28,6 +28,9 @@ interface RangeSliderProps {
   values?: [number, number];
   width?: number;
   onUpdate: RangeUpdater;
+  vertical?: boolean;
+  reversed?: boolean;
+  onAxis?: boolean;
 }
 
 export default function RangeSlider({
@@ -35,24 +38,41 @@ export default function RangeSlider({
   values = [0, 20],
   width,
   onUpdate,
+  vertical,
+  reversed,
+  onAxis,
 }: RangeSliderProps) {
   return (
     <div
-      className="RangeSlider"
+      className={`RangeSlider${onAxis ? ' onAxis' : ''}`}
       css={css`
         width: 100%;
         padding: 12px;
         width: ${width}px;
+
+        &.onAxis {
+          input::-webkit-outer-spin-button,
+          input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+        }
       `}
     >
-      <RangeInputs values={values} onUpdate={onUpdate}>
+      <RangeInputs
+        values={reversed ? [values[1], values[0]] : values}
+        onUpdate={onUpdate}
+        reversed={reversed}
+      >
         <Slider
+          vertical={vertical}
+          reversed={reversed}
           className="range-slider"
           mode={1}
           domain={domain}
           rootStyle={sliderStyle}
           onUpdate={onUpdate}
-          values={values}
+          values={reversed ? [values[1], values[0]] : values}
         >
           <Rail>{(props) => <SliderRail {...props} />}</Rail>
           <Handles>
@@ -113,11 +133,13 @@ interface RangeInputsProps {
   children: React.ReactNode;
   values: [number, number];
   onUpdate: RangeUpdater;
+  reversed?: boolean;
 }
 
 function RangeInputs(props: RangeInputsProps) {
   const [minInput, setMinInput] = useState(props.values[0]);
   const [maxInput, setMaxInput] = useState(props.values[1]);
+
   useEffect(() => {
     setMinInput(props.values[0]);
     setMaxInput(props.values[1]);
@@ -232,13 +254,11 @@ function SliderRail({
   /**
    * Update the tooltip value
    */
-  const onMouseMove = useCallback(
-    (e: MouseEvent) =>
-      setTooltipState(
-        activeHandleID ? { value: null, percent: null } : getEventData(e)
-      ),
-    []
-  );
+  const onMouseMove = useCallback((e: MouseEvent) => {
+    setTooltipState(
+      activeHandleID ? { value: null, percent: null } : getEventData(e)
+    );
+  }, []);
   /**
    * Attach events for tooltip
    */
