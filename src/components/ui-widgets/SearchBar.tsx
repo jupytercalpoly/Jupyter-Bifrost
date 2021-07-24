@@ -10,22 +10,24 @@ const searchBarCss = css`
   margin-top: 10px;
   input {
     border: 1px solid #bdbdbd;
-    /* background-color: #eee; */
     border-radius: 0 20px 20px 0px;
     width: 80%;
     height: 100%;
     margin: 0px;
     margin-left: 35px;
     border-left: none;
-    padding: 0px;
+    padding: 15px;
+    padding-left: 5px;
   }
 `;
 
 const searchIconCss = css`
   position: absolute;
+  display: grid;
+  place-items: center;
   /* background-color: #eee; */
   width: 30px;
-  height: 23px;
+  height: 32px;
   border: 1px solid #bdbdbd;
   border-right: none;
   border-radius: 20px 0 0 20px;
@@ -76,7 +78,7 @@ export default function SearchBar(props: SearchProps) {
   return (
     <div className="searchBar" css={searchBarCss}>
       <span css={searchIconCss}>
-        <Search size={21} />
+        <Search size={17} />
       </span>
       <input
         ref={props.forwardedRef}

@@ -123,12 +123,8 @@ class BifrostWidget(DOMWidget):
         graph_spec = {}
         query_spec = {}
         query_spec_template = {
-                "config":{
-                    "mark": {"tooltip": True}
-                },
                 "width": 400,
                 "height": 200,
-                "params": [{"name": "brush", "select": "interval"}],
                 "data": {"name": "data"},
                 "transform": [],
                 "chooseBy": "effectiveness"

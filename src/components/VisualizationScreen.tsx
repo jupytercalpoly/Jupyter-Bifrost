@@ -22,6 +22,10 @@ const bifrostWidgetCss = css`
   }
 `;
 
+interface VisualizationProps {
+  onPrevious?: () => void;
+}
+
 export default function VisualizationScreen({
   onPrevious,
 }: {

@@ -4,7 +4,7 @@ import { jsx, css } from '@emotion/react';
 const pillCss = css`
   display: inline-block;
   list-style: none;
-  padding: 4px;
+  padding: 5px;
   background: #dedede;
   border-radius: 15px;
   border: 1px solid transparent;
