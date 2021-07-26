@@ -1,6 +1,6 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useMemo } from 'react';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import SearchBar from '../../ui-widgets/SearchBar';
@@ -24,17 +24,15 @@ const historyCss = (theme: any) => css`
         border-left: 3px solid ${theme.color.primary[1]};
         font-weight: 700;
       }
-
-      &.temporary {
-        color: gray;
-      }
     }
   }
 `;
 
 export default function HistoryTab() {
-  const [spec, setSpec] = useModelState('graph_spec');
-  const [specHistory, setSpecHistory] = useModelState('spec_history');
+  const setSpec = useModelState('graph_spec')[1];
+  const [specHistory] = useModelState('spec_history');
+  console.log({ inHistory: specHistory });
+
   const [dfIndex, setDfIndex] = useModelState('current_dataframe_index');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setResults] = useState<
@@ -48,25 +46,6 @@ export default function HistoryTab() {
     () => generateDescriptions(reverseHistory),
     [reverseHistory]
   );
-
-  useEffect(() => {
-    const updatedHist = specHistory.slice(0, dfIndex + 1);
-    updatedHist.push(spec);
-    setSpecHistory(updatedHist);
-    setDfIndex(updatedHist.length - 1);
-
-    return () => {
-      setSpecHistory(updatedHist.slice(0, updatedHist.length - 1));
-      if (dfIndex > updatedHist.length - 2) {
-        setDfIndex(updatedHist.length - 2);
-      }
-    };
-  }, []);
-
-  /**
-   * Preserves the spec state when the user navigates to the history tab
-   * and deletes the temporarily saved spec when the user navigates away.
-   */
 
   function invertHistIndex(i: number) {
     return specHistory.length - 1 - i;
@@ -101,7 +80,6 @@ export default function HistoryTab() {
           const classes = [
             ['history-el', true],
             ['active', index === invertHistIndex(dfIndex)],
-            ['temporary', index === 0],
           ]
             .filter((pair) => pair[1])
             .map((pair) => pair[0])
@@ -113,7 +91,7 @@ export default function HistoryTab() {
               key={index}
               onClick={() => setHistoryPosition(index)}
             >
-              {(index === 0 ? '(Unsaved) ' : '') + choice}
+              {choice}
             </li>
           );
         })}
