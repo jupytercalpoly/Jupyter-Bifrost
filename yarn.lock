@@ -7707,6 +7707,11 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-keyboard-navigation@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/react-keyboard-navigation/-/react-keyboard-navigation-0.0.3.tgz#e94a061948bfba31e9a4545744d673fb5712864d"
+  integrity sha512-wmidpWszPTqX0ZSz5a9jRUf8mZNHZyZ/zFF3X97AEgCmJBpiZEE1WUlDOgd0Cbf3kKOh6VPryu/KqtGUZPObgw==
+
 react-lifecycles-compat@^3.0.4:
   version "3.0.4"
   resolved "https://registry.npmjs.org/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz"

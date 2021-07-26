@@ -7,6 +7,7 @@ import { useModelState, BifrostModelContext } from '../hooks/bifrost-model';
 import theme from '../theme';
 import OnboardingWidget from './Onboarding/OnboardingWidget';
 import VisualizationScreen from './VisualizationScreen';
+import { NavigationProvider } from 'react-keyboard-navigation';
 
 const globalStyles = (theme: any) => css`
   // Global styles for the widget
@@ -80,12 +81,14 @@ interface BifrostReactWidgetProps {
 
 export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
   return (
-    <ThemeProvider theme={theme}>
-      <BifrostModelContext.Provider value={props.model}>
-        <Global styles={globalStyles} />
-        <BifrostReactWidgetDisplay />
-      </BifrostModelContext.Provider>
-    </ThemeProvider>
+    <NavigationProvider>
+      <ThemeProvider theme={theme}>
+        <BifrostModelContext.Provider value={props.model}>
+          <Global styles={globalStyles} />
+          <BifrostReactWidgetDisplay />
+        </BifrostModelContext.Provider>
+      </ThemeProvider>
+    </NavigationProvider>
   );
 }
 

@@ -12,6 +12,7 @@ import { Query } from 'compassql/build/src/query/query';
 import { Lock, X } from 'react-feather';
 import { useEffect } from 'react';
 import { EncodingQuery } from 'compassql/build/src/query/encoding';
+import { Focusable } from './KeyboardNav';
 
 import {
   useModelState,
@@ -22,7 +23,8 @@ import Pill from '../ui-widgets/Pill';
 import { useMemo } from 'react';
 
 const columnSelectorCss = css`
-  width: 300px;
+  width: 320px;
+  margin-right: 30px;
 
   h1,
   h2 {
@@ -241,17 +243,19 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
       <ul className="column-tags">
         {Array.from(selectedColumns).map((column: string) => {
           return (
-            <Pill key={`tag_${column}`}>
-              <div className="tag-content-wrapper">
-                <span style={{ padding: '0px 5px' }}>{column}</span>
-                <button
-                  className={`tagButton_${column}`}
-                  onClick={handleDelete}
-                >
-                  <X size={10} />
-                </button>
-              </div>
-            </Pill>
+            <Focusable id="test" parentId="default">
+              <Pill key={`tag_${column}`}>
+                <div className="tag-content-wrapper">
+                  <span style={{ padding: '0px 5px' }}>{column}</span>
+                  <button
+                    className={`tagButton_${column}`}
+                    onClick={handleDelete}
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              </Pill>
+            </Focusable>
           );
         })}
       </ul>
