@@ -1,6 +1,7 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { useState } from 'react';
+import produce from 'immer';
+import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import SearchBar from '../../ui-widgets/SearchBar';
@@ -30,7 +31,7 @@ const historyCss = (theme: any) => css`
 `;
 
 export default function HistoryTab() {
-  const setSpec = useModelState('graph_spec')[1];
+  const [spec, setSpec] = useModelState('graph_spec');
   const [specHistory] = useModelState('spec_history');
 
   const [dfIndex, setDfIndex] = useModelState('current_dataframe_index');
@@ -46,6 +47,18 @@ export default function HistoryTab() {
     () => generateDescriptions(reverseHistory),
     [reverseHistory]
   );
+
+  // Select the last valid spec if current spec has no encoding
+  useEffect(() => {
+    const hasNoEncodings = !Object.keys(spec.encoding).length;
+    if (hasNoEncodings) {
+      const lastValidSpec = produce(
+        specHistory[specHistory.length - 1],
+        (gs) => gs
+      );
+      setSpec(lastValidSpec);
+    }
+  }, []);
 
   function invertHistIndex(i: number) {
     return specHistory.length - 1 - i;
