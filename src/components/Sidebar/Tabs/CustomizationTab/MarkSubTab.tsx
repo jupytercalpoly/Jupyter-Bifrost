@@ -21,7 +21,7 @@ const markOptionsListCss = css`
   flex-wrap: wrap;
   overflow-y: scroll;
   list-style: none;
-  height: 215px;
+  height: 247px;
   padding: 0px;
 `;
 
@@ -43,6 +43,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
   const [results, setResults] = useState(
     vegaChartList.map((choice, index) => ({ choice, index }))
   );
+
   const graphData = useModelState('graph_data')[0];
 
   const data = { data: graphData };
@@ -52,6 +53,10 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
   >(props.spec.mark);
 
   function handleOnClick(spec: GraphSpec) {
+    const mark = typeof spec.mark === 'object' ? spec.mark.type : spec.mark;
+    if (mark === selectedMark) {
+      return;
+    }
     const newSpec = produce(spec, (draftSpec: GraphSpec) => {
       draftSpec['width'] = props.spec.width;
       draftSpec['height'] = props.spec.height;
@@ -62,12 +67,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
         draftSpec.params[0].select = 'interval';
       }
     });
-
-    if (typeof newSpec.mark === 'object') {
-      setSelectedMark(newSpec.mark.type);
-    } else {
-      setSelectedMark(newSpec.mark);
-    }
+    setSelectedMark(mark);
     props.setSpec(newSpec);
   }
 

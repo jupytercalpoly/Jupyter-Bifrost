@@ -19,7 +19,6 @@ export default function Graph() {
       return;
     }
     const graphBounds = selectedData[1];
-    console.log(graphBounds);
 
     // Assign the ranges to the spec
     const fields = Object.keys(graphBounds);
@@ -39,7 +38,6 @@ export default function Graph() {
         { compoundOperator: 'and' }
       );
     }, spec);
-    console.log(selectedData[1], snapshotSpec);
     setSpec(snapshotSpec);
 
     setGraphBounds(graphBounds);
@@ -62,7 +60,6 @@ export default function Graph() {
         { compoundOperator: 'and' }
       );
     }, spec);
-    console.log(spec, snapshotSpec);
     setSpec(snapshotSpec);
 
     setGraphBounds({});
