@@ -15,6 +15,16 @@ export interface CustomizeSubTapProps {
   setSpec: (val: GraphSpec, options?: any) => void;
 }
 
+const customizeCss = css`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .customize-contents {
+    height: 100%;
+  }
+`;
 //TODO: factor out this css to global tab css
 const subTabCss = css`
   ul {
@@ -59,7 +69,7 @@ export default function CustomizationTab() {
   }
 
   return (
-    <div className="customize">
+    <div className="customize" css={customizeCss}>
       <section className="subtab" css={subTabCss}>
         <ul>
           {subTabs.map((subtab) => {
@@ -75,9 +85,9 @@ export default function CustomizationTab() {
           })}
         </ul>
       </section>
-      <section>
+      <div className="customize-contents">
         <TabContents spec={graphSpec} setSpec={updateGraphSpec} />
-      </section>
+      </div>
     </div>
   );
 }

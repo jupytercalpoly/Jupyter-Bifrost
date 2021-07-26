@@ -37,7 +37,6 @@ export default function useSpecHistory(
   function save(spec: GraphSpec = graphSpec) {
     const hasChanged = originalSpec !== spec;
     const hasNoEncoding = !Object.keys(spec.encoding).length;
-    console.log({ spec, hasNoEncoding });
     if (!hasChanged || hasNoEncoding) {
       return;
     }

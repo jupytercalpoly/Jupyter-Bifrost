@@ -6,10 +6,11 @@ import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import SearchBar from '../../ui-widgets/SearchBar';
 
 const historyCss = (theme: any) => css`
+  height: 100%;
   .history-list {
     list-style: none;
     padding: 0;
-    max-height: 160px;
+    max-height: 300px;
     overflow-y: scroll;
 
     .history-el {
@@ -31,7 +32,6 @@ const historyCss = (theme: any) => css`
 export default function HistoryTab() {
   const setSpec = useModelState('graph_spec')[1];
   const [specHistory] = useModelState('spec_history');
-  console.log({ inHistory: specHistory });
 
   const [dfIndex, setDfIndex] = useModelState('current_dataframe_index');
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,17 +58,6 @@ export default function HistoryTab() {
 
   return (
     <section className="HistoryTab" css={historyCss}>
-      <h1>History Tab</h1>
-      <input
-        type="range"
-        value={dfIndex}
-        min={0}
-        max={specHistory.length - 1}
-        onChange={(e) =>
-          setHistoryPosition(invertHistIndex(e.target.valueAsNumber))
-        }
-      />
-
       <SearchBar
         choices={histDescriptions}
         value={searchQuery}

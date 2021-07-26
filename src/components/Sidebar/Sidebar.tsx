@@ -8,6 +8,9 @@ import { useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 
 const sidebarCss = css`
+  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 600px;
   height: 100%;
@@ -17,6 +20,8 @@ const sidebarCss = css`
     border-top: none;
     border-bottom: none;
     padding: 10px;
+    padding-bottom: 0;
+    height: 100%;
   }
 `;
 const tabMapping: { [name: string]: () => jsx.JSX.Element } = {
