@@ -31,7 +31,7 @@ version = get_version(pjoin(name, '_version.py'))
 
 # Representative files that should exist after a successful build
 jstargets = [
-    pjoin(HERE, name, 'nbextension', 'index.js'),
+    # pjoin(HERE, name, 'nbextension', 'index.js'),
     pjoin(HERE, 'lib', 'plugin.js'),
 ]
 
@@ -45,7 +45,7 @@ package_data_spec = {
 
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/bifrost_jupyter_extension', 'bifrost_jupyter_extension/nbextension', '**'),
+    # ('share/jupyter/nbextensions/bifrost_jupyter_extension', 'bifrost_jupyter_extension/nbextension', '**'),
     ('share/jupyter/labextensions/bifrost-jupyter-extension', 'bifrost_jupyter_extension/labextension', '**'),
     ('share/jupyter/labextensions/bifrost-jupyter-extension', '.', 'install.json'),
     ('etc/jupyter/nbconfig/notebook.d', '.', 'bifrost_jupyter_extension.json'),
