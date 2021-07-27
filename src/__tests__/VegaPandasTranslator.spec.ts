@@ -25,7 +25,6 @@ describe('Vega Pandas Translator', () => {
     });
 
     const code = translator.convertSpecToCode(basicSpec);
-    console.log(code);
     expect(code).toEqual(
       "$df = $df[($df['field'] >= 3.3) & ($df['field'] <= 4)]\n"
     );

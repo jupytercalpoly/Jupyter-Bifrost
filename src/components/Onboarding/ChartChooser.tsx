@@ -83,8 +83,6 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
       }, new Set<string>()),
     [suggestedGraphs]
   );
-  console.log((suggestedGraphs as GraphSpec[]).map((gs) => gs.mark));
-  console.log(activeMarks);
   const data = useModelState('graph_data')[0];
   const setGraphSpec = useModelState('graph_spec')[1];
   const setOpHistory = useModelState('spec_history')[1];
@@ -95,7 +93,6 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
   useEffect(() => {
     chartChooserRef.current?.focus();
   }, []);
-  console.log({ filteredGraphs });
 
   function displayChart() {
     if (selectedIndex === -1) {

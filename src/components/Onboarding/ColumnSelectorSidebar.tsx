@@ -156,7 +156,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   function createChartsFromColumns() {
     const opt = {};
     const schema = build(data, opt);
-
+    console.log({ schema });
     const selectedEncodings = Array.from(selectedColumns).map((column) => {
       if (preSelectedColumns.has(column)) {
         return spec.spec.encodings.filter(

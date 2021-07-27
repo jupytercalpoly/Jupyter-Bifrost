@@ -41,6 +41,6 @@ describe('Bifrost React Widget', () => {
   it('Should be renderable and the title of the column screen should be visible.', () => {
     const model = createTestModel(BifrostModel);
     render(BifrostReactWidget({ model }));
-    screen.getByText('Select Columns');
+    screen.getByText('Chart Browser');
   });
 });
