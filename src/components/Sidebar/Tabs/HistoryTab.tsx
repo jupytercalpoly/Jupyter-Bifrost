@@ -1,12 +1,13 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   GraphSpec,
   SpecHistoryTree,
   useModelState,
 } from '../../../hooks/bifrost-model';
+import theme from '../../../theme';
 import Tree from 'react-d3-tree';
 
 const historyCss = (theme: any) => css`
@@ -48,15 +49,9 @@ export default function HistoryTab() {
     }
   }, []);
 
-  // function invertHistIndex(i: number) {
-  //   return specHistory.length - 1 - i;
-  // }
-
   function setHistoryPosition(nodeData: D3Node) {
     setSpec(nodeData.spec);
-    const selectedNode = specHistory.find(
-      (node) => node.spec === nodeData.spec
-    );
+    const selectedNode = specHistory.find((node) => node.id === nodeData.id);
     selectedNode && setHistoryNode(selectedNode);
   }
 
@@ -70,7 +65,7 @@ export default function HistoryTab() {
             nodeDatum={data.nodeDatum as unknown as D3Node} // Did this so that I could include spec on the node
             toggleNode={data.toggleNode}
             onClick={setHistoryPosition}
-            activeSpec={historyNode.spec}
+            activeNodeId={historyNode.id}
           />
         )}
       />
@@ -91,6 +86,7 @@ interface D3Node {
   attributes?: Record<string, string | number | boolean>;
   children: D3Node[];
   spec: GraphSpec;
+  id: number;
 }
 
 function generateTreeSpec(node: SpecHistoryTree): D3Node {
@@ -98,6 +94,7 @@ function generateTreeSpec(node: SpecHistoryTree): D3Node {
     name: generateDescription(node.spec),
     children: node.children.map(generateTreeSpec),
     spec: node.spec,
+    id: node.id,
   };
 }
 
@@ -105,19 +102,27 @@ function TreeNode(props: {
   nodeDatum: D3Node;
   toggleNode: () => void;
   onClick: (node: D3Node) => void;
-  activeSpec: GraphSpec;
+  activeNodeId: number;
 }) {
+  const [hovering, setHovering] = useState(false);
   return (
     <g>
-      <circle r="15" onClick={() => props.onClick(props.nodeDatum)} />
-      <text
-        fill={props.activeSpec === props.nodeDatum.spec ? 'red' : 'black'}
-        strokeWidth="1"
-        x="20"
-        onClick={props.toggleNode}
-      >
-        {props.nodeDatum.name}
-      </text>
+      <circle
+        r="15"
+        onClick={() => props.onClick(props.nodeDatum)}
+        fill={
+          props.activeNodeId === props.nodeDatum.id
+            ? theme.color.primary.standard
+            : 'black'
+        }
+        onMouseOver={() => setHovering(true)}
+        onMouseOut={() => setHovering(false)}
+      />
+      {hovering && (
+        <text fill="black" strokeWidth="1" x="20">
+          {props.nodeDatum.name}
+        </text>
+      )}
     </g>
   );
 }

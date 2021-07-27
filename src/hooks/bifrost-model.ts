@@ -56,9 +56,11 @@ export type GraphSpec = VisualizationSpec & {
 export class SpecHistoryTree {
   spec: GraphSpec;
   children: SpecHistoryTree[];
+  id: number;
   constructor(graphSpec: GraphSpec) {
     this.spec = graphSpec;
     this.children = [];
+    this.id = Date.now();
   }
 
   get mainLeaf(): GraphSpec {
