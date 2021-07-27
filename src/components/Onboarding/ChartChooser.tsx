@@ -1,15 +1,15 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
+
 import produce from 'immer';
 import { useMemo } from 'react';
 import { useState } from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import {
-  // EncodingInfo,
   GraphSpec,
   useModelState,
+  SpecHistoryTree,
 } from '../../hooks/bifrost-model';
-// import { VegaEncoding } from '../../modules/VegaEncodings';
 import { BifrostTheme } from '../../theme';
 import ChartFilter from './ChartFilter';
 
@@ -93,6 +93,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
   const setGraphSpec = useModelState('graph_spec')[1];
   const setOpHistory = useModelState('spec_history')[1];
   const graphData = { data };
+  const setHistoryNode = useModelState('history_node')[1];
 
   function displayChart(selectedIndex: number) {
     if (selectedIndex === -1) {
@@ -109,7 +110,9 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
       gs.params = [{ name: 'brush', select: 'interval' }];
     });
     setGraphSpec(spec);
-    setOpHistory([spec]);
+    const specRoot = new SpecHistoryTree(spec);
+    setOpHistory(specRoot);
+    setHistoryNode(specRoot);
     props.onOnboarded();
   }
 

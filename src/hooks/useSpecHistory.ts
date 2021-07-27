@@ -13,9 +13,8 @@ interface SpecHistoryOptions {
 export default function useSpecHistory(
   options: SpecHistoryOptions = { saveOnDismount: false }
 ) {
-  const [opHistory, setOpHistory] = useModelState('spec_history');
   const graphSpec = useModelState('graph_spec')[0];
-  const [index, setIndex] = useModelState('current_dataframe_index');
+  const [historyNode, setHistoryNode] = useModelState('history_node');
   const [originalSpec, setOriginalSpec] = useState(graphSpec);
   const saveRef = useRef<(spec?: GraphSpec) => void>(save);
 
@@ -40,10 +39,8 @@ export default function useSpecHistory(
     if (!hasChanged || hasNoEncoding) {
       return;
     }
-    const newHist = opHistory.slice(0, index + 1);
-    newHist.push(spec);
-    setOpHistory(newHist);
-    setIndex(newHist.length - 1);
+    const node = historyNode.addChild(spec);
+    setHistoryNode(node);
     setOriginalSpec(spec);
   }
 

@@ -11,6 +11,7 @@ import ReactDOM from 'react-dom';
 import BifrostReactWidget from './components/BifrostReactWidget';
 import {
   GraphSpec,
+  SpecHistoryTree,
   GraphData,
   SuggestedGraphs,
   QuerySpec,
@@ -25,7 +26,8 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 import '../css/widget.css';
 
 const bifrostModelPropDefaults = {
-  spec_history: [] as GraphSpec[],
+  spec_history: {} as SpecHistoryTree,
+  history_node: {} as SpecHistoryTree,
   output_variable: '',
   df_variable_name: '',
   current_dataframe_index: 0,
