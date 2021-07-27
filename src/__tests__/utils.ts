@@ -116,3 +116,36 @@ export function createTestModel<T extends widgets.WidgetModel>(
 
   return new constructor(attributes, modelOptions);
 }
+
+/**
+ * Creates a basic spec for testing purposes.
+ * @param options Override spec default options.
+ * @returns A GraphSpec.
+ */
+export function createGraphSpec(options?: {
+  mark?: string;
+  encoding?: any;
+  transform?: any[];
+}) {
+  const optionDefaults = {
+    mark: 'point',
+    encoding: {
+      x: { field: 'foo', type: 'quantitative' },
+      y: { field: 'bar', type: 'quantitative' },
+    },
+    transform: [],
+  };
+  options = options ? { ...optionDefaults, ...options } : optionDefaults;
+  return {
+    config: {
+      mark: { tooltip: true },
+    },
+    width: 400,
+    height: 200,
+    mark: options.mark,
+    params: [{ name: 'brush', select: 'interval' }],
+    data: { name: 'data' },
+    encoding: options.encoding,
+    transform: options.transform,
+  };
+}

@@ -16,7 +16,7 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "target": "es2015",
-    "types": ["jest"]
+    "types": ["jest", "node"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
   "exclude": ["src/**/__tests__"]

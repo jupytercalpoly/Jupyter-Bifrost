@@ -2,6 +2,7 @@ module.exports = {
   automock: false,
   moduleNameMapper: {
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
+    'compassql/build/src/*': '<rootDir>/src/__tests__/mocks/compassql',
   },
   preset: 'ts-jest/presets/js-with-babel',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
