@@ -1,5 +1,14 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
+import { useState, useRef, useEffect } from 'react';
+import { VegaLite, VisualizationSpec } from 'react-vega';
+import {
+  useModelState,
+  GraphSpec,
+  SpecHistoryTree,
+} from '../../hooks/bifrost-model';
+import NavHeader from './NavHeader';
+import theme from '../../theme';
 import produce from 'immer';
 import { useMemo } from 'react';
 import { useState } from 'react';
@@ -86,6 +95,12 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
   const setGraphSpec = useModelState('graph_spec')[1];
   const setOpHistory = useModelState('spec_history')[1];
   const graphData = { data };
+  const setHistoryNode = useModelState('history_node')[1];
+  const chartChooserRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    chartChooserRef.current?.focus();
+  }, []);
 
   function displayChart(selectedIndex: number) {
     if (selectedIndex === -1) {
@@ -102,8 +117,10 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
       gs.params = [{ name: 'brush', select: 'interval' }];
     });
     setGraphSpec(spec);
-    setOpHistory([spec]);
-    props.onOnboarded();
+    const specRoot = new SpecHistoryTree(spec);
+    setOpHistory(specRoot);
+    setHistoryNode(specRoot);
+    props.onChartSelected(spec);
   }
 
   function selectChartWithSpaceBar(

@@ -49,6 +49,40 @@ export type GraphSpec = VisualizationSpec & {
   data: { name: string };
 };
 
+export class SpecHistoryTree {
+  spec: GraphSpec;
+  children: SpecHistoryTree[];
+  constructor(graphSpec: GraphSpec) {
+    this.spec = graphSpec;
+    this.children = [];
+  }
+
+  get mainLeaf(): GraphSpec {
+    return this.children.length ? this.children[0].mainLeaf : this.spec;
+  }
+
+  addChild(spec: GraphSpec) {
+    const node = new SpecHistoryTree(spec);
+    this.children.push(node);
+    return node;
+  }
+
+  find(condition: (node: SpecHistoryTree) => boolean): SpecHistoryTree | null {
+    if (condition(this)) {
+      return this;
+    } else {
+      const childResults = this.children
+        .map((node) => node.find(condition))
+        .filter(Boolean);
+      return childResults.length ? childResults[0] : null;
+    }
+  }
+}
+export interface SpecHistoryTree {
+  spec: GraphSpec;
+  children: SpecHistoryTree[];
+}
+
 export type Args = {
   x: string;
   y: string;
