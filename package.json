@@ -37,7 +37,7 @@
   },
   "scripts": {
     "build": "yarn run build:lib && yarn run build:nbextension && yarn run build:labextension:dev",
-    "build:prod": "yarn run build:lib && yarn run build:nbextension && yarn run build:labextension",
+    "build:prod": "yarn run build:lib && yarn run build:labextension",
     "build:binder": "yarn run build:lib && yarn run build:labextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
