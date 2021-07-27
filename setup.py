@@ -22,8 +22,6 @@ from jupyter_packaging import (
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
-
-
 # The name of the project
 name = 'bifrost_jupyter_extension'
 
@@ -33,7 +31,7 @@ version = get_version(pjoin(name, '_version.py'))
 
 # Representative files that should exist after a successful build
 jstargets = [
-    pjoin(HERE, name, 'nbextension', 'index.js'),
+    # pjoin(HERE, name, 'nbextension', 'index.js'),
     pjoin(HERE, 'lib', 'plugin.js'),
 ]
 
@@ -57,7 +55,8 @@ data_files_spec = [
 cmdclass = create_cmdclass('jsdeps', package_data_spec=package_data_spec,
     data_files_spec=data_files_spec)
 cmdclass['jsdeps'] = combine_commands(
-    install_npm(HERE, build_cmd='build:prod'),
+    # change this to build:prod for production
+    install_npm(HERE, build_cmd='build:binder'),
     ensure_targets(jstargets),
 )
 
