@@ -102,7 +102,10 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
-  const bounds = useMemo(getBounds, [graphData, currentAggregation]);
+  const bounds = useMemo(
+    () => getBounds(graphData, field),
+    [graphData, currentAggregation]
+  );
   const ranges = getRanges();
 
   // Initialize a slider if one doesn't exist
