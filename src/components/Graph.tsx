@@ -318,46 +318,44 @@ export default function Graph(props: GraphProps) {
   }
 
   return (
-    <div>
-      <div ref={wrapperRef} css={graphCss} onDoubleClick={resetBrushView}>
-        <div
-          onMouseUp={updateGraphBounds}
-          onMouseLeave={() => setSelectedData(['brush', {}])}
-        >
-          <BifrostVega
-            spec={spec}
-            data={graphData}
-            signalListeners={signalListeners}
-            renderer={'svg'}
-            onNewView={onNewView}
-          />
-        </div>
-        <div
-          className="x-axis-wrapper"
-          onClick={(event) => handleClickOnAxis(event, 'x')}
-          onMouseEnter={(event) => handleMouseEnter(event, 'x')}
-          onMouseLeave={(event) => handleMouseLeave(event, 'x')}
-          css={axisCss}
-        ></div>
-        <div
-          className="y-axis-wrapper"
-          onClick={(event) => handleClickOnAxis(event, 'y')}
-          onMouseEnter={(event) => handleMouseEnter(event, 'y')}
-          onMouseLeave={(event) => handleMouseLeave(event, 'y')}
-          css={axisCss}
-        ></div>
-        {clickedAxis !== '' &&
-          !['nominal', 'oridnal'].includes(
-            spec.encoding[clickedAxis as VegaEncoding].type
-          ) && (
-            <AxisRangeSlider
-              graphSpec={spec}
-              setGraphSpec={setSpec}
-              field={spec.encoding[clickedAxis as VegaEncoding].field}
-              axis={clickedAxis}
-            />
-          )}
+    <div ref={wrapperRef} css={graphCss} onDoubleClick={resetBrushView}>
+      <div
+        onMouseUp={updateGraphBounds}
+        onMouseLeave={() => setSelectedData(['brush', {}])}
+      >
+        <BifrostVega
+          spec={spec}
+          data={graphData}
+          signalListeners={signalListeners}
+          renderer={'svg'}
+          onNewView={onNewView}
+        />
       </div>
+      <div
+        className="x-axis-wrapper"
+        onClick={(event) => handleClickOnAxis(event, 'x')}
+        onMouseEnter={(event) => handleMouseEnter(event, 'x')}
+        onMouseLeave={(event) => handleMouseLeave(event, 'x')}
+        css={axisCss}
+      ></div>
+      <div
+        className="y-axis-wrapper"
+        onClick={(event) => handleClickOnAxis(event, 'y')}
+        onMouseEnter={(event) => handleMouseEnter(event, 'y')}
+        onMouseLeave={(event) => handleMouseLeave(event, 'y')}
+        css={axisCss}
+      ></div>
+      {clickedAxis !== '' &&
+        !['nominal', 'oridnal'].includes(
+          spec.encoding[clickedAxis as VegaEncoding].type
+        ) && (
+          <AxisRangeSlider
+            graphSpec={spec}
+            setGraphSpec={setSpec}
+            field={spec.encoding[clickedAxis as VegaEncoding].field}
+            axis={clickedAxis}
+          />
+        )}
     </div>
   );
 }
