@@ -38,12 +38,18 @@ interface PillProps {
   children?: React.ReactNode;
   onClick?: () => void;
   active?: boolean;
+  [other: string]: any;
 }
 
-export default function Pill(props: PillProps) {
+export default function Pill({
+  active,
+  children,
+  onClick,
+  ...rest
+}: PillProps) {
   return (
-    <li css={[pillCss, props.active && activeCss]} onClick={props.onClick}>
-      <div className="content-wrapper">{props.children}</div>
+    <li css={[pillCss, active && activeCss]} onClick={onClick} {...rest}>
+      <div className="content-wrapper">{children}</div>
     </li>
   );
 }

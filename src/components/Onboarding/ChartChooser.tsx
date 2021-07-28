@@ -2,7 +2,7 @@
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
 import { useMemo } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 import { BifrostTheme } from '../../theme';
@@ -35,6 +35,9 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
   .graph-wrapper {
     position: relative;
     margin: 40px 0;
+    padding: 0;
+    background-color: transparent;
+    border: none;
     border-radius: 5px;
     transition: border-color 0.5s;
     border: 10px solid transparent;
@@ -57,7 +60,7 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
       opacity: 1;
     }
 
-    &.selected {
+    &.focused {
       border: 10px solid ${theme.color.primary.light};
     }
   }
@@ -88,11 +91,6 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
   const setOpHistory = useModelState('spec_history')[1];
   const graphData = { data };
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const chartChooserRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    chartChooserRef.current?.focus();
-  }, []);
 
   function displayChart() {
     if (selectedIndex === -1) {
@@ -113,13 +111,17 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
     props.onOnboarded();
   }
 
+  function selectChartWithSpaceBar(e: React.KeyboardEvent<HTMLButtonElement>) {
+    if (e.key !== ' ') {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    displayChart();
+  }
+
   return suggestedGraphs.length ? (
-    <section
-      tabIndex={-1}
-      className="ChartChooser"
-      css={suggestedChartCss}
-      ref={chartChooserRef}
-    >
+    <section tabIndex={-1} className="ChartChooser" css={suggestedChartCss}>
       <ChartFilter
         activeMarks={activeMarks}
         availableMarks={availableMarks}
@@ -127,13 +129,15 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
       />
       <div className="suggested-charts">
         {filteredGraphs.map((spec, i) => (
-          <div
+          <button
             onDoubleClick={displayChart}
+            onKeyDown={selectChartWithSpaceBar}
             style={{ scrollSnapAlign: 'center' }}
             className={
               selectedIndex === i ? 'graph-wrapper selected' : 'graph-wrapper'
             }
             key={i}
+            data-focusable={'chart' + i}
           >
             <div onClick={() => setSelectedIndex(i)}>
               <VegaLite
@@ -142,7 +146,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
                 actions={false}
               />
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </section>

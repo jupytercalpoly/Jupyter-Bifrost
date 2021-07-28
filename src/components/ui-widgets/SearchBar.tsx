@@ -43,24 +43,35 @@ export interface SearchProps {
   value: string;
   placeholder?: string;
   forwardedRef?: React.ForwardedRef<HTMLInputElement>;
+  [other: string]: any;
 }
 
 export default function SearchBar(props: SearchProps) {
+  const {
+    choices,
+    onResultsChange,
+    onChange,
+    onKeyDown,
+    value,
+    placeholder,
+    forwardedRef,
+    ...rest
+  } = props;
   useEffect(() => {
     const notAlpha = /[^A-Za-z]/g;
-    const normQuery = props.value.replace(notAlpha, '').toLowerCase();
+    const normQuery = value.replace(notAlpha, '').toLowerCase();
     const compScore = (name: string) =>
       StringExt.matchSumOfSquares(
         name.replace(notAlpha, '').toLowerCase(),
         normQuery
       )?.score;
 
-    const indexedChoices = props.choices.map((choice, index) => ({
+    const indexedChoices = choices.map((choice, index) => ({
       choice,
       index,
     }));
-    if (props.value.length === 0) {
-      props.onResultsChange(indexedChoices);
+    if (value.length === 0) {
+      onResultsChange(indexedChoices);
     } else {
       const results = indexedChoices.filter(({ choice }) => {
         return compScore(choice) === undefined ? false : true;
@@ -71,9 +82,9 @@ export default function SearchBar(props: SearchProps) {
         (a, b) =>
           (compScore(a.choice) as number) - (compScore(b.choice) as number)
       );
-      props.onResultsChange(results);
+      onResultsChange(results);
     }
-  }, [props.value, props.choices]);
+  }, [value, choices]);
 
   return (
     <div className="searchBar" css={searchBarCss}>
@@ -81,12 +92,13 @@ export default function SearchBar(props: SearchProps) {
         <Search size={17} />
       </span>
       <input
-        ref={props.forwardedRef}
+        ref={forwardedRef}
         type="search"
-        value={props.value}
-        placeholder={props.placeholder}
-        onChange={(e) => props.onChange(e.target.value)}
-        onKeyDown={props.onKeyDown}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
+        {...rest}
       />
     </div>
   );

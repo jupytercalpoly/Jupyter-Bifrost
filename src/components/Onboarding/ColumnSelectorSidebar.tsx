@@ -12,7 +12,6 @@ import { Query } from 'compassql/build/src/query/query';
 import { Lock, X } from 'react-feather';
 import { useEffect } from 'react';
 import { EncodingQuery } from 'compassql/build/src/query/encoding';
-import { Focusable } from './KeyboardNav';
 
 import {
   useModelState,
@@ -21,8 +20,9 @@ import {
 } from '../../hooks/bifrost-model';
 import Pill from '../ui-widgets/Pill';
 import { useMemo } from 'react';
+import { BifrostTheme } from '../../theme';
 
-const columnSelectorCss = css`
+const columnSelectorCss = (theme: BifrostTheme) => css`
   width: 320px;
   margin-right: 30px;
 
@@ -39,11 +39,13 @@ const columnSelectorCss = css`
 
   .choice {
     display: flex;
-    margin: 10px;
+    margin: 5px 0;
+    padding: 5px;
     width: fit-content;
+    border-left: 2px solid transparent;
 
     &.focused {
-      background-color: #dedede;
+      border-left: 2px solid ${theme.color.primary.standard};
     }
   }
 
@@ -126,9 +128,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
     columnChoices.map((choice, index) => ({ choice, index }))
   );
   const optionsRef = useRef<HTMLFieldSetElement>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
 
-  const [focusedIdx, setFocusedIdx] = useState<number>(0);
   const preSelectedColumns = useMemo(
     () => new Set(Object.values(props.plotArgs).filter(Boolean)),
     [props.plotArgs]
@@ -142,21 +142,12 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
     setSelectedColumns(Array.from(preSelectedColumns));
   }, []);
 
-  // Focus the search field
-  useEffect(() => {
-    searchRef.current?.focus();
-    if (results.length !== 0) {
-      setFocusedIdx(0);
-    }
-  }, [results]);
-
   // Create charts whenever the column selection changes
   useEffect(createChartsFromColumns, [selectedColumns]);
 
   function createChartsFromColumns() {
     const opt = {};
     const schema = build(data, opt);
-    console.log({ schema });
     const selectedEncodings = Array.from(selectedColumns).map((column) => {
       if (preSelectedColumns.has(column)) {
         return spec.spec.encodings.filter(
@@ -241,39 +232,36 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
       <h1>Chart Browser</h1>
       <h2 className="subtitle">Select up to 3 columns</h2>
       <ul className="column-tags">
-        {Array.from(selectedColumns).map((column: string) => {
+        {Array.from(selectedColumns).map((column: string, i) => {
           return (
-            <Focusable id="test" parentId="default">
-              <Pill key={`tag_${column}`}>
-                <div className="tag-content-wrapper">
-                  <span style={{ padding: '0px 5px' }}>{column}</span>
-                  <button
-                    className={`tagButton_${column}`}
-                    onClick={handleDelete}
-                  >
-                    <X size={10} />
-                  </button>
-                </div>
-              </Pill>
-            </Focusable>
+            <Pill key={`tag_${column}`}>
+              <div className="tag-content-wrapper">
+                <span style={{ padding: '0px 5px' }}>{column}</span>
+                <button
+                  className={`tagButton_${column}`}
+                  onClick={handleDelete}
+                >
+                  <X size={10} />
+                </button>
+              </div>
+            </Pill>
           );
         })}
       </ul>
       <SearchBar
+        data-immediate-focus
+        data-focusable="search"
         choices={columnChoices}
         value={query}
         onChange={setQuery}
         onResultsChange={setResults}
-        forwardedRef={searchRef}
       />
+
       <form onSubmit={(e) => e.preventDefault()}>
         <fieldset ref={optionsRef}>
           {results.map(({ choice: col }, i) => {
             return (
-              <label
-                className={i === focusedIdx ? 'choice focused' : 'choice'}
-                key={col}
-              >
+              <label className="choice" data-focusable key={col}>
                 {preSelectedColumns.has(col) ? (
                   <Lock size={15} style={{ marginRight: '6px' }} />
                 ) : (
@@ -283,6 +271,10 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
                     value={col}
                     onChange={handleCheckboxChange}
                     checked={selectedColumns.includes(col)}
+                    disabled={
+                      selectedColumns.length > 2 &&
+                      !selectedColumns.includes(col)
+                    }
                   />
                 )}
                 {col}
