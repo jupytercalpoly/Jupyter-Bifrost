@@ -8,12 +8,23 @@ import StyleSubTab from './StyleSubTab';
 import theme from '../../../../theme';
 
 import { useModelState, GraphSpec } from '../../../../hooks/bifrost-model';
+import useSpecHistory from '../../../../hooks/useSpecHistory';
 
 export interface CustomizeSubTapProps {
   spec: GraphSpec;
   setSpec: (val: GraphSpec, options?: any) => void;
 }
 
+const customizeCss = css`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .customize-contents {
+    height: 100%;
+  }
+`;
 //TODO: factor out this css to global tab css
 const subTabCss = css`
   ul {
@@ -50,9 +61,15 @@ export default function CustomizationTab() {
   const [selectedTab, setSelectedTab] = useState<string>(subTabs[0]);
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const TabContents = subtabMapping[selectedTab];
+  const saveSpec = useSpecHistory();
+
+  function updateGraphSpec(spec: GraphSpec) {
+    saveSpec(spec);
+    setGraphSpec(spec);
+  }
 
   return (
-    <div className="customize">
+    <div className="customize" css={customizeCss}>
       <section className="subtab" css={subTabCss}>
         <ul>
           {subTabs.map((subtab) => {
@@ -68,9 +85,9 @@ export default function CustomizationTab() {
           })}
         </ul>
       </section>
-      <section>
-        <TabContents spec={graphSpec} setSpec={setGraphSpec} />
-      </section>
+      <div className="customize-contents">
+        <TabContents spec={graphSpec} setSpec={updateGraphSpec} />
+      </div>
     </div>
   );
 }

@@ -1,0 +1,11 @@
+  python >=3.8,<3.9.0a0
+  jupyterlab >=3,<4.0.0a0
+  nodejs >=14,<15
+  pip
+  wheel
+  setuptools
+  jupyter-packaging
+  codecov
+  numpy
+  pandas
+  scikit-learn 

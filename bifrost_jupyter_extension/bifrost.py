@@ -41,6 +41,7 @@ class BifrostWidget(DOMWidget):
     graph_spec = Dict({}).tag(sync=True)
     plot_function_args = Dict({}).tag(sync=True)
     graph_data = List([]).tag(sync=True)
+    graph_bounds = Dict({}).tag(sync=True)
     graph_encodings = Dict({}).tag(sync=True)
     df_variable_name = Unicode("").tag(sync=True)
     output_variable = Unicode("").tag(sync=True)

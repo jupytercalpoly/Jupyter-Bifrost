@@ -51,7 +51,6 @@ jobs:
           python -m pip install --upgrade -v -e ".[test, examples, docs]"
           yarn run lint:check
 
-          pytest
           yarn run test
 
       - name: Check docs can be build + links
@@ -59,5 +58,4 @@ jobs:
           sudo apt install -y pandoc
           pushd docs
           make html
-          python -m pytest --check-links
           popd

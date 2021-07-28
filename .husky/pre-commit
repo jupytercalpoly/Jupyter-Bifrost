@@ -3,3 +3,4 @@
 
 npx --no-install lint-staged
 jlpm lint-staged
+jlpm run test

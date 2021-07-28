@@ -8,6 +8,9 @@ import { useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 
 const sidebarCss = css`
+  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 600px;
   height: 100%;
@@ -20,16 +23,18 @@ const sidebarCss = css`
     border-bottom: none;
     padding: 10px;
     overflow: auto;
+    padding-bottom: 0;
+    height: 100%;
   }
 `;
 const tabMapping: { [name: string]: () => jsx.JSX.Element } = {
-  Variables: VariablesTab,
+  Data: VariablesTab,
   Customization: CustomizationTab,
   History: HistoryTab,
 };
 
 export default function Sidebar() {
-  const tabs = ['Variables', 'Customization', 'History'];
+  const tabs = ['Data', 'Customization', 'History'];
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const TabContents = tabMapping[selectedTab];
   return (
@@ -114,9 +119,7 @@ const actionBarCss = css`
 `;
 
 function ActionBar() {
-  const [opHistory, setOpHistory] = useModelState('spec_history');
   const spec = useModelState('graph_spec')[0];
-  const [index, setIndex] = useModelState('current_dataframe_index');
   const [dataframeName] = useModelState('df_variable_name');
 
   function exportCode() {
@@ -127,19 +130,9 @@ function ActionBar() {
     navigator.clipboard.writeText(query);
   }
 
-  function applyGraphChanges() {
-    const newHist = opHistory.slice(0, index + 1);
-    newHist.push(spec);
-    setOpHistory(newHist);
-    setIndex(newHist.length - 1);
-  }
-
   return (
     <nav className="action-bar" css={actionBarCss}>
       <ul>
-        <li>
-          <button onClick={applyGraphChanges}>Apply Changes</button>
-        </li>
         <li>
           <button onClick={exportCode}>Export Code</button>
         </li>

@@ -69,10 +69,15 @@ export default class VegaPandasTranslator {
   private getFilterFromTransform(transform: GraphSpec['transform']) {
     return transform
       .map((t) => {
-        if ('or' in t.filter) {
+        const compoundOperator =
+          'or' in t.filter ? 'or' : 'and' in t.filter ? 'and' : null;
+        if (compoundOperator) {
           // Handle compound query ex. "and", "or", "not"
-          const compFilters = t.filter.or.map(this.getQueryFromFilter);
-          let query = compFilters.join('|');
+          const connector = compoundOperator === 'or' ? '|' : '&';
+          const compFilters = t.filter[compoundOperator].map(
+            this.getQueryFromFilter
+          );
+          let query = compFilters.join(connector);
           if (compFilters.length > 1) {
             query = '(' + query + ')';
           }

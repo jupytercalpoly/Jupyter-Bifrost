@@ -1,15 +1,17 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
+import produce from 'immer';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import SearchBar from '../../ui-widgets/SearchBar';
 
 const historyCss = (theme: any) => css`
+  height: 100%;
   .history-list {
     list-style: none;
     padding: 0;
-    max-height: 160px;
+    max-height: 300px;
     overflow-y: scroll;
 
     .history-el {
@@ -24,17 +26,14 @@ const historyCss = (theme: any) => css`
         border-left: 3px solid ${theme.color.primary[1]};
         font-weight: 700;
       }
-
-      &.temporary {
-        color: gray;
-      }
     }
   }
 `;
 
 export default function HistoryTab() {
   const [spec, setSpec] = useModelState('graph_spec');
-  const [specHistory, setSpecHistory] = useModelState('spec_history');
+  const [specHistory] = useModelState('spec_history');
+
   const [dfIndex, setDfIndex] = useModelState('current_dataframe_index');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setResults] = useState<
@@ -49,24 +48,17 @@ export default function HistoryTab() {
     [reverseHistory]
   );
 
+  // Select the last valid spec if current spec has no encoding
   useEffect(() => {
-    const updatedHist = specHistory.slice(0, dfIndex + 1);
-    updatedHist.push(spec);
-    setSpecHistory(updatedHist);
-    setDfIndex(updatedHist.length - 1);
-
-    return () => {
-      setSpecHistory(updatedHist.slice(0, updatedHist.length - 1));
-      if (dfIndex > updatedHist.length - 2) {
-        setDfIndex(updatedHist.length - 2);
-      }
-    };
+    const hasNoEncodings = !Object.keys(spec.encoding).length;
+    if (hasNoEncodings) {
+      const lastValidSpec = produce(
+        specHistory[specHistory.length - 1],
+        (gs) => gs
+      );
+      setSpec(lastValidSpec);
+    }
   }, []);
-
-  /**
-   * Preserves the spec state when the user navigates to the history tab
-   * and deletes the temporarily saved spec when the user navigates away.
-   */
 
   function invertHistIndex(i: number) {
     return specHistory.length - 1 - i;
@@ -79,17 +71,6 @@ export default function HistoryTab() {
 
   return (
     <section className="HistoryTab" css={historyCss}>
-      <h1>History Tab</h1>
-      <input
-        type="range"
-        value={dfIndex}
-        min={0}
-        max={specHistory.length - 1}
-        onChange={(e) =>
-          setHistoryPosition(invertHistIndex(e.target.valueAsNumber))
-        }
-      />
-
       <SearchBar
         choices={histDescriptions}
         value={searchQuery}
@@ -101,7 +82,6 @@ export default function HistoryTab() {
           const classes = [
             ['history-el', true],
             ['active', index === invertHistIndex(dfIndex)],
-            ['temporary', index === 0],
           ]
             .filter((pair) => pair[1])
             .map((pair) => pair[0])
@@ -113,7 +93,7 @@ export default function HistoryTab() {
               key={index}
               onClick={() => setHistoryPosition(index)}
             >
-              {(index === 0 ? '(Unsaved) ' : '') + choice}
+              {choice}
             </li>
           );
         })}
@@ -124,11 +104,10 @@ export default function HistoryTab() {
 
 function generateDescriptions(hist: GraphSpec[]) {
   return hist.map((spec) => {
-    const field = {
-      x: spec.encoding.x.field,
-      y: spec.encoding.y.field,
-    };
+    const fieldString = Object.values(spec.encoding)
+      .map((info) => info.field)
+      .join(' vs ');
     const mark = spec.mark;
-    return `${field.x} vs ${field.y} ${mark} chart`;
+    return `${fieldString} ${mark} chart`;
   });
 }
