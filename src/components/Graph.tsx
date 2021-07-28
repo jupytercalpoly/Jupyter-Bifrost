@@ -7,11 +7,10 @@ import {
   getBounds,
   updateSpecFilter,
 } from '../modules/VegaFilters';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import BifrostVega from '../modules/BifrostVega';
-import { ScenegraphEvent, View } from 'vega';
+import { View } from 'vega';
 import theme from '../theme';
-// import { filterMap } from '../components/Sidebar/Tabs/FilterScreen';
 import { VegaEncoding } from '../modules/VegaEncodings';
 import RangeSlider from './ui-widgets/RangeSlider';
 
@@ -26,13 +25,14 @@ const graphCss = css`
   }
 
   g.mark-text.role-axis-title {
-    cursor: pointer;
-    pointer-events: all;
-
     text.hovered {
       fill: ${theme.color.primary.dark};
     }
   }
+`;
+
+const axisCss = css`
+  cursor: pointer;
 `;
 
 interface GraphProps {
@@ -50,24 +50,14 @@ export default function Graph(props: GraphProps) {
 
   const graphData = { data };
 
+  // multiple signals can be added by adding a new field
+  const signalListeners = { brush: handleBrush };
+
   function handleBrush(...args: any) {
     setSelectedData(args);
   }
 
-  function checkBoundary(
-    xCoord: number,
-    yCoord: number,
-    boundingBox: Record<string, number>
-  ) {
-    return (
-      xCoord <= boundingBox.right &&
-      xCoord >= boundingBox.left &&
-      yCoord >= boundingBox.top &&
-      yCoord <= boundingBox.bottom
-    );
-  }
-
-  function getBoundingBoxes(
+  function getAxisBoundingBoxes(
     wrapper: HTMLDivElement
   ): Record<string, Record<string, number>> {
     const axisLabels = wrapper.querySelectorAll('.mark-text.role-axis-title');
@@ -138,118 +128,236 @@ export default function Graph(props: GraphProps) {
     setGraphBounds({});
   }
 
-  // multiple signals can be added by adding a new field
-  const signalListeners = { brush: handleBrush };
+  function resetOtherAxis(channel: VegaEncoding): boolean {
+    if (!wrapperRef.current) {
+      return false;
+    }
+    const wrapper = wrapperRef.current;
 
-  function onNewView(view: View) {
-    function handleClickOnAxis(event: ScenegraphEvent) {
-      if (!wrapperRef.current) {
-        return;
-      }
-      const wrapper = wrapperRef.current;
+    let axisWrapper;
 
-      const boundingBoxes = getBoundingBoxes(wrapper);
-
-      const xCoord = (event as MouseEvent).clientX;
-      const yCoord = (event as MouseEvent).clientY;
-
-      const clickedBox = Object.keys(boundingBoxes).filter((key) => {
-        const boundingBox = boundingBoxes[key];
-        return checkBoundary(xCoord, yCoord, boundingBox);
-      })[0];
-
-      if (!clickedBox) {
-        return;
-      }
-
-      const variableTab = props.sideBarRef.current?.querySelectorAll(
-        '.TabBar li'
+    if (channel === 'x') {
+      axisWrapper = wrapper.getElementsByClassName(
+        'y-axis-wrapper'
       )[0] as HTMLElement;
-      variableTab.click();
+    } else if (channel === 'y') {
+      axisWrapper = wrapper.getElementsByClassName(
+        'x-axis-wrapper'
+      )[0] as HTMLElement;
+    }
 
-      const pills = props.sideBarRef.current
-        ?.getElementsByClassName('encoding-list')[0]
-        .getElementsByTagName('li');
+    if (axisWrapper && axisWrapper?.classList.contains('clicked')) {
+      axisWrapper?.classList.remove('clicked');
+
+      if (axisWrapper?.classList.contains('x-axis-wrapper')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function handleClickOnAxis(event: React.MouseEvent, channel: VegaEncoding) {
+    const axisWrapper = event.currentTarget as HTMLElement;
+
+    axisWrapper.classList.toggle('clicked');
+
+    const checkOffset = resetOtherAxis(channel);
+
+    const field = spec.encoding[channel].field;
+    let resetClick = false;
+
+    const variableTab = props.sideBarRef.current?.querySelectorAll(
+      '.TabBar li'
+    )[0] as HTMLElement;
+
+    variableTab.click();
+
+    const encodingList =
+      props.sideBarRef.current?.getElementsByClassName('encoding-list')[0];
+
+    if (!encodingList) {
+      if (axisWrapper.classList.contains('clicked')) {
+        axisWrapper.classList.remove('clicked');
+        resetClick = true;
+      }
+    } else {
+      const pills = encodingList.getElementsByTagName('li');
 
       if (pills) {
         Array.from(pills).forEach((pill) => {
           if (
-            pill.querySelector('.encoding-wrapper span')?.textContent ===
-            clickedBox
+            pill.querySelector('.encoding-wrapper span')?.textContent === field
           ) {
             pill.click();
-            if (['nominal', 'ordinal'].includes(columnTypes[clickedBox])) {
+            if (['nominal', 'ordinal'].includes(columnTypes[field])) {
               pill.querySelectorAll('button')[1]?.click();
             }
           }
         });
       }
-
-      setClickedAxis((clickedAxis) => {
-        const channel = Object.keys(spec.encoding).filter((channel) => {
-          return spec.encoding[channel as VegaEncoding].field === clickedBox;
-        })[0] as VegaEncoding;
-
-        return clickedAxis === channel ? '' : channel;
-      });
+    }
+    if (!resetClick) {
+      placeAxisWrappers(false, channel, checkOffset);
     }
 
-    function handleMouseOverOnAxis(event: any) {
-      if (!wrapperRef.current) {
-        return;
-      }
-      const wrapper = wrapperRef.current;
+    let newChannel = clickedAxis === channel ? '' : channel;
 
-      const axisLabels = wrapper.querySelectorAll('.mark-text.role-axis-title');
-      const boundingBoxes = getBoundingBoxes(wrapper);
-
-      Array.from(axisLabels).forEach((axisLabel) => {
-        const xCoord = (event as MouseEvent).clientX;
-        const yCoord = (event as MouseEvent).clientY;
-
-        const hoveredBox = Object.keys(boundingBoxes).filter((key) => {
-          const boundingBox = boundingBoxes[key];
-          return checkBoundary(xCoord, yCoord, boundingBox);
-        })[0];
-
-        const axisTitle = axisLabel.getElementsByTagName('text')[0];
-
-        if (!hoveredBox && axisTitle.classList.contains('hovered')) {
-          axisTitle.classList.remove('hovered');
-        } else if (hoveredBox && axisTitle.textContent === hoveredBox) {
-          axisTitle.classList.add('hovered');
-        }
-      });
+    if (resetClick) {
+      newChannel = '';
     }
 
-    view.addEventListener('click', handleClickOnAxis);
-    view.addEventListener('mouseover', handleMouseOverOnAxis);
+    setClickedAxis(newChannel);
   }
+
+  function placeAxisWrappers(
+    onNewView: boolean,
+    clickedChannel?: VegaEncoding,
+    checkOffset?: boolean
+  ) {
+    if (!wrapperRef.current) {
+      return;
+    }
+    const wrapper = wrapperRef.current;
+    const parentBoundingBox = wrapper.getBoundingClientRect();
+    const axisBoundingBoxes = getAxisBoundingBoxes(wrapper);
+
+    const fields = Object.keys(axisBoundingBoxes);
+    const xAxisBooundingBox = axisBoundingBoxes[fields[0]];
+    const yAxisBoundingBox = axisBoundingBoxes[fields[1]];
+
+    const xAxisWrapper = wrapper.getElementsByClassName(
+      'x-axis-wrapper'
+    )[0] as HTMLElement;
+
+    const yAxisWrapper = wrapper.getElementsByClassName(
+      'y-axis-wrapper'
+    )[0] as HTMLElement;
+
+    let offset = 0;
+    if (
+      clickedChannel &&
+      clickedChannel === 'x' &&
+      !onNewView &&
+      ['quantitative', 'temporal'].includes(spec.encoding[clickedChannel].type)
+    ) {
+      offset = xAxisWrapper.classList.contains('clicked') ? 40 : -40;
+    }
+    // handling edge case when y axis is clicked when x axis is clicked
+    if (checkOffset && offset !== -40) {
+      offset = -40;
+    }
+
+    if (xAxisBooundingBox) {
+      xAxisWrapper.setAttribute(
+        'style',
+        `width:${xAxisBooundingBox.right - xAxisBooundingBox.left}px; height: ${
+          xAxisBooundingBox.bottom - xAxisBooundingBox.top
+        }px;
+        position: absolute;
+        left: ${xAxisBooundingBox.left - parentBoundingBox.left}px;
+        bottom: ${
+          parentBoundingBox.bottom - xAxisBooundingBox.bottom + offset
+        }px;
+        `
+      );
+    }
+
+    if (yAxisBoundingBox) {
+      yAxisWrapper.setAttribute(
+        'style',
+        `width:${yAxisBoundingBox.right - yAxisBoundingBox.left}px; height: ${
+          yAxisBoundingBox.bottom - yAxisBoundingBox.top
+        }px;
+        position: absolute;
+        left: ${yAxisBoundingBox.left - parentBoundingBox.left}px;
+        bottom: ${
+          parentBoundingBox.bottom - yAxisBoundingBox.bottom + offset
+        }px;`
+      );
+    }
+  }
+
+  function onNewView(view: View) {
+    setTimeout(() => placeAxisWrappers(true), 100);
+  }
+
+  function handleMouseEnter(event: React.MouseEvent, channel: VegaEncoding) {
+    if (!wrapperRef) {
+      return;
+    }
+    const wrapper = wrapperRef.current;
+    if (channel === 'x') {
+      const xAxis = wrapper?.querySelectorAll(
+        'g.mark-text.role-axis-title text'
+      )[0];
+      xAxis?.classList.add('hovered');
+    } else {
+      const yAxis = wrapper?.querySelectorAll(
+        'g.mark-text.role-axis-title text'
+      )[1];
+      yAxis?.classList.add('hovered');
+    }
+  }
+
+  function handleMouseLeave(event: React.MouseEvent, channel: VegaEncoding) {
+    if (!wrapperRef) {
+      return;
+    }
+    const wrapper = wrapperRef.current;
+    if (channel === 'x') {
+      const xAxis = wrapper?.querySelectorAll(
+        'g.mark-text.role-axis-title text'
+      )[0];
+      xAxis?.classList.remove('hovered');
+    } else {
+      const yAxis = wrapper?.querySelectorAll(
+        'g.mark-text.role-axis-title text'
+      )[1];
+      yAxis?.classList.remove('hovered');
+    }
+  }
+
   return (
-    <div ref={wrapperRef} css={graphCss} onDoubleClick={resetBrushView}>
-      <div
-        onMouseUp={updateGraphBounds}
-        onMouseLeave={() => setSelectedData(['brush', {}])}
-      >
-        <BifrostVega
-          spec={spec}
-          data={graphData}
-          signalListeners={signalListeners}
-          renderer={'svg'}
-          onNewView={onNewView}
-        />
-      </div>
-      {clickedAxis !== '' &&
-        !['nominal', 'oridnal'].includes(
-          spec.encoding[clickedAxis as VegaEncoding].type
-        ) && (
-          <AxisRangeSlider
-            graphSpec={spec}
-            setGraphSpec={setSpec}
-            field={spec.encoding[clickedAxis as VegaEncoding].field}
-            axis={clickedAxis}
+    <div>
+      <div ref={wrapperRef} css={graphCss} onDoubleClick={resetBrushView}>
+        <div
+          onMouseUp={updateGraphBounds}
+          onMouseLeave={() => setSelectedData(['brush', {}])}
+        >
+          <BifrostVega
+            spec={spec}
+            data={graphData}
+            signalListeners={signalListeners}
+            renderer={'svg'}
+            onNewView={onNewView}
           />
-        )}
+        </div>
+        <div
+          className="x-axis-wrapper"
+          onClick={(event) => handleClickOnAxis(event, 'x')}
+          onMouseEnter={(event) => handleMouseEnter(event, 'x')}
+          onMouseLeave={(event) => handleMouseLeave(event, 'x')}
+          css={axisCss}
+        ></div>
+        <div
+          className="y-axis-wrapper"
+          onClick={(event) => handleClickOnAxis(event, 'y')}
+          onMouseEnter={(event) => handleMouseEnter(event, 'y')}
+          onMouseLeave={(event) => handleMouseLeave(event, 'y')}
+          css={axisCss}
+        ></div>
+        {clickedAxis !== '' &&
+          !['nominal', 'oridnal'].includes(
+            spec.encoding[clickedAxis as VegaEncoding].type
+          ) && (
+            <AxisRangeSlider
+              graphSpec={spec}
+              setGraphSpec={setSpec}
+              field={spec.encoding[clickedAxis as VegaEncoding].field}
+              axis={clickedAxis}
+            />
+          )}
+      </div>
     </div>
   );
 }
@@ -266,7 +374,6 @@ function AxisRangeSlider({
   axis: string;
 }) {
   const [graphData] = useModelState('graph_data');
-  // const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const bounds = useMemo(() => getBounds(graphData, field), [field]);
   const range = getRange();
 
@@ -325,8 +432,3 @@ function AxisRangeSlider({
     </div>
   );
 }
-
-// transform: [
-//   {filter: {type: "range", value: [1,2]}} // non compound
-//   {filter: {and|or|not: [{field: "", "type" : "range", "value": [1,2]}]}} //compound
-// ]
