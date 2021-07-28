@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
@@ -27,13 +27,16 @@ const sidebarCss = css`
     height: 100%;
   }
 `;
-const tabMapping: { [name: string]: () => jsx.JSX.Element } = {
+const tabMapping: { [name: string]: ((props: {
+  graphRef: React.RefObject<HTMLDivElement>;) => jsx.JSX.Element } = {
   Data: VariablesTab,
   Customization: CustomizationTab,
   History: HistoryTab,
 };
 
-export default function Sidebar() {
+export default function Sidebar(props: {
+  graphRef: React.RefObject<HTMLDivElement>;
+}) {
   const tabs = ['Data', 'Customization', 'History'];
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const TabContents = tabMapping[selectedTab];
@@ -45,7 +48,7 @@ export default function Sidebar() {
         activeTab={selectedTab}
       />
       <div className="sidebar-content">
-        <TabContents />
+        <TabContents graphRef={props.graphRef} />
       </div>
       <ActionBar />
     </aside>

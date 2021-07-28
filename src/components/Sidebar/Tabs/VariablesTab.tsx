@@ -44,15 +44,36 @@ const variableTabCss = css`
 `;
 const sortedEncodingList = [...vegaEncodingList];
 sortedEncodingList.sort();
-export default function VariablesTab() {
+export default function VariablesTab(props: {
+  graphRef: React.RefObject<HTMLDivElement>;
+}) {
   const columns = useModelState('df_columns')[0];
   const columnTypes = useModelState('column_types')[0];
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(
     columns.map((choice, index) => ({ choice, index }))
   );
+
+  const graphWrapper = props.graphRef.current;
+  let defaultActiveEncoding: VegaEncoding | '' = '';
+  if (
+    graphWrapper
+      ?.querySelector('.y-axis-wrapper')
+      ?.classList.contains('clicked')
+  ) {
+    defaultActiveEncoding = 'y';
+  } else if (
+    graphWrapper
+      ?.querySelector('.x-axis-wrapper')
+      ?.classList.contains('clicked')
+  ) {
+    defaultActiveEncoding = 'x';
+  }
+
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
-  const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>('');
+  const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>(
+    defaultActiveEncoding
+  );
   const [showEncodings, setShowEncodings] = useState(false);
   const [filterEncoding, setFilterEncoding] = useState<VegaEncoding | ''>('');
   const saveSpecToHistory = useSpecHistory();
@@ -181,6 +202,7 @@ export default function VariablesTab() {
         <FilterScreen
           encoding={filterEncoding}
           onBack={() => setFilterEncoding('')}
+          graphRef={props.graphRef}
         />
       )}
     </section>
