@@ -23,6 +23,7 @@ const markOptionsListCss = css`
   list-style: none;
   height: 247px;
   padding: 0px;
+  max-height: 250px;
 `;
 
 const markOptionCss = css`
@@ -72,7 +73,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
   }
 
   return (
-    <div className="mark-options-wrapper" style={{ width: '100%' }}>
+    <div className="mark-sub-tab" style={{ height: '100%', width: '100%' }}>
       <SearchBar
         choices={vegaChartList}
         onResultsChange={setResults}

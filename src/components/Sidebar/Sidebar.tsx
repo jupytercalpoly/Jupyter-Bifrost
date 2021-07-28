@@ -14,12 +14,15 @@ const sidebarCss = css`
   width: 100%;
   max-width: 600px;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .sidebar-content {
     border: 2px solid #e4e4e4;
     border-top: none;
     border-bottom: none;
     padding: 10px;
+    overflow: auto;
     padding-bottom: 0;
     height: 100%;
   }

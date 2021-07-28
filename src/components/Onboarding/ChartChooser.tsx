@@ -8,14 +8,11 @@ import theme from '../../theme';
 import produce from 'immer';
 
 const suggestedChartCss = css`
-  width: 100vw;
-
   .suggestedCharts {
     padding: 20px;
     padding-left: 40px;
     display: flex;
     overflow: scroll;
-    width: 85%;
   }
 
   .graph-wrapper {
@@ -79,7 +76,6 @@ export default function ChartChooser(props: ChartChooserProps) {
         chartChooserRef.current
           ?.querySelector('.graph-wrapper.selected')
           ?.scrollIntoView({
-            behavior: 'smooth',
             block: 'nearest',
             inline: 'start',
           });
@@ -91,7 +87,6 @@ export default function ChartChooser(props: ChartChooserProps) {
         chartChooserRef.current
           ?.querySelector('.graph-wrapper.selected')
           ?.scrollIntoView({
-            behavior: 'smooth',
             block: 'nearest',
             inline: 'end',
           });

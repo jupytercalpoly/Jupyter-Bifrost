@@ -1,9 +1,18 @@
 /** @jsx jsx */
-import { jsx } from '@emotion/react';
+import { jsx, css } from '@emotion/react';
 import { VegaLite } from 'react-vega';
 import { useModelState } from '../hooks/bifrost-model';
 import { deleteSpecFilter, updateSpecFilter } from '../modules/VegaFilters';
 
+const graphCss = css`
+  .vega-embed.has-actions {
+    details {
+      position: absolute;
+      top: -28px;
+      left: 75px;
+    }
+  }
+`;
 export default function Graph() {
   const [selectedData, setSelectedData] = useModelState('selected_data');
   const [spec, setSpec] = useModelState('graph_spec');
@@ -72,7 +81,7 @@ export default function Graph() {
   const signalListeners = { brush: handleBrush };
 
   return (
-    <div onDoubleClick={resetBrushView}>
+    <div css={graphCss} onDoubleClick={resetBrushView}>
       <div
         onMouseUp={updateGraphBounds}
         onMouseLeave={() => setSelectedData(['brush', {}])}
