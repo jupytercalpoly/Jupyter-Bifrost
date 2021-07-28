@@ -27,8 +27,11 @@ const sidebarCss = css`
     height: 100%;
   }
 `;
-const tabMapping: { [name: string]: ((props: {
-  graphRef: React.RefObject<HTMLDivElement>;) => jsx.JSX.Element } = {
+const tabMapping: {
+  [name: string]: (props: {
+    graphRef: React.RefObject<HTMLDivElement>;
+  }) => jsx.JSX.Element;
+} = {
   Data: VariablesTab,
   Customization: CustomizationTab,
   History: HistoryTab,
