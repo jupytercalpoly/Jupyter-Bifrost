@@ -1,11 +1,12 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
 import { useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
+import { VegaEncoding } from '../../modules/VegaEncodings';
 
 const sidebarCss = css`
   position: relative;
@@ -27,13 +28,22 @@ const sidebarCss = css`
     height: 100%;
   }
 `;
-const tabMapping: { [name: string]: () => jsx.JSX.Element } = {
+const tabMapping: {
+  [name: string]: (props: {
+    clickedAxis: VegaEncoding | '';
+    updateClickedAxis: (encoding: VegaEncoding | '') => void;
+  }) => jsx.JSX.Element;
+} = {
   Data: VariablesTab,
   Customization: CustomizationTab,
   History: HistoryTab,
 };
 
-export default function Sidebar() {
+export default function Sidebar(props: {
+  graphRef: React.RefObject<HTMLDivElement>;
+  clickedAxis: VegaEncoding | '';
+  updateClickedAxis: (encoding: VegaEncoding | '') => void;
+}) {
   const tabs = ['Data', 'Customization', 'History'];
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const TabContents = tabMapping[selectedTab];
@@ -45,7 +55,10 @@ export default function Sidebar() {
         activeTab={selectedTab}
       />
       <div className="sidebar-content">
-        <TabContents />
+        <TabContents
+          clickedAxis={props.clickedAxis}
+          updateClickedAxis={props.updateClickedAxis}
+        />
       </div>
       <ActionBar />
     </aside>

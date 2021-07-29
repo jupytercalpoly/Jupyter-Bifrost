@@ -2,16 +2,17 @@
 import { jsx, css } from '@emotion/react';
 
 import Sidebar from './Sidebar/Sidebar';
-import React from 'react';
+import React, { useState } from 'react';
 import NavBar from './NavBar';
 import Graph from './Graph';
+import { VegaEncoding } from '../modules/VegaEncodings';
 
 const bifrostWidgetCss = css`
   // Element-based styles
   //===========================================================
   display: grid;
   grid-template-columns: 720px minmax(450px, 600px);
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 500px;
   grid-template-areas: 'nav sidebar' 'graph sidebar';
   height: 100%;
   max-height: 541px;
@@ -26,6 +27,14 @@ export default function VisualizationScreen({
 }: {
   onPrevious?: () => void;
 }) {
+  const sidebarRef = React.useRef<HTMLDivElement>(null);
+  const graphRef = React.useRef<HTMLDivElement>(null);
+  const [clickedAxis, setClickedAxis] = useState<VegaEncoding | ''>('');
+
+  function updateClickedAxis(encoding: VegaEncoding | ''): void {
+    setClickedAxis(encoding);
+  }
+
   return (
     <article className="BifrostWidget" css={bifrostWidgetCss}>
       {onPrevious ? (
@@ -33,11 +42,20 @@ export default function VisualizationScreen({
           <NavBar onBack={onPrevious} />
         </GridArea>
       ) : null}
-      <GridArea area="graph">
-        <Graph />
+      <GridArea area="graph" ref={graphRef}>
+        <Graph
+          sideBarRef={sidebarRef}
+          graphRef={graphRef}
+          clickedAxis={clickedAxis}
+          updateClickedAxis={updateClickedAxis}
+        />
       </GridArea>
-      <GridArea area="sidebar">
-        <Sidebar />
+      <GridArea area="sidebar" ref={sidebarRef}>
+        <Sidebar
+          graphRef={graphRef}
+          clickedAxis={clickedAxis}
+          updateClickedAxis={updateClickedAxis}
+        />
       </GridArea>
     </article>
   );

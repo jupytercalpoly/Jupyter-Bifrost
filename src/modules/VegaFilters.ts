@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { GraphSpec } from '../hooks/bifrost-model';
+import { GraphData, GraphSpec } from '../hooks/bifrost-model';
 import { isFunction } from './utils';
 
 /**
@@ -148,7 +148,30 @@ function locateFilter(
 }
 
 /**
+ * Gets the minimum and maximum bounds for a specific field.
+ */
+export function getBounds(
+  graphData: GraphData,
+  field: string
+): [number, number] {
+  return graphData.reduce(
+    (minMax, cur) => {
+      const val = cur[field] as number;
+      if (minMax[0] > val) {
+        minMax[0] = val;
+      }
+      if (minMax[1] < val) {
+        minMax[1] = val;
+      }
+      return minMax;
+    },
+    [Infinity, -Infinity]
+  );
+}
+
+/**
  * @param occurrence If several of the same type of filters, identifies the desired instance by index. Defaults to first (1).
+ * If the occurrence is not found, the filter value will be appended to the compound group.
  */
 interface SpecFilterOptions {
   occurrence?: number;

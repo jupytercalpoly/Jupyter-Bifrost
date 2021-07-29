@@ -10,8 +10,8 @@ import {
   vegaAggregationList,
 } from '../../../modules/VegaEncodings';
 import RangeSlider from '../../ui-widgets/RangeSlider';
-import { updateSpecFilter } from '../../../modules/VegaFilters';
 import useSpecHistory from '../../../hooks/useSpecHistory';
+import { updateSpecFilter, getBounds } from '../../../modules/VegaFilters';
 
 const screenCss = (theme: BifrostTheme) => css`
   position: absolute;
@@ -58,7 +58,7 @@ interface FilterGroupProps {
   encoding: VegaEncoding;
 }
 
-const filterMap: {
+export const filterMap: {
   [type: string]: (props: FilterGroupProps) => jsx.JSX.Element;
 } = {
   quantitative: QuantitativeFilters,
@@ -72,7 +72,9 @@ interface FilterScreenProps {
 
 export default function FilterScreen(props: FilterScreenProps) {
   const [graphSpec] = useModelState('graph_spec');
+  console.log(props.encoding);
   const columnInfo = graphSpec.encoding[props.encoding];
+  console.log(columnInfo);
   const Filters = filterMap[columnInfo.type];
   useSpecHistory({ saveOnDismount: true });
 
@@ -99,7 +101,10 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
-  const bounds = useMemo(getBounds, [graphData, currentAggregation]);
+  const bounds = useMemo(
+    () => getBounds(graphData, field),
+    [graphData, currentAggregation]
+  );
   const ranges = getRanges();
 
   // Initialize a slider if one doesn't exist
@@ -108,22 +113,6 @@ function QuantitativeFilters(props: FilterGroupProps) {
       updateRange(bounds, 0);
     }
   }, []);
-
-  function getBounds(): [number, number] {
-    return graphData.reduce(
-      (minMax, cur) => {
-        const val = cur[field] as number;
-        if (minMax[0] > val) {
-          minMax[0] = val;
-        }
-        if (minMax[1] < val) {
-          minMax[1] = val;
-        }
-        return minMax;
-      },
-      [Infinity, -Infinity]
-    );
-  }
 
   function getRanges(): [number, number][] {
     const type = 'range';
@@ -181,17 +170,19 @@ function QuantitativeFilters(props: FilterGroupProps) {
 
   return (
     <div className="filters">
-      <h2>Aggregate</h2>
-      <select
-        value={currentAggregation}
-        onChange={(e) => updateAggregation(e.target.value)}
-      >
-        {['none', ...vegaAggregationList].map((aggregation) => (
-          <option value={aggregation}>{aggregation}</option>
-        ))}
-      </select>
+      <div>
+        <h2>Aggregate</h2>
+        <select
+          value={currentAggregation}
+          onChange={(e) => updateAggregation(e.target.value)}
+        >
+          {['none', ...vegaAggregationList].map((aggregation) => (
+            <option value={aggregation}>{aggregation}</option>
+          ))}
+        </select>
 
-      <h2>Filter</h2>
+        <h2>Filter</h2>
+      </div>
 
       {ranges.map((r, i) => (
         <div style={{ display: 'flex' }}>
