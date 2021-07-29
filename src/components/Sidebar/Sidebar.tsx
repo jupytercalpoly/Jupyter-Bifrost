@@ -6,6 +6,7 @@ import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
 import { useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
+import { VegaEncoding } from '../../modules/VegaEncodings';
 
 const sidebarCss = css`
   position: relative;
@@ -29,7 +30,8 @@ const sidebarCss = css`
 `;
 const tabMapping: {
   [name: string]: (props: {
-    graphRef: React.RefObject<HTMLDivElement>;
+    clickedAxis: VegaEncoding | '';
+    updateClickedAxis: (encoding: VegaEncoding | '') => void;
   }) => jsx.JSX.Element;
 } = {
   Data: VariablesTab,
@@ -39,6 +41,8 @@ const tabMapping: {
 
 export default function Sidebar(props: {
   graphRef: React.RefObject<HTMLDivElement>;
+  clickedAxis: VegaEncoding | '';
+  updateClickedAxis: (encoding: VegaEncoding | '') => void;
 }) {
   const tabs = ['Data', 'Customization', 'History'];
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
@@ -51,7 +55,10 @@ export default function Sidebar(props: {
         activeTab={selectedTab}
       />
       <div className="sidebar-content">
-        <TabContents graphRef={props.graphRef} />
+        <TabContents
+          clickedAxis={props.clickedAxis}
+          updateClickedAxis={props.updateClickedAxis}
+        />
       </div>
       <ActionBar />
     </aside>

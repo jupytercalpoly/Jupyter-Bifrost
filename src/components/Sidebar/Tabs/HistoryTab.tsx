@@ -30,9 +30,7 @@ const historyCss = (theme: any) => css`
   }
 `;
 
-export default function HistoryTab(props: {
-  graphRef: React.RefObject<HTMLDivElement>;
-}) {
+export default function HistoryTab() {
   const [spec, setSpec] = useModelState('graph_spec');
   const [specHistory] = useModelState('spec_history');
 

@@ -68,7 +68,6 @@ export const filterMap: {
 interface FilterScreenProps {
   encoding: VegaEncoding;
   onBack(): void;
-  graphRef: React.RefObject<HTMLDivElement>;
 }
 
 export default function FilterScreen(props: FilterScreenProps) {

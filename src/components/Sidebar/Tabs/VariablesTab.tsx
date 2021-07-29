@@ -1,10 +1,10 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react';
 import produce from 'immer';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { Filter, PlusCircle, XCircle } from 'react-feather';
 import { EncodingInfo, useModelState } from '../../../hooks/bifrost-model';
-import useSpecHistory from '../../../hooks/useSpecHistory';
 import { VegaEncoding, vegaEncodingList } from '../../../modules/VegaEncodings';
 import Pill from '../../ui-widgets/Pill';
 import SearchBar from '../../ui-widgets/SearchBar';
@@ -44,8 +44,12 @@ const variableTabCss = css`
 `;
 const sortedEncodingList = [...vegaEncodingList];
 sortedEncodingList.sort();
-export default function VariablesTab(props: {
-  graphRef: React.RefObject<HTMLDivElement>;
+export default function VariablesTab({
+  clickedAxis,
+  updateClickedAxis,
+}: {
+  clickedAxis: VegaEncoding | '';
+  updateClickedAxis: (encoding: VegaEncoding | '') => void;
 }) {
   const columns = useModelState('df_columns')[0];
   const columnTypes = useModelState('column_types')[0];
@@ -53,30 +57,14 @@ export default function VariablesTab(props: {
   const [searchResults, setSearchResults] = useState(
     columns.map((choice, index) => ({ choice, index }))
   );
-
-  const graphWrapper = props.graphRef.current;
-  let defaultActiveEncoding: VegaEncoding | '' = '';
-  if (
-    graphWrapper
-      ?.querySelector('.y-axis-wrapper')
-      ?.classList.contains('clicked')
-  ) {
-    defaultActiveEncoding = 'y';
-  } else if (
-    graphWrapper
-      ?.querySelector('.x-axis-wrapper')
-      ?.classList.contains('clicked')
-  ) {
-    defaultActiveEncoding = 'x';
-  }
-
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
-  const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>(
-    defaultActiveEncoding
-  );
+  const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>('');
   const [showEncodings, setShowEncodings] = useState(false);
   const [filterEncoding, setFilterEncoding] = useState<VegaEncoding | ''>('');
-  const saveSpecToHistory = useSpecHistory();
+
+  useEffect(() => {
+    setActiveEncoding(clickedAxis);
+  }, [clickedAxis]);
 
   const updateEncodings = (column: string) => {
     if (activeEncoding === '') {
@@ -96,10 +84,19 @@ export default function VariablesTab(props: {
       };
     });
     setGraphSpec(newSpec);
-    saveSpecToHistory(newSpec);
+
+    if (clickedAxis === '') {
+      setActiveEncoding('');
+    } else {
+      updateClickedAxis('');
+    }
   };
 
-  function deleteEncoding(encoding: VegaEncoding) {
+  function deleteEncoding(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    encoding: VegaEncoding
+  ) {
+    event.stopPropagation();
     if (!graphSpec.encoding[encoding]) {
       return;
     }
@@ -107,10 +104,17 @@ export default function VariablesTab(props: {
       delete gs.encoding[encoding];
     });
     setGraphSpec(newSpec);
-    saveSpecToHistory(newSpec);
+
+    if (encoding === activeEncoding) {
+      updateClickedAxis('');
+    }
   }
 
-  function openFilters(encoding: VegaEncoding) {
+  function openFilters(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    encoding: VegaEncoding
+  ) {
+    event.stopPropagation();
     setFilterEncoding(encoding);
   }
 
@@ -130,7 +134,7 @@ export default function VariablesTab(props: {
   }
 
   function selectEncoding(encoding: VegaEncoding) {
-    setActiveEncoding((e) => (e === encoding ? '' : encoding));
+    updateClickedAxis(activeEncoding === encoding ? '' : encoding);
   }
 
   const encodingList = Object.entries(graphSpec.encoding).map(
@@ -141,7 +145,7 @@ export default function VariablesTab(props: {
       >
         <button
           className="wrapper"
-          onClick={() => deleteEncoding(encoding as VegaEncoding)}
+          onClick={(e) => deleteEncoding(e, encoding as VegaEncoding)}
         >
           <XCircle size={20} />
         </button>
@@ -152,7 +156,7 @@ export default function VariablesTab(props: {
 
         <button
           className="wrapper"
-          onClick={() => openFilters(encoding as VegaEncoding)}
+          onClick={(e) => openFilters(e, encoding as VegaEncoding)}
         >
           <Filter size={20} />
         </button>
@@ -202,7 +206,6 @@ export default function VariablesTab(props: {
         <FilterScreen
           encoding={filterEncoding}
           onBack={() => setFilterEncoding('')}
-          graphRef={props.graphRef}
         />
       )}
     </section>
