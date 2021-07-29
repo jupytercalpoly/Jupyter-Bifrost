@@ -1,6 +1,9 @@
 import produce from 'immer';
 import { GraphData, GraphSpec } from '../hooks/bifrost-model';
 import { isFunction } from './utils';
+import { VegaParamPredicate, vegaParamPredicatesList } from './VegaEncodings';
+
+const filterTypes = new Set<string>(vegaParamPredicatesList);
 
 /**
  *
@@ -166,7 +169,45 @@ export function getBounds(
       return minMax;
     },
     [Infinity, -Infinity]
-  );
+  ); }
+ /** Creates a flat array of all filters in a spec.
+ */
+export function getFilterList(
+  spec: GraphSpec
+): { field: string; [other: string]: any }[] {
+  return spec.transform.flatMap((t) => {
+    const compoundOperator =
+      'or' in t.filter ? 'or' : 'and' in t.filter ? 'and' : null;
+    return compoundOperator ? t.filter[compoundOperator] : t.filter;
+  });
+}
+
+/**
+ * Turns filter into a human readable string.
+ * @param filter A single filter config object from the vega transform array
+ * @returns array of string representation
+ */
+export function stringifyFilter(filter: {
+  field: string;
+  [other: string]: any;
+}): string[] {
+  return Object.keys(filter)
+    .filter((k) => filterTypes.has(k))
+    .map((type) => {
+      switch (type as VegaParamPredicate) {
+        case 'gte':
+          return '> ' + filter.gte;
+        case 'lte':
+          return '< ' + filter.lte;
+        case 'range':
+          return `${filter.range[0]} - ${filter.range[1]}`;
+        case 'oneOf':
+          return filter.oneOf.join(', ');
+
+        default:
+          return '';
+      }
+    });
 }
 
 /**

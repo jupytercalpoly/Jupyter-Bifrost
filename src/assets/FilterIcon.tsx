@@ -1,14 +1,16 @@
 import React from 'react';
 
 export default function FilterIcon({
-  color,
+  color = 'rgba(0,0,0,0.4)',
+  width = 15,
+  height = 14,
   ...props
 }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      width="15"
-      height="14"
-      viewBox="0 0 15 14"
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       {...props}

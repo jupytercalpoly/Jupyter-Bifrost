@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function CategoryIcon({
-  color,
+  color = 'rgba(0,0,0,0.4)',
   ...props
 }: React.SVGProps<SVGSVGElement>) {
   return (

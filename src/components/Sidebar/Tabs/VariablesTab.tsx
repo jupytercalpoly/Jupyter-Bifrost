@@ -5,10 +5,20 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { Filter, PlusCircle, XCircle } from 'react-feather';
 import { EncodingInfo, useModelState } from '../../../hooks/bifrost-model';
+import { useMemo, useState } from 'react';
+import { PlusCircle } from 'react-feather';
+import {
+  EncodingInfo,
+  GraphSpec,
+  useModelState,
+} from '../../../hooks/bifrost-model';
+import useSpecHistory from '../../../hooks/useSpecHistory';
 import { VegaEncoding, vegaEncodingList } from '../../../modules/VegaEncodings';
 import Pill from '../../ui-widgets/Pill';
 import SearchBar from '../../ui-widgets/SearchBar';
 import FilterScreen from './FilterScreen';
+import { getFilterList, stringifyFilter } from '../../../modules/VegaFilters';
+import GraphPill from '../../ui-widgets/GraphPill';
 
 const variableTabCss = css`
   position: relative;
@@ -23,6 +33,11 @@ const variableTabCss = css`
         margin-right: 5px;
       }
     }
+  }
+
+  .encoding-list {
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .encoding-choices {
@@ -65,6 +80,8 @@ export default function VariablesTab({
   useEffect(() => {
     setActiveEncoding(clickedAxis);
   }, [clickedAxis]);
+  const saveSpecToHistory = useSpecHistory();
+  const pillsInfo = useMemo(() => extractPillProps(graphSpec), [graphSpec]);
 
   const updateEncodings = (column: string) => {
     if (activeEncoding === '') {
@@ -133,36 +150,20 @@ export default function VariablesTab({
     setActiveEncoding(encoding);
   }
 
-  function selectEncoding(encoding: VegaEncoding) {
-    updateClickedAxis(activeEncoding === encoding ? '' : encoding);
-  }
+  // function selectEncoding(encoding: VegaEncoding) {
+  //   setActiveEncoding((e) => (e === encoding ? '' : encoding));
+  // }
 
-  const encodingList = Object.entries(graphSpec.encoding).map(
-    ([encoding, col]) => (
-      <Pill
-        active={activeEncoding === encoding}
-        onClick={() => selectEncoding(encoding as VegaEncoding)}
-      >
-        <button
-          className="wrapper"
-          onClick={(e) => deleteEncoding(e, encoding as VegaEncoding)}
-        >
-          <XCircle size={20} />
-        </button>
-        <div className="encoding-wrapper">
-          <b>{encoding}:</b>
-          <span>{col.field}</span>
-        </div>
-
-        <button
-          className="wrapper"
-          onClick={(e) => openFilters(e, encoding as VegaEncoding)}
-        >
-          <Filter size={20} />
-        </button>
-      </Pill>
-    )
-  );
+  const encodingList = pillsInfo.map((props, i) => (
+    <GraphPill
+      onClose={() => deleteEncoding(props.encoding as VegaEncoding)}
+      onAggregationSelected={() => openFilters(props.encoding as VegaEncoding)}
+      onFilterSelected={() => openFilters(props.encoding as VegaEncoding)}
+      position={i}
+      key={i}
+      {...props}
+    />
+  ));
 
   encodingList.push(
     <button className="wrapper" onClick={() => setShowEncodings(true)}>
@@ -210,4 +211,52 @@ export default function VariablesTab({
       )}
     </section>
   );
+}
+
+type PillMap = Record<
+  string,
+  {
+    encoding: string;
+    type: string;
+    filters: string[];
+    aggregation: string;
+    field: string;
+  }
+>;
+
+function extractPillProps(spec: GraphSpec) {
+  // Get all of the encodings
+  spec.encoding['x'].aggregate;
+  const pillsByField = Object.entries(spec.encoding).reduce(
+    (pillMap, [encoding, info]) => {
+      const field = info.field;
+      const pillConfig = {
+        field,
+        encoding,
+        aggregation: info.aggregate || '',
+        type: info.type,
+        filters: [],
+      };
+      pillMap[field] = pillConfig;
+      return pillMap;
+    },
+    {} as PillMap
+  );
+  // Add all of the filters to existing encodings
+  // and create entries for pure filters.
+  getFilterList(spec).forEach((filter) => {
+    if (filter.field in pillsByField) {
+      pillsByField[filter.field].filters.push(...stringifyFilter(filter));
+    } else {
+      pillsByField[filter.field] = {
+        field: filter.field,
+        encoding: '',
+        aggregation: '',
+        type: 'filter',
+        filters: stringifyFilter(filter),
+      };
+    }
+  });
+
+  return Object.values(pillsByField);
 }
