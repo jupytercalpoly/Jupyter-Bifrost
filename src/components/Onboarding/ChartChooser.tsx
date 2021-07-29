@@ -16,10 +16,18 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
   align-items: center;
   position: relative;
   overflow: hidden;
+  .title {
+    margin: 0;
+  }
+
+  .chart-col {
+    position: relative;
+    max-height: 100%;
+    align-self: flex-start;
+  }
 
   .suggested-charts {
-    height: 100%;
-    padding: 100px 0;
+    height: 300px;
     margin-left: 10px;
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
@@ -41,26 +49,14 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
     border-radius: 5px;
     transition: border-color 0.5s;
     border: 10px solid transparent;
+    transition: border-color 0.4s;
 
-    &::after {
-      transform: translateX(10px);
-      opacity: 0;
-      transition: opacity 0.5s, transform 0.5s;
+    &:active {
+      transform: scale(1);
     }
 
-    &:hover::after {
-      content: 'Double Click to Explore';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 150px;
-      background-color: #ffffffc5;
-      padding: 2px;
-      transform: translateX(0px);
-      opacity: 1;
-    }
-
-    &.focused {
+    &.focused,
+    &:hover {
       border: 10px solid ${theme.color.primary.light};
     }
   }
@@ -90,9 +86,8 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
   const setGraphSpec = useModelState('graph_spec')[1];
   const setOpHistory = useModelState('spec_history')[1];
   const graphData = { data };
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
-  function displayChart() {
+  function displayChart(selectedIndex: number) {
     if (selectedIndex === -1) {
       return;
     }
@@ -111,13 +106,16 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
     props.onOnboarded();
   }
 
-  function selectChartWithSpaceBar(e: React.KeyboardEvent<HTMLButtonElement>) {
+  function selectChartWithSpaceBar(
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    index: number
+  ) {
     if (e.key !== ' ') {
       return;
     }
     e.preventDefault();
     e.stopPropagation();
-    displayChart();
+    displayChart(index);
   }
 
   return suggestedGraphs.length ? (
@@ -127,27 +125,31 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
         availableMarks={availableMarks}
         onChange={setActiveMarks}
       />
-      <div className="suggested-charts">
-        {filteredGraphs.map((spec, i) => (
-          <button
-            onDoubleClick={displayChart}
-            onKeyDown={selectChartWithSpaceBar}
-            style={{ scrollSnapAlign: 'center' }}
-            className={
-              selectedIndex === i ? 'graph-wrapper selected' : 'graph-wrapper'
-            }
-            key={i}
-            data-focusable={'chart' + i}
-          >
-            <div onClick={() => setSelectedIndex(i)}>
+      <div className="chart-col">
+        {filteredGraphs.length && (
+          <div style={{ paddingBottom: 10 }}>
+            <h2 className="title">Recommended Charts</h2>
+            <h3 className="subtitle">Select a chart</h3>
+          </div>
+        )}
+        <div className="suggested-charts">
+          {filteredGraphs.map((spec, i) => (
+            <button
+              onClick={() => displayChart(i)}
+              onKeyDown={(e) => selectChartWithSpaceBar(e, i)}
+              style={{ scrollSnapAlign: 'center' }}
+              className="graph-wrapper"
+              key={i}
+              data-focusable={'chart' + i}
+            >
               <VegaLite
                 spec={spec as VisualizationSpec}
                 data={graphData}
                 actions={false}
               />
-            </div>
-          </button>
-        ))}
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   ) : (

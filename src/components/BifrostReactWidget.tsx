@@ -71,6 +71,13 @@ const globalStyles = (theme: any) => css`
       font-size: 25px;
       font-weight: 800;
     }
+
+    .subtitle {
+      font-size: 18px;
+      color: gray;
+      font-weight: 700;
+      margin: 0;
+    }
   }
 `;
 

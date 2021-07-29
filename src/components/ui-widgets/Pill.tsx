@@ -34,11 +34,10 @@ const activeCss = (theme: any) => css`
   }
 `;
 
-interface PillProps {
+interface PillProps extends React.LiHTMLAttributes<HTMLLIElement> {
   children?: React.ReactNode;
   onClick?: () => void;
   active?: boolean;
-  [other: string]: any;
 }
 
 export default function Pill({

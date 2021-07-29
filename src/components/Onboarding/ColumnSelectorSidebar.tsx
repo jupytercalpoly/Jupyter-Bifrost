@@ -25,16 +25,11 @@ import { BifrostTheme } from '../../theme';
 const columnSelectorCss = (theme: BifrostTheme) => css`
   width: 320px;
   margin-right: 30px;
-
-  h1,
-  h2 {
+  padding-right: 30px;
+  border-right: 1px solid #cecece;
+  h2,
+  h3 {
     margin: 0;
-  }
-
-  .subtitle {
-    font-size: 18px;
-    color: gray;
-    font-weight: 700;
   }
 
   .choice {
@@ -203,6 +198,10 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
 
   function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
     const updatedSet = new Set(selectedColumns);
+    if (e.target.checked && selectedColumns.length > 2) {
+      e.target.checked = false;
+      return;
+    }
     if (e.target.checked) {
       updatedSet.add(e.target.value);
     } else {
@@ -229,14 +228,16 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
 
   return (
     <aside className="ColumnSelectorSidebar" css={columnSelectorCss}>
-      <h1>Chart Browser</h1>
-      <h2 className="subtitle">Select up to 3 columns</h2>
+      <h2>Select Columns</h2>
+      <h3 className="subtitle">Select up to 3 columns</h3>
       <ul className="column-tags">
         {Array.from(selectedColumns).map((column: string, i) => {
           return (
-            <Pill key={`tag_${column}`}>
+            <Pill key={column} style={{ margin: 4, padding: 4 }}>
               <div className="tag-content-wrapper">
-                <span style={{ padding: '0px 5px' }}>{column}</span>
+                <span style={{ padding: '0px 5px', fontSize: 12 }}>
+                  {column}
+                </span>
                 <button
                   className={`tagButton_${column}`}
                   onClick={handleDelete}
@@ -271,10 +272,10 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
                     value={col}
                     onChange={handleCheckboxChange}
                     checked={selectedColumns.includes(col)}
-                    disabled={
-                      selectedColumns.length > 2 &&
-                      !selectedColumns.includes(col)
-                    }
+                    // disabled={
+                    //   selectedColumns.length > 2 &&
+                    //   !selectedColumns.includes(col)
+                    // }
                   />
                 )}
                 {col}
