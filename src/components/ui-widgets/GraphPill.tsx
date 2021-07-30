@@ -60,6 +60,18 @@ export default function GraphPill(props: GraphPillProps) {
       span {
         white-space: nowrap;
         margin: 0 5px;
+        cursor: pointer;
+
+        &.tag {
+          width: 50px;
+          height: 16px;
+          background-color: ${theme.color.primary.light};
+          border-radius: ${borderRaidus};
+        }
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
       .divider {
         height: 30px;
@@ -107,7 +119,9 @@ export default function GraphPill(props: GraphPillProps) {
         <div className="divider"></div>
         <span onClick={props.onEncodingSelected}>{encoding}</span>
         <div className="divider"></div>
-        <span onClick={props.onFieldSelected}>{field}</span>
+        <span onClick={props.onFieldSelected} className={field ? '' : 'tag'}>
+          {field}
+        </span>
         <button className="wrapper" onClick={onClose}>
           <X size={15} />
         </button>

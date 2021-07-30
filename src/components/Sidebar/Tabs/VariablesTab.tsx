@@ -1,12 +1,9 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react';
 import produce from 'immer';
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { Filter, PlusCircle, XCircle } from 'react-feather';
-import { EncodingInfo, useModelState } from '../../../hooks/bifrost-model';
-import { useMemo, useState } from 'react';
+
 import { PlusCircle } from 'react-feather';
+import { useEffect, useState } from 'react';
 import {
   EncodingInfo,
   GraphSpec,
@@ -22,6 +19,8 @@ import GraphPill from '../../ui-widgets/GraphPill';
 
 const variableTabCss = css`
   position: relative;
+  width: 100%;
+  height: 100%;
   .encoding-list,
   .encoding-choices {
     margin: 0;
@@ -81,24 +80,31 @@ export default function VariablesTab({
     setActiveEncoding(clickedAxis);
   }, [clickedAxis]);
   const saveSpecToHistory = useSpecHistory();
-  const pillsInfo = useMemo(() => extractPillProps(graphSpec), [graphSpec]);
+  const [pillsInfo, setPillsInfo] = useState<PillState[]>([]);
 
-  const updateEncodings = (column: string) => {
+  // Set initial pills based off of spec.
+  useEffect(() => {
+    setPillsInfo(extractPillProps(graphSpec));
+  }, []);
+
+  const updateField = (field: string) => {
     if (activeEncoding === '') {
       return;
     }
-    const dtype = columnTypes[column];
-
+    const dtype = columnTypes[field];
     const newSpec = produce(graphSpec, (gs) => {
-      if (gs.encoding[activeEncoding]) {
-        const info = gs.encoding[activeEncoding] as EncodingInfo;
-        info.field = column;
-        info.type = dtype;
-      }
       (gs.encoding[activeEncoding] as EncodingInfo) = {
-        field: column,
+        field: field,
         type: dtype,
       };
+    });
+    const newPillsInfo = produce(pillsInfo, (info) => {
+      const pill = info.find((pill) => pill.encoding === activeEncoding);
+      if (!pill) {
+        return;
+      }
+      pill.field = field;
+      pill.type = dtype;
     });
     setGraphSpec(newSpec);
 
@@ -107,6 +113,9 @@ export default function VariablesTab({
     } else {
       updateClickedAxis('');
     }
+    saveSpecToHistory(newSpec);
+    setPillsInfo(newPillsInfo);
+    setActiveEncoding('');
   };
 
   function deleteEncoding(
@@ -120,6 +129,14 @@ export default function VariablesTab({
     const newSpec = produce(graphSpec, (gs) => {
       delete gs.encoding[encoding];
     });
+    const newPills = produce(pillsInfo, (info) => {
+      const i = info.findIndex((pill) => pill.encoding === encoding);
+      if (i === -1) {
+        return;
+      }
+      info.splice(i, 1);
+    });
+    setPillsInfo(newPills);
     setGraphSpec(newSpec);
 
     if (encoding === activeEncoding) {
@@ -140,27 +157,59 @@ export default function VariablesTab({
       return;
     }
     const newSpec = produce(graphSpec, (gs) => {
-      (gs.encoding[encoding] as EncodingInfo) = {
-        field: '',
-        type: '',
-      };
+      if (activeEncoding) {
+        (gs.encoding[encoding] as EncodingInfo) =
+          gs.encoding[activeEncoding as VegaEncoding];
+        delete gs.encoding[activeEncoding];
+      } else {
+        (gs.encoding[encoding] as EncodingInfo) = {
+          field: '',
+          type: '',
+        };
+      }
       setShowEncodings(false);
     });
-    setGraphSpec(newSpec);
-    setActiveEncoding(encoding);
-  }
 
-  // function selectEncoding(encoding: VegaEncoding) {
-  //   setActiveEncoding((e) => (e === encoding ? '' : encoding));
-  // }
+    const newPills = produce(pillsInfo, (info) => {
+      if (activeEncoding) {
+        const i = pillsInfo.findIndex(
+          (pill) => pill.encoding === activeEncoding
+        );
+        if (i === -1) {
+          return;
+        }
+        info[i].encoding = encoding;
+      } else {
+        info.push({
+          field: '',
+          encoding,
+          aggregation: '',
+          type: '',
+          filters: [],
+        });
+      }
+    });
+
+    console.log(newPills);
+    setPillsInfo(newPills);
+    setGraphSpec(newSpec);
+    setActiveEncoding('');
+  }
 
   const encodingList = pillsInfo.map((props, i) => (
     <GraphPill
       onClose={() => deleteEncoding(props.encoding as VegaEncoding)}
       onAggregationSelected={() => openFilters(props.encoding as VegaEncoding)}
       onFilterSelected={() => openFilters(props.encoding as VegaEncoding)}
-      onEncodingSelected={() => console.log('encoding')}
-      onFieldSelected={() => console.log('column')}
+      onEncodingSelected={() => {
+        setActiveEncoding(props.encoding as VegaEncoding);
+        setShowEncodings((show) => !show);
+      }}
+      onFieldSelected={() =>
+        setActiveEncoding((encoding) =>
+          encoding === props.encoding ? '' : (props.encoding as VegaEncoding)
+        )
+      }
       position={i}
       key={i}
       {...props}
@@ -168,7 +217,11 @@ export default function VariablesTab({
   ));
 
   encodingList.push(
-    <button className="wrapper" onClick={() => setShowEncodings(true)}>
+    <button
+      className="wrapper"
+      style={{ margin: '0 10px' }}
+      onClick={() => setShowEncodings(true)}
+    >
       <PlusCircle />
     </button>
   );
@@ -185,26 +238,31 @@ export default function VariablesTab({
           ))}
         </ul>
       )}
-      <SearchBar
-        choices={columns}
-        onChange={setSearchQuery}
-        value={searchQuery}
-        onResultsChange={setSearchResults}
-        placeholder="Search Columns"
-      />
-      <ul className="columns-list">
-        {searchResults.map(({ choice: col }) => {
-          return (
-            <li
-              className="column-el"
-              key={col}
-              onClick={() => updateEncodings(col)}
-            >
-              {col}
-            </li>
-          );
-        })}
-      </ul>
+      {activeEncoding && (
+        <div>
+          <SearchBar
+            choices={columns}
+            onChange={setSearchQuery}
+            value={searchQuery}
+            onResultsChange={setSearchResults}
+            placeholder="Search Columns"
+          />
+          <ul className="columns-list">
+            {searchResults.map(({ choice: col }) => {
+              return (
+                <li
+                  className="column-el"
+                  key={col}
+                  onClick={() => updateField(col)}
+                >
+                  {col}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
       {filterEncoding && (
         <FilterScreen
           encoding={filterEncoding}
@@ -215,20 +273,17 @@ export default function VariablesTab({
   );
 }
 
-type PillMap = Record<
-  string,
-  {
-    encoding: string;
-    type: string;
-    filters: string[];
-    aggregation: string;
-    field: string;
-  }
->;
+interface PillState {
+  encoding: string;
+  type: string;
+  filters: string[];
+  aggregation: string;
+  field: string;
+}
+type PillMap = Record<string, PillState>;
 
 function extractPillProps(spec: GraphSpec) {
   // Get all of the encodings
-  spec.encoding['x'].aggregate;
   const pillsByField = Object.entries(spec.encoding).reduce(
     (pillMap, [encoding, info]) => {
       const field = info.field;

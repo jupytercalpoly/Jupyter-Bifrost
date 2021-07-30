@@ -17,6 +17,7 @@ import useSpecHistory from '../hooks/useSpecHistory';
 
 const graphCss = css`
   padding-left: 34px;
+  overflow-x: auto;
   .vega-embed.has-actions {
     details {
       position: absolute;

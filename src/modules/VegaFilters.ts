@@ -196,11 +196,13 @@ export function stringifyFilter(filter: {
     .map((type) => {
       switch (type as VegaParamPredicate) {
         case 'gte':
-          return '> ' + filter.gte;
+          return '> ' + filter.gte.toFixed(2);
         case 'lte':
-          return '< ' + filter.lte;
+          return '< ' + filter.lte.toFixed(2);
         case 'range':
-          return `${filter.range[0]} - ${filter.range[1]}`;
+          return `${filter.range[0].toFixed(2)} - ${filter.range[1].toFixed(
+            2
+          )}`;
         case 'oneOf':
           return filter.oneOf.join(', ');
 
