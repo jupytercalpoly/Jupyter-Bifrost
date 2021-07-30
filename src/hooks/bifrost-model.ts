@@ -57,18 +57,22 @@ export class SpecHistoryTree {
   spec: GraphSpec;
   children: SpecHistoryTree[];
   id: number;
-  constructor(graphSpec: GraphSpec) {
+  parentId: number | null;
+  constructor(graphSpec: GraphSpec, parentId: number | null) {
     this.spec = graphSpec;
     this.children = [];
     this.id = Date.now();
+    this.parentId = parentId;
   }
 
-  get mainLeaf(): GraphSpec {
-    return this.children.length ? this.children[0].mainLeaf : this.spec;
+  get mainLeaf(): [number, GraphSpec] {
+    return this.children.length
+      ? this.children[0].mainLeaf
+      : [this.id, this.spec];
   }
 
   addChild(spec: GraphSpec) {
-    const node = new SpecHistoryTree(spec);
+    const node = new SpecHistoryTree(spec, this.id);
     this.children.push(node);
     return node;
   }
@@ -84,6 +88,7 @@ export class SpecHistoryTree {
     }
   }
 }
+
 export interface SpecHistoryTree {
   spec: GraphSpec;
   children: SpecHistoryTree[];

@@ -110,8 +110,8 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
       gs.params = [{ name: 'brush', select: 'interval' }];
     });
     setGraphSpec(spec);
-    const specRoot = new SpecHistoryTree(spec);
-    setOpHistory(specRoot);
+    const specRoot = new SpecHistoryTree(spec, null);
+    setOpHistory([specRoot]);
     setHistoryNode(specRoot);
     props.onOnboarded();
   }

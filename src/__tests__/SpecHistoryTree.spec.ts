@@ -4,13 +4,13 @@ import { createGraphSpec } from './utils';
 describe('testing spec history tree', () => {
   it('creates SpecHistoryTree Instance', () => {
     const graphSpec = createGraphSpec() as GraphSpec;
-    const root = new SpecHistoryTree(graphSpec);
+    const root = new SpecHistoryTree(graphSpec, null);
     expect(root).toBeInstanceOf(SpecHistoryTree);
   });
 
   it('adds a child to spec history', () => {
     const graphSpec = createGraphSpec() as GraphSpec;
-    const root = new SpecHistoryTree(graphSpec);
+    const root = new SpecHistoryTree(graphSpec, null);
 
     const childSpec = createGraphSpec() as GraphSpec;
     root.addChild(childSpec);
@@ -21,7 +21,7 @@ describe('testing spec history tree', () => {
 
   it('adds multiple childs to spec history', () => {
     const graphSpec = createGraphSpec() as GraphSpec;
-    const root = new SpecHistoryTree(graphSpec);
+    const root = new SpecHistoryTree(graphSpec, null);
 
     const childrenSpecs = [];
     for (let i = 0; i < 5; i++) {
@@ -33,7 +33,7 @@ describe('testing spec history tree', () => {
 
   it('gets a main leaf of a shallow specHistoryTree', () => {
     const graphSpec = createGraphSpec() as GraphSpec;
-    const root = new SpecHistoryTree(graphSpec);
+    const root = new SpecHistoryTree(graphSpec, null);
 
     const childrenSpecs = [];
     for (let i = 0; i < 5; i++) {
@@ -44,12 +44,12 @@ describe('testing spec history tree', () => {
     const trueMainLeaf = createGraphSpec() as GraphSpec;
     root.children[0].addChild(trueMainLeaf);
 
-    expect(root.mainLeaf).toBe(trueMainLeaf);
+    expect(root.mainLeaf[1]).toBe(trueMainLeaf);
   });
 
   it('finds the node with the condition', () => {
     const graphSpec = createGraphSpec() as GraphSpec;
-    const root = new SpecHistoryTree(graphSpec);
+    const root = new SpecHistoryTree(graphSpec, null);
 
     const childrenSpecs = [];
     for (let i = 0; i < 5; i++) {

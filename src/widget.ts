@@ -26,7 +26,7 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 import '../css/widget.css';
 
 const bifrostModelPropDefaults = {
-  spec_history: {} as SpecHistoryTree,
+  spec_history: [] as SpecHistoryTree[],
   history_node: {} as SpecHistoryTree,
   output_variable: '',
   df_variable_name: '',
