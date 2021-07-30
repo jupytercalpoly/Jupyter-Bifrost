@@ -52,6 +52,9 @@ export default function useSpecHistory(
    */
   function save(spec: GraphSpec = graphSpec) {
     const hasChanged = originalSpec !== spec;
+    console.log(hasChanged);
+    console.log(originalSpec);
+    console.log(spec);
     const hasNoEncoding = !Object.keys(spec.encoding).length;
     if (!hasChanged || hasNoEncoding) {
       return;
