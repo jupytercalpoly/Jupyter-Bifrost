@@ -1,19 +1,13 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import {
   useModelState,
   GraphSpec,
   SpecHistoryTree,
 } from '../../hooks/bifrost-model';
-import NavHeader from './NavHeader';
-import theme from '../../theme';
 import produce from 'immer';
-import { useMemo } from 'react';
-import { useState } from 'react';
-import { VegaLite, VisualizationSpec } from 'react-vega';
-import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 import { BifrostTheme } from '../../theme';
 import ChartFilter from './ChartFilter';
 
@@ -120,7 +114,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
     const specRoot = new SpecHistoryTree(spec);
     setOpHistory(specRoot);
     setHistoryNode(specRoot);
-    props.onChartSelected(spec);
+    props.onOnboarded();
   }
 
   function selectChartWithSpaceBar(

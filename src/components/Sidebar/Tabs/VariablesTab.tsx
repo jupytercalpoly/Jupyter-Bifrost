@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { Filter, PlusCircle, XCircle } from 'react-feather';
 import { EncodingInfo, useModelState } from '../../../hooks/bifrost-model';
+import useSpecHistory from '../../../hooks/useSpecHistory';
 import { VegaEncoding, vegaEncodingList } from '../../../modules/VegaEncodings';
 import Pill from '../../ui-widgets/Pill';
 import SearchBar from '../../ui-widgets/SearchBar';
@@ -61,6 +62,7 @@ export default function VariablesTab({
   const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>('');
   const [showEncodings, setShowEncodings] = useState(false);
   const [filterEncoding, setFilterEncoding] = useState<VegaEncoding | ''>('');
+  const save = useSpecHistory();
 
   useEffect(() => {
     setActiveEncoding(clickedAxis);
@@ -90,6 +92,8 @@ export default function VariablesTab({
     } else {
       updateClickedAxis('');
     }
+
+    save(newSpec);
   };
 
   function deleteEncoding(
@@ -108,6 +112,7 @@ export default function VariablesTab({
     if (encoding === activeEncoding) {
       updateClickedAxis('');
     }
+    save(newSpec);
   }
 
   function openFilters(
