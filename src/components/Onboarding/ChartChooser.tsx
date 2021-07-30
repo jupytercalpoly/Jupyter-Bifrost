@@ -126,7 +126,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
         onChange={setActiveMarks}
       />
       <div className="chart-col">
-        {filteredGraphs.length && (
+        {!!filteredGraphs.length && (
           <div style={{ paddingBottom: 10 }}>
             <h2 className="title">Recommended Charts</h2>
             <h3 className="subtitle">Select a chart</h3>
