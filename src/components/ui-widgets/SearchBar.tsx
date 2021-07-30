@@ -10,22 +10,24 @@ const searchBarCss = css`
   margin-top: 10px;
   input {
     border: 1px solid #bdbdbd;
-    /* background-color: #eee; */
     border-radius: 0 20px 20px 0px;
     width: 80%;
     height: 100%;
     margin: 0px;
     margin-left: 35px;
     border-left: none;
-    padding: 0px;
+    padding: 15px;
+    padding-left: 5px;
   }
 `;
 
 const searchIconCss = css`
   position: absolute;
+  display: grid;
+  place-items: center;
   /* background-color: #eee; */
   width: 30px;
-  height: 23px;
+  height: 32px;
   border: 1px solid #bdbdbd;
   border-right: none;
   border-radius: 20px 0 0 20px;
@@ -41,24 +43,35 @@ export interface SearchProps {
   value: string;
   placeholder?: string;
   forwardedRef?: React.ForwardedRef<HTMLInputElement>;
+  [other: string]: any;
 }
 
 export default function SearchBar(props: SearchProps) {
+  const {
+    choices,
+    onResultsChange,
+    onChange,
+    onKeyDown,
+    value,
+    placeholder,
+    forwardedRef,
+    ...rest
+  } = props;
   useEffect(() => {
     const notAlpha = /[^A-Za-z]/g;
-    const normQuery = props.value.replace(notAlpha, '').toLowerCase();
+    const normQuery = value.replace(notAlpha, '').toLowerCase();
     const compScore = (name: string) =>
       StringExt.matchSumOfSquares(
         name.replace(notAlpha, '').toLowerCase(),
         normQuery
       )?.score;
 
-    const indexedChoices = props.choices.map((choice, index) => ({
+    const indexedChoices = choices.map((choice, index) => ({
       choice,
       index,
     }));
-    if (props.value.length === 0) {
-      props.onResultsChange(indexedChoices);
+    if (value.length === 0) {
+      onResultsChange(indexedChoices);
     } else {
       const results = indexedChoices.filter(({ choice }) => {
         return compScore(choice) === undefined ? false : true;
@@ -69,22 +82,23 @@ export default function SearchBar(props: SearchProps) {
         (a, b) =>
           (compScore(a.choice) as number) - (compScore(b.choice) as number)
       );
-      props.onResultsChange(results);
+      onResultsChange(results);
     }
-  }, [props.value, props.choices]);
+  }, [value, choices]);
 
   return (
     <div className="searchBar" css={searchBarCss}>
       <span css={searchIconCss}>
-        <Search size={21} />
+        <Search size={17} />
       </span>
       <input
-        ref={props.forwardedRef}
+        ref={forwardedRef}
         type="search"
-        value={props.value}
-        placeholder={props.placeholder}
-        onChange={(e) => props.onChange(e.target.value)}
-        onKeyDown={props.onKeyDown}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
+        {...rest}
       />
     </div>
   );

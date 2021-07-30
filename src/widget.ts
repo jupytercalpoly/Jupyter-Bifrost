@@ -35,7 +35,7 @@ const bifrostModelPropDefaults = {
   generate_random_dist: 0,
   df_columns: [] as string[],
   selected_data: ['', {}] as SelectionData,
-  selected_columns: [],
+  selected_columns: [] as string[],
   selected_mark: '',
   graph_data: {} as GraphData,
   graph_bounds: {} as SelectionData[1],

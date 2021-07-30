@@ -1,53 +1,93 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { useState, useRef, useEffect } from 'react';
-import { VegaLite, VisualizationSpec } from 'react-vega';
-import { useModelState, GraphSpec } from '../../hooks/bifrost-model';
-import NavHeader from './NavHeader';
-import theme from '../../theme';
 import produce from 'immer';
+import { useMemo } from 'react';
+import { useState } from 'react';
+import { VegaLite, VisualizationSpec } from 'react-vega';
+import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
+import { BifrostTheme } from '../../theme';
+import ChartFilter from './ChartFilter';
 
-const suggestedChartCss = css`
-  .suggestedCharts {
-    padding: 20px;
-    padding-left: 40px;
-    display: flex;
+const suggestedChartCss = (theme: BifrostTheme) => css`
+  width: 100%;
+  max-height: 400px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  .title {
+    margin: 0;
+  }
+
+  .chart-col {
+    position: relative;
+    max-height: 100%;
+    align-self: flex-start;
+  }
+
+  .suggested-charts {
+    height: 300px;
+    margin-left: 10px;
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    scroll-snap-align: center;
+
     overflow: scroll;
+
+    @media screen and (max-width: 1200px) {
+      max-height: 500px;
+    }
   }
 
   .graph-wrapper {
-    padding: 10px;
-    margin: 0 10px;
-    border: 3px solid transparent;
+    position: relative;
+    margin: 40px 0;
+    padding: 0;
+    background-color: transparent;
+    border: none;
     border-radius: 5px;
     transition: border-color 0.5s;
-    &.selected {
+    border: 10px solid transparent;
+    transition: border-color 0.4s;
+
+    &:active {
+      transform: scale(1);
+    }
+
+    &.focused,
+    &:hover {
       border: 10px solid ${theme.color.primary.light};
     }
   }
 `;
 
-interface ChartChooserProps {
-  onBack?: () => void;
-  onChartSelected: (spec: VisualizationSpec) => void;
-}
+const defaultMarks = new Set(['point', 'bar', 'arc', 'line']);
 
-export default function ChartChooser(props: ChartChooserProps) {
+export default function ChartChooser(props: { onOnboarded: () => void }) {
+  const [activeMarks, setActiveMarks] = useState(defaultMarks);
   const suggestedGraphs = useModelState('suggested_graphs')[0];
+  const filteredGraphs = useMemo(
+    () =>
+      suggestedGraphs.filter((spec) =>
+        activeMarks.has((spec as GraphSpec).mark as string)
+      ),
+    [activeMarks, suggestedGraphs]
+  );
+  const availableMarks = useMemo(
+    () =>
+      (suggestedGraphs as GraphSpec[]).reduce((markSet, { mark }) => {
+        markSet.add(mark as string);
+        return markSet;
+      }, new Set<string>()),
+    [suggestedGraphs]
+  );
   const data = useModelState('graph_data')[0];
-
-  const graphData = { data };
-
   const setGraphSpec = useModelState('graph_spec')[1];
   const setOpHistory = useModelState('spec_history')[1];
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const chartChooserRef = useRef<HTMLElement>(null);
+  const graphData = { data };
 
-  useEffect(() => {
-    chartChooserRef.current?.focus();
-  }, []);
-
-  function displayChart() {
+  function displayChart(selectedIndex: number) {
     if (selectedIndex === -1) {
       return;
     }
@@ -56,97 +96,63 @@ export default function ChartChooser(props: ChartChooserProps) {
       // Resize the spec to fit a single graph view
       gs.height = 405;
       gs.width = 550;
+      gs.config = {
+        mark: { tooltip: true },
+      };
+      gs.params = [{ name: 'brush', select: 'interval' }];
     });
     setGraphSpec(spec);
     setOpHistory([spec]);
-    props.onChartSelected(spec);
+    props.onOnboarded();
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    switch (e.key) {
-      case 'Enter':
-        e.preventDefault();
-        e.stopPropagation();
-        displayChart();
-        break;
-      case 'ArrowRight':
-        if (selectedIndex < suggestedGraphs.length - 1) {
-          setSelectedIndex(selectedIndex + 1);
-        }
-        chartChooserRef.current
-          ?.querySelector('.graph-wrapper.selected')
-          ?.scrollIntoView({
-            block: 'nearest',
-            inline: 'start',
-          });
-        break;
-      case 'ArrowLeft':
-        if (selectedIndex !== 0) {
-          setSelectedIndex(selectedIndex - 1);
-        }
-        chartChooserRef.current
-          ?.querySelector('.graph-wrapper.selected')
-          ?.scrollIntoView({
-            block: 'nearest',
-            inline: 'end',
-          });
-        break;
-      case 'Backspace':
-        props.onBack && props.onBack();
-        break;
+  function selectChartWithSpaceBar(
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    index: number
+  ) {
+    if (e.key !== ' ') {
+      return;
     }
+    e.preventDefault();
+    e.stopPropagation();
+    displayChart(index);
   }
 
-  return (
-    <section
-      tabIndex={-1}
-      className="ChartChooser"
-      onKeyDown={handleKeyDown}
-      css={suggestedChartCss}
-      ref={chartChooserRef}
-    >
-      <NavHeader
-        title="Select Chart"
-        onNext={displayChart}
-        onPrevious={props.onBack}
+  return suggestedGraphs.length ? (
+    <section tabIndex={-1} className="ChartChooser" css={suggestedChartCss}>
+      <ChartFilter
+        activeMarks={activeMarks}
+        availableMarks={availableMarks}
+        onChange={setActiveMarks}
       />
-      <div className="suggestedCharts">
-        {suggestedGraphs.map((spec, i) => (
-          <div
-            className={
-              selectedIndex === i ? 'graph-wrapper selected' : 'graph-wrapper'
-            }
-            key={`spec_${i}`}
-            onClick={() => setSelectedIndex(i)}
-          >
-            <VegaLite
-              spec={spec as VisualizationSpec}
-              data={graphData}
-              actions={false}
-            />
-            <div
-              className="graph-info"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                marginLeft: '20px',
-              }}
-            >
-              <b style={{ textTransform: 'capitalize' }}>{`${
-                (spec as any).mark
-              } Chart`}</b>
-              <span>
-                <b>x: </b>
-                {(spec as any).encoding.x.field}
-              </span>
-              <span>
-                <b>y: </b>
-                {(spec as any).encoding.y.field}
-              </span>
-            </div>
+      <div className="chart-col">
+        {!!filteredGraphs.length && (
+          <div style={{ paddingBottom: 10 }}>
+            <h2 className="title">Recommended Charts</h2>
+            <h3 className="subtitle">Select a chart</h3>
           </div>
-        ))}
+        )}
+        <div className="suggested-charts">
+          {filteredGraphs.map((spec, i) => (
+            <button
+              onClick={() => displayChart(i)}
+              onKeyDown={(e) => selectChartWithSpaceBar(e, i)}
+              style={{ scrollSnapAlign: 'center' }}
+              className="graph-wrapper"
+              key={i}
+              data-focusable={'chart' + i}
+            >
+              <VegaLite
+                spec={spec as VisualizationSpec}
+                data={graphData}
+                actions={false}
+              />
+            </button>
+          ))}
+        </div>
       </div>
     </section>
+  ) : (
+    <div></div>
   );
 }

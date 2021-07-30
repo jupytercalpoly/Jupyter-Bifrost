@@ -41,7 +41,6 @@ const globalStyles = (theme: any) => css`
         background: transparent;
         margin: 0;
         padding: 0;
-        margin-right: 15px;
         color: initial;
       }
 
@@ -72,6 +71,13 @@ const globalStyles = (theme: any) => css`
       font-size: 25px;
       font-weight: 800;
     }
+
+    .subtitle {
+      font-size: 18px;
+      color: gray;
+      font-weight: 700;
+      margin: 0;
+    }
   }
 `;
 
@@ -91,27 +97,19 @@ export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
 }
 
 function BifrostReactWidgetDisplay() {
-  const args = useModelState('plot_function_args')[0];
-
-  const [screenName, setScreenName] = useState<string>(
-    !(args['x'] && args['y'])
-      ? 'columnChooser'
-      : !args['kind']
-      ? 'chartChooser'
-      : 'straight_visualize'
+  const plotArgs = useModelState('plot_function_args')[0];
+  // TODO: Might need to check the mark as well
+  const [onboarded, setOnboarded] = useState(
+    Boolean(plotArgs['x'] && plotArgs['y'])
   );
   return (
-    <div
-      className="bifrost-widget-display"
-      style={{ height: '100%', width: '100%' }}
-    >
-      {screenName === 'straight_visualize' ? (
-        <VisualizationScreen />
+    <div className="bifrost-widget-display">
+      {onboarded ? (
+        <VisualizationScreen onPrevious={() => setOnboarded(false)} />
       ) : (
         <OnboardingWidget
-          screenName={screenName}
-          setScreenName={setScreenName}
-          args={args}
+          onOnboarded={() => setOnboarded(true)}
+          plotArgs={plotArgs}
         />
       )}
     </div>

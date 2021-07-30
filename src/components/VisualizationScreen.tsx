@@ -22,11 +22,13 @@ const bifrostWidgetCss = css`
   }
 `;
 
+interface VisualizationProps {
+  onPrevious?: () => void;
+}
+
 export default function VisualizationScreen({
   onPrevious,
-}: {
-  onPrevious?: () => void;
-}) {
+}: VisualizationProps) {
   const sidebarRef = React.useRef<HTMLDivElement>(null);
   const graphRef = React.useRef<HTMLDivElement>(null);
   const [clickedAxis, setClickedAxis] = useState<VegaEncoding | ''>('');
