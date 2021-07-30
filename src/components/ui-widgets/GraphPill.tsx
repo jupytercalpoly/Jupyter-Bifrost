@@ -16,6 +16,8 @@ interface GraphPillProps extends React.LiHTMLAttributes<HTMLLIElement> {
   onClose: () => void;
   onAggregationSelected: () => void;
   onFilterSelected: () => void;
+  onEncodingSelected: () => void;
+  onFieldSelected: () => void;
   position: number;
   type: string;
   encoding: string;
@@ -103,9 +105,9 @@ export default function GraphPill(props: GraphPillProps) {
       <div className="pill-header">
         <TypeIcon />
         <div className="divider"></div>
-        <span>{encoding}</span>
+        <span onClick={props.onEncodingSelected}>{encoding}</span>
         <div className="divider"></div>
-        <span>{field}</span>
+        <span onClick={props.onFieldSelected}>{field}</span>
         <button className="wrapper" onClick={onClose}>
           <X size={15} />
         </button>

@@ -159,6 +159,8 @@ export default function VariablesTab({
       onClose={() => deleteEncoding(props.encoding as VegaEncoding)}
       onAggregationSelected={() => openFilters(props.encoding as VegaEncoding)}
       onFilterSelected={() => openFilters(props.encoding as VegaEncoding)}
+      onEncodingSelected={() => console.log('encoding')}
+      onFieldSelected={() => console.log('column')}
       position={i}
       key={i}
       {...props}
