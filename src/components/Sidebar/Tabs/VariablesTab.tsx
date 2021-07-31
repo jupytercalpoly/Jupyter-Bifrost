@@ -80,12 +80,31 @@ export default function VariablesTab({
     setActiveEncoding(clickedAxis);
   }, [clickedAxis]);
   const saveSpecToHistory = useSpecHistory();
+  // A list of GraphPill Props. Defined separately from spec to prevent reordering during user edits.
   const [pillsInfo, setPillsInfo] = useState<PillState[]>([]);
 
   // Set initial pills based off of spec.
   useEffect(() => {
     setPillsInfo(extractPillProps(graphSpec));
   }, []);
+
+  // update pill filters and aggregations on spec change
+  useEffect(() => {
+    setPillsInfo((pillsInfo) =>
+      produce(pillsInfo, (info) => {
+        info.forEach((config) => {
+          config.filters = [];
+          config.aggregation =
+            graphSpec.encoding[config.encoding as VegaEncoding].aggregate || '';
+        });
+        getFilterList(graphSpec).forEach((filter) => {
+          info
+            .find((config) => config.field === filter.field)
+            ?.filters.push(...stringifyFilter(filter));
+        });
+      })
+    );
+  }, [graphSpec]);
 
   const updateField = (field: string) => {
     if (activeEncoding === '') {
@@ -282,6 +301,9 @@ interface PillState {
 }
 type PillMap = Record<string, PillState>;
 
+/**
+ * Converts a graph spec to a list of GraphPill props.
+ */
 function extractPillProps(spec: GraphSpec) {
   // Get all of the encodings
   const pillsByField = Object.entries(spec.encoding).reduce(
