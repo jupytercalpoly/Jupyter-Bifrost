@@ -89,22 +89,7 @@ export default function VariablesTab({
   }, []);
 
   // update pill filters and aggregations on spec change
-  useEffect(() => {
-    setPillsInfo((pillsInfo) =>
-      produce(pillsInfo, (info) => {
-        info.forEach((config) => {
-          config.filters = [];
-          config.aggregation =
-            graphSpec.encoding[config.encoding as VegaEncoding].aggregate || '';
-        });
-        getFilterList(graphSpec).forEach((filter) => {
-          info
-            .find((config) => config.field === filter.field)
-            ?.filters.push(...stringifyFilter(filter));
-        });
-      })
-    );
-  }, [graphSpec]);
+  useEffect(updatePillFilters, [graphSpec]);
 
   const updateField = (field: string) => {
     if (activeEncoding === '') {
@@ -137,11 +122,28 @@ export default function VariablesTab({
     setActiveEncoding('');
   };
 
-  function deleteEncoding(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    encoding: VegaEncoding
-  ) {
-    event.stopPropagation();
+  function updatePillFilters() {
+    setPillsInfo((pillsInfo) =>
+      produce(pillsInfo, (info) => {
+        info.forEach((config) => {
+          config.filters = [];
+          config.aggregation =
+            graphSpec.encoding[config.encoding as VegaEncoding].aggregate || '';
+        });
+        getFilterList(graphSpec).forEach((filter) => {
+          // Apply filters to all pills with the same field
+          info.forEach((config) => {
+            if (config.field !== filter.field) {
+              return;
+            }
+            config.filters.push(...stringifyFilter(filter));
+          });
+        });
+      })
+    );
+  }
+
+  function deleteEncoding(encoding: VegaEncoding) {
     if (!graphSpec.encoding[encoding]) {
       return;
     }
@@ -299,7 +301,7 @@ interface PillState {
   aggregation: string;
   field: string;
 }
-type PillMap = Record<string, PillState>;
+type PillMap = Record<string, PillState[]>;
 
 /**
  * Converts a graph spec to a list of GraphPill props.
@@ -316,7 +318,9 @@ function extractPillProps(spec: GraphSpec) {
         type: info.type,
         filters: [],
       };
-      pillMap[field] = pillConfig;
+      pillMap[field]
+        ? pillMap[field].push(pillConfig)
+        : (pillMap[field] = [pillConfig]);
       return pillMap;
     },
     {} as PillMap
@@ -325,17 +329,20 @@ function extractPillProps(spec: GraphSpec) {
   // and create entries for pure filters.
   getFilterList(spec).forEach((filter) => {
     if (filter.field in pillsByField) {
-      pillsByField[filter.field].filters.push(...stringifyFilter(filter));
+      pillsByField[filter.field].forEach((config) =>
+        config.filters.push(...stringifyFilter(filter))
+      );
     } else {
-      pillsByField[filter.field] = {
-        field: filter.field,
-        encoding: '',
-        aggregation: '',
-        type: 'filter',
-        filters: stringifyFilter(filter),
-      };
+      pillsByField[filter.field] = [
+        {
+          field: filter.field,
+          encoding: '',
+          aggregation: '',
+          type: 'filter',
+          filters: stringifyFilter(filter),
+        },
+      ];
     }
   });
-
-  return Object.values(pillsByField);
+  return Object.values(pillsByField).flat();
 }

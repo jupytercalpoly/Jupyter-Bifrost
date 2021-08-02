@@ -120,7 +120,7 @@ export default function GraphPill(props: GraphPillProps) {
         <span onClick={props.onEncodingSelected}>{encoding}</span>
         <div className="divider"></div>
         <span onClick={props.onFieldSelected} className={field ? '' : 'tag'}>
-          {field}
+          <b>{field}</b>
         </span>
         <button className="wrapper" onClick={onClose}>
           <X size={15} />
