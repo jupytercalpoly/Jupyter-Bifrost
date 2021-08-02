@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 import VariablesTab from './Tabs/VariablesTab';
 import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
-import { useModelState } from '../../hooks/bifrost-model';
+import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 import { VegaEncoding } from '../../modules/VegaEncodings';
+import produce from 'immer';
 
 const sidebarCss = css`
   position: relative;
@@ -133,12 +134,27 @@ const actionBarCss = css`
 
 function ActionBar() {
   const spec = useModelState('graph_spec')[0];
+  const columnTable = useModelState('column_table')[0];
   const [dataframeName] = useModelState('df_variable_name');
 
   function exportCode() {
+    // convert formatted columns to original
+    const revertedSpec = produce(spec, (gs: GraphSpec) => {
+      Object.keys(gs.encoding).forEach((channel) => {
+        gs.encoding[channel as VegaEncoding].field =
+          columnTable[gs.encoding[channel as VegaEncoding].field];
+      });
+      gs.transform.forEach((obj) =>
+        obj['filter']['or'].forEach((el: any) => {
+          el.field = columnTable[el.field];
+        })
+      );
+    });
+    console.log(revertedSpec);
+
     const translator = new VegaPandasTranslator();
     const query = translator
-      .convertSpecToCode(spec)
+      .convertSpecToCode(revertedSpec)
       .replace(/\$df/g, dataframeName || 'df');
     navigator.clipboard.writeText(query);
   }

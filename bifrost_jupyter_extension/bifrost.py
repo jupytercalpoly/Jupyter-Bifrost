@@ -52,20 +52,25 @@ class BifrostWidget(DOMWidget):
     selected_data = List([]).tag(sync=True)
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
+    column_table = Dict({}).tag(sync=True)
 
-    def __init__(self, df:pd.DataFrame, kind=None, x=None, y=None, color=None, **kwargs):
+    def __init__(self, df:pd.DataFrame, column_table: dict, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)
         self.df_history.append(df)
-        self.set_trait("df_columns", list(df.columns))
-        self.set_trait("selected_data", [])
         data = self.get_data(df)
         column_types = self.get_column_types(df)
         graph_info = self.create_graph_data(df, data, column_types, kind=kind, x=x, y=y, color=color)
+
+        self.set_trait("df_columns", list(df.columns))
+        self.set_trait("selected_data", [])
         self.set_trait("query_spec", graph_info["query_spec"])
         self.set_trait("graph_data", graph_info["data"])
         self.set_trait("graph_spec", graph_info["graph_spec"])
         self.set_trait("plot_function_args", graph_info["args"])
         self.set_trait("column_types", column_types)
+        self.set_trait("column_table", column_table)
+
+        df.columns = column_table.values();
         if df_watcher.plot_output: self.set_trait("output_variable", df_watcher.plot_output)
         if df_watcher.bifrost_input: self.set_trait("df_variable_name", df_watcher.bifrost_input)
         
@@ -91,7 +96,6 @@ class BifrostWidget(DOMWidget):
 
     def get_data(self, df: pd.DataFrame):
         return json.loads(df.to_json(orient="records"))
-
 
     def get_column_types(self, df: pd.DataFrame):
         graph_types = {

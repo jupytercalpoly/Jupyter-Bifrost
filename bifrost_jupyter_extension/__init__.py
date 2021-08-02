@@ -32,9 +32,28 @@ class BifrostAccessor:
             print(error)
             return
 
-        w = BifrostWidget(self._obj, kind, x, y, color)
+        formatted_x = self.format_string(x)
+        formatted_y = self.format_string(y)
+        formatted_color = self.format_string(color)
+
+        original_columns = self._obj.columns
+        # space and parenthesis not allowed for Draco
+        formatted_columns = []
+        for column in self._obj.columns:
+            formatted_columns.append(self.format_string(column))
+        self._obj.columns = formatted_columns
+
+        column_table = dict(zip(formatted_columns, original_columns))
+
+        w = BifrostWidget(self._obj, column_table, kind, formatted_x, formatted_y, formatted_color)
         display(w)
         return w.df_history[-1]
+
+
+    def format_string(self, s):
+        if not s:
+            return None
+        return s.replace(' ', '_').replace('(', '').replace(')', '') 
 
 def _jupyter_labextension_paths():
     """Called by Jupyter Lab Server to detect if it is a valid labextension and
