@@ -28,6 +28,7 @@ interface RangeSliderProps {
   values?: [number, number];
   width?: number;
   onUpdate: RangeUpdater;
+  onSlideEnd?: () => void;
   vertical?: boolean;
   reversed?: boolean;
   onAxis?: boolean;
@@ -38,6 +39,7 @@ export default function RangeSlider({
   values = [0, 20],
   width,
   onUpdate,
+  onSlideEnd,
   vertical,
   reversed,
   onAxis,
@@ -72,6 +74,7 @@ export default function RangeSlider({
           domain={domain}
           rootStyle={sliderStyle}
           onUpdate={onUpdate}
+          onSlideEnd={onSlideEnd}
           values={reversed ? [values[1], values[0]] : values}
         >
           <Rail>{(props) => <SliderRail {...props} />}</Rail>
