@@ -74,6 +74,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
       ),
     [activeMarks, suggestedGraphs]
   );
+
   const availableMarks = useMemo(
     () =>
       (suggestedGraphs as GraphSpec[]).reduce((markSet, { mark }) => {
