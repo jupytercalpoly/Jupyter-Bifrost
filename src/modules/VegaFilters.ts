@@ -82,7 +82,7 @@ export function deleteSpecFilter(
   graphSpec: GraphSpec,
   field: string,
   type: string,
-  options?: SpecFilterOptions
+  options?: SpecFilterOptions & { deleteCompound?: boolean }
 ) {
   const compoundOperator = options?.compoundOperator || 'or';
   const [compoundIndex, index] = locateFilter(graphSpec, field, type, options);
@@ -94,7 +94,7 @@ export function deleteSpecFilter(
       if (compoundIndex !== -1) {
         const lastMember =
           gs.transform[compoundIndex].filter[compoundOperator].length === 1;
-        if (lastMember) {
+        if (lastMember || options?.deleteCompound) {
           gs.transform.splice(compoundIndex, 1);
         } else {
           gs.transform[compoundIndex].filter[compoundOperator].splice(index, 1);
@@ -169,8 +169,9 @@ export function getBounds(
       return minMax;
     },
     [Infinity, -Infinity]
-  ); }
- /** Creates a flat array of all filters in a spec.
+  );
+}
+/** Creates a flat array of all filters in a spec.
  */
 export function getFilterList(
   spec: GraphSpec

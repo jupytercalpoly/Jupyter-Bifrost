@@ -14,7 +14,11 @@ import { VegaEncoding, vegaEncodingList } from '../../../modules/VegaEncodings';
 import Pill from '../../ui-widgets/Pill';
 import SearchBar from '../../ui-widgets/SearchBar';
 import FilterScreen from './FilterScreen';
-import { getFilterList, stringifyFilter } from '../../../modules/VegaFilters';
+import {
+  deleteSpecFilter,
+  getFilterList,
+  stringifyFilter,
+} from '../../../modules/VegaFilters';
 import GraphPill from '../../ui-widgets/GraphPill';
 
 const variableTabCss = css`
@@ -41,6 +45,8 @@ const variableTabCss = css`
 
   .encoding-choices {
     background-color: whitesmoke;
+    max-height: 150px;
+    overflow: auto;
   }
   .columns-list {
     list-style: none;
@@ -112,9 +118,7 @@ export default function VariablesTab({
     });
     setGraphSpec(newSpec);
 
-    if (clickedAxis === '') {
-      setActiveEncoding('');
-    } else {
+    if (clickedAxis) {
       updateClickedAxis('');
     }
     saveSpecToHistory(newSpec);
@@ -128,7 +132,8 @@ export default function VariablesTab({
         info.forEach((config) => {
           config.filters = [];
           config.aggregation =
-            graphSpec.encoding[config.encoding as VegaEncoding].aggregate || '';
+            graphSpec.encoding[config.encoding as VegaEncoding]?.aggregate ||
+            '';
         });
         getFilterList(graphSpec).forEach((filter) => {
           // Apply filters to all pills with the same field
@@ -143,18 +148,36 @@ export default function VariablesTab({
     );
   }
 
-  function deleteEncoding(encoding: VegaEncoding) {
-    if (!graphSpec.encoding[encoding]) {
-      return;
+  function deletePill(pillState: PillState) {
+    const encoding = pillState.encoding as VegaEncoding;
+    const isFilter = pillState.type === 'filter';
+
+    // Remove all filters associated with the pill
+    let newSpec = deleteSpecFilter(
+      graphSpec,
+      pillState.field,
+      columnTypes[pillState.field] === 'quantitative' ? 'range' : 'oneOf',
+      { deleteCompound: true }
+    );
+
+    // Remove encodings if the pill has them
+    if (!isFilter) {
+      newSpec = produce(newSpec, (gs) => {
+        delete gs.encoding[encoding];
+      });
     }
-    const newSpec = produce(graphSpec, (gs) => {
-      delete gs.encoding[encoding];
-    });
+
+    // Update the pill list accordingly
     const newPills = produce(pillsInfo, (info) => {
-      const i = info.findIndex((pill) => pill.encoding === encoding);
+      const searchFunc = isFilter
+        ? (pill: PillState) =>
+            pill.encoding === '' && pill.field === pillState.field
+        : (pill: PillState) => pill.encoding === encoding;
+      const i = info.findIndex(searchFunc);
       if (i === -1) {
         return;
       }
+
       info.splice(i, 1);
     });
     setPillsInfo(newPills);
@@ -165,11 +188,7 @@ export default function VariablesTab({
     }
   }
 
-  function openFilters(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    encoding: VegaEncoding
-  ) {
-    event.stopPropagation();
+  function openFilters(encoding: VegaEncoding) {
     setFilterEncoding(encoding);
   }
 
@@ -219,18 +238,18 @@ export default function VariablesTab({
 
   const encodingList = pillsInfo.map((props, i) => (
     <GraphPill
-      onClose={() => deleteEncoding(props.encoding as VegaEncoding)}
+      onClose={() => deletePill(props)}
       onAggregationSelected={() => openFilters(props.encoding as VegaEncoding)}
       onFilterSelected={() => openFilters(props.encoding as VegaEncoding)}
       onEncodingSelected={() => {
         setActiveEncoding(props.encoding as VegaEncoding);
         setShowEncodings((show) => !show);
       }}
-      onFieldSelected={() =>
+      onFieldSelected={() => {
         setActiveEncoding((encoding) =>
           encoding === props.encoding ? '' : (props.encoding as VegaEncoding)
-        )
-      }
+        );
+      }}
       position={i}
       key={i}
       {...props}
