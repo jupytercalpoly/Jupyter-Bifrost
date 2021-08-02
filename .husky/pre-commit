@@ -2,4 +2,4 @@
 . "$(dirname "$0")/_/husky.sh"
 
 jlpm lint-staged
-jlpm run test
+# jlpm run test
