@@ -176,6 +176,16 @@ export const vegaCategoricalChartList = [
   'errorbar',
 ];
 
+export const vegaScaleList = [
+  'linear',
+  'log',
+  'pow',
+  'sqrt',
+  'quantile',
+  'quantize',
+  'threshold',
+];
+
 export const vegaTemporalChartList = ['area'];
 
 export type VegaColumnType = typeof vegaColTypesList[number];
