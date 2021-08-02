@@ -230,7 +230,6 @@ export default function VariablesTab({
       }
     });
 
-    console.log(newPills);
     setPillsInfo(newPills);
     setGraphSpec(newSpec);
     setActiveEncoding('');
