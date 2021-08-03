@@ -10,6 +10,7 @@ import {
 import theme from '../../../theme';
 import Tree, { Node } from '@naisutech/react-tree';
 import { ChevronUp } from 'react-feather';
+import { chartIcons } from '../../../assets/icons/ChartIcons';
 // import SearchBar from '../../ui-widgets/SearchBar';
 
 const historyCss = css`
@@ -120,7 +121,7 @@ function generateDescription(
 
 interface customNode {
   id: string;
-  parentId: number | null;
+  parentId: string | number | null;
   label: string;
   items: Node[];
   spec: GraphSpec;
@@ -130,7 +131,7 @@ function generateTreeSpec(
   node: SpecHistoryTree,
   parentIndex: number,
   childIndex: number
-): Node {
+): customNode {
   return {
     id: node.id.toString(),
     parentId: node.parentId ? node.parentId.toString() : node.parentId,
@@ -140,6 +141,7 @@ function generateTreeSpec(
     items: node.children.map((child, i) =>
       generateTreeSpec(child, parentIndex, i + 1)
     ),
+    spec: node.spec,
   };
 }
 
@@ -165,6 +167,7 @@ function TreeNode(props: {
     .join(' ');
 
   const isOpen = props.data.items ? props.isOpen : false;
+  const mark = props.data.spec.mark;
 
   return (
     <div className={classes} key={props.data.id}>
@@ -174,6 +177,11 @@ function TreeNode(props: {
           <ChevronUp size={15} />
         </div>
       )}
+      {chartIcons
+        .filter((icon) => icon.mark === mark)
+        .map(({ icon: Icon }) => (
+          <Icon />
+        ))}
     </div>
   );
 }
@@ -197,9 +205,17 @@ function LeaveNode(props: {
     .filter((pair) => pair[1])
     .map((pair) => pair[0])
     .join(' ');
+
+  const mark = props.data.spec.mark;
+
   return (
     <div className={classes} key={props.data.id}>
       {props.data.label}
+      {chartIcons
+        .filter((icon) => icon.mark === mark)
+        .map(({ icon: Icon }) => (
+          <Icon />
+        ))}
     </div>
   );
 }
