@@ -186,6 +186,29 @@ export const vegaScaleList = [
   'threshold',
 ];
 
+const bifrostVegaMark = [
+  'point',
+  'circle',
+  'sqaure',
+  'tick',
+  'line',
+  'bar',
+  'trail',
+];
+
+const minimalEncoding = ['x', 'y', 'color', 'opacity', 'size', 'facet'];
+minimalEncoding.sort();
+
+export const vegaMarkEncodingMap: Record<string, string[]> = {
+  point: minimalEncoding,
+  circle: minimalEncoding,
+  square: minimalEncoding,
+  tick: minimalEncoding,
+  line: minimalEncoding,
+  bar: minimalEncoding,
+  trail: minimalEncoding,
+};
+
 export const vegaTemporalChartList = ['area'];
 
 export type VegaColumnType = typeof vegaColTypesList[number];
@@ -197,3 +220,5 @@ export type VegaAggregation = typeof vegaAggregationList[number];
 export type VegaParamPredicate = typeof vegaParamPredicatesList[number];
 
 export type VegaMark = typeof vegaChartList[number];
+
+export type BifrostVegaMark = typeof bifrostVegaMark[number];
