@@ -35,6 +35,9 @@ export interface EncodingInfo {
     [scaleType: string]: any;
   };
   aggregate?: string;
+  axis?: {
+    title?: string;
+  };
 }
 
 export type GraphSpec = VisualizationSpec & {

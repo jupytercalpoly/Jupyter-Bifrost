@@ -8,6 +8,7 @@ import { BifrostTheme } from '../../../theme';
 import {
   VegaEncoding,
   vegaAggregationList,
+  vegaScaleList,
 } from '../../../modules/VegaEncodings';
 import RangeSlider from '../../ui-widgets/RangeSlider';
 import useSpecHistory from '../../../hooks/useSpecHistory';
@@ -99,6 +100,8 @@ function QuantitativeFilters(props: FilterGroupProps) {
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
+  const currentScale =
+    graphSpec.encoding[props.encoding].scale?.type || 'linear';
   const bounds = useMemo(
     () => getBounds(graphData, field),
     [graphData, currentAggregation]
@@ -166,6 +169,20 @@ function QuantitativeFilters(props: FilterGroupProps) {
     setGraphSpec(newSpec);
   }
 
+  function updateScale(scale: string) {
+    setGraphSpec(
+      produce(graphSpec, (gs) => {
+        gs.encoding[props.encoding].scale = { type: scale };
+        const axisTitle = scale === 'linear' ? field : field + ` (${scale})`;
+        if (gs.encoding[props.encoding].axis) {
+          gs.encoding[props.encoding].axis!.title = axisTitle;
+        } else {
+          gs.encoding[props.encoding].axis = { title: axisTitle };
+        }
+      })
+    );
+  }
+
   return (
     <div className="filters">
       <div>
@@ -176,6 +193,16 @@ function QuantitativeFilters(props: FilterGroupProps) {
         >
           {['none', ...vegaAggregationList].map((aggregation) => (
             <option value={aggregation}>{aggregation}</option>
+          ))}
+        </select>
+
+        <h2>Scale</h2>
+        <select
+          value={currentScale}
+          onChange={(e) => updateScale(e.target.value)}
+        >
+          {vegaScaleList.map((scale) => (
+            <option value={scale}>{scale}</option>
           ))}
         </select>
 
