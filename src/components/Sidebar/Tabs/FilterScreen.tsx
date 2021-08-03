@@ -173,6 +173,12 @@ function QuantitativeFilters(props: FilterGroupProps) {
     setGraphSpec(
       produce(graphSpec, (gs) => {
         gs.encoding[props.encoding].scale = { type: scale };
+        const axisTitle = scale === 'linear' ? field : field + ` (${scale})`;
+        if (gs.encoding[props.encoding].axis) {
+          gs.encoding[props.encoding].axis!.title = axisTitle;
+        } else {
+          gs.encoding[props.encoding].axis = { title: axisTitle };
+        }
       })
     );
   }
