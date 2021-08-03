@@ -13,6 +13,7 @@ import { View } from 'vega';
 import theme from '../theme';
 import { VegaEncoding } from '../modules/VegaEncodings';
 import RangeSlider from './ui-widgets/RangeSlider';
+import useSpecHistory from '../hooks/useSpecHistory';
 
 const graphCss = css`
   padding-left: 34px;
@@ -335,6 +336,7 @@ function AxisRangeSlider({
   const [graphData] = useModelState('graph_data');
   const bounds = useMemo(() => getBounds(graphData, field), [field]);
   const range = getRange();
+  const save = useSpecHistory();
 
   // Initialize a slider if one doesn't exist
   useEffect(() => {
@@ -384,6 +386,7 @@ function AxisRangeSlider({
         domain={bounds}
         values={range}
         onUpdate={(update) => updateRange(update)}
+        onSlideEnd={() => save(graphSpec)}
         vertical={axis === 'y'}
         reversed={axis === 'y'}
         onAxis={true}

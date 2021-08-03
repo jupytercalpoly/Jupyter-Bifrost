@@ -72,9 +72,7 @@ interface FilterScreenProps {
 
 export default function FilterScreen(props: FilterScreenProps) {
   const [graphSpec] = useModelState('graph_spec');
-  console.log(props.encoding);
   const columnInfo = graphSpec.encoding[props.encoding];
-  console.log(columnInfo);
   const Filters = filterMap[columnInfo.type];
   useSpecHistory({ saveOnDismount: true });
 
