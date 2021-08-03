@@ -52,9 +52,9 @@ class BifrostWidget(DOMWidget):
     selected_data = List([]).tag(sync=True)
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
-    column_table = Dict({}).tag(sync=True)
+    column_name_map = Dict({}).tag(sync=True)
 
-    def __init__(self, df:pd.DataFrame, column_table: dict, kind=None, x=None, y=None, color=None, **kwargs):
+    def __init__(self, df:pd.DataFrame, column_name_map: dict, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)
         self.df_history.append(df)
         data = self.get_data(df)
@@ -68,9 +68,9 @@ class BifrostWidget(DOMWidget):
         self.set_trait("graph_spec", graph_info["graph_spec"])
         self.set_trait("plot_function_args", graph_info["args"])
         self.set_trait("column_types", column_types)
-        self.set_trait("column_table", column_table)
+        self.set_trait("column_name_map", column_name_map)
 
-        df.columns = column_table.values();
+        df.columns = column_name_map.values();
         if df_watcher.plot_output: self.set_trait("output_variable", df_watcher.plot_output)
         if df_watcher.bifrost_input: self.set_trait("df_variable_name", df_watcher.bifrost_input)
         

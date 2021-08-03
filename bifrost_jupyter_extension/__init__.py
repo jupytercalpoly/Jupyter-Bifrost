@@ -43,9 +43,9 @@ class BifrostAccessor:
             formatted_columns.append(self.format_string(column))
         self._obj.columns = formatted_columns
 
-        column_table = dict(zip(formatted_columns, original_columns))
+        column_name_map = dict(zip(formatted_columns, original_columns))
 
-        w = BifrostWidget(self._obj, column_table, kind, formatted_x, formatted_y, formatted_color)
+        w = BifrostWidget(self._obj, column_name_map, kind, formatted_x, formatted_y, formatted_color)
         display(w)
         return w.df_history[-1]
 

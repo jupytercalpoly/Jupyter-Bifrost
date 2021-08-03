@@ -134,7 +134,7 @@ const actionBarCss = css`
 
 function ActionBar() {
   const spec = useModelState('graph_spec')[0];
-  const columnTable = useModelState('column_table')[0];
+  const columnNameMap = useModelState('column_name_map')[0];
   const [dataframeName] = useModelState('df_variable_name');
 
   function exportCode() {
@@ -142,15 +142,14 @@ function ActionBar() {
     const revertedSpec = produce(spec, (gs: GraphSpec) => {
       Object.keys(gs.encoding).forEach((channel) => {
         gs.encoding[channel as VegaEncoding].field =
-          columnTable[gs.encoding[channel as VegaEncoding].field];
+          columnNameMap[gs.encoding[channel as VegaEncoding].field];
       });
       gs.transform.forEach((obj) =>
         obj['filter']['or'].forEach((el: any) => {
-          el.field = columnTable[el.field];
+          el.field = columnNameMap[el.field];
         })
       );
     });
-    console.log(revertedSpec);
 
     const translator = new VegaPandasTranslator();
     const query = translator

@@ -200,10 +200,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
           })
         );
         setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
-
-        console.log(recommendedSpecs);
       }
-      console.log(solution);
     });
   }
 
