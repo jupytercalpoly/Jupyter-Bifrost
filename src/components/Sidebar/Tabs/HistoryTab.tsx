@@ -13,6 +13,8 @@ import { ChevronUp } from 'react-feather';
 import { chartIcons } from '../../../assets/icons/ChartIcons';
 import { filterIcons } from '../../../assets/icons/FilterIcons';
 import HistoryMergeIcon from '../../../assets/icons/HistoryMergeIcon';
+import { VegaEncoding } from '../../../modules/VegaEncodings';
+import { findNodes } from '../../../modules/BifrostHistory';
 // import SearchBar from '../../ui-widgets/SearchBar';
 
 const historyCss = css`
@@ -125,7 +127,6 @@ export default function HistoryTab() {
     spec && setSpec(spec);
     selectedNode && setHistoryNode(selectedNode);
   }
-
   return (
     <section className="HistoryTab" css={historyCss}>
       <Tree
@@ -234,14 +235,7 @@ function LeaveNode(props: {
   const [specHistory, setSpecHistory] = useModelState('spec_history');
 
   const parentNode = useMemo(
-    () =>
-      (
-        specHistory
-          .map((history) =>
-            history.find((change) => change.id === props.data.parentId)
-          )
-          .filter((node) => node) as SpecHistoryTree[]
-      )[0],
+    () => findNodes(props.data.parentId as number, specHistory)[0],
     [props.data]
   );
 
@@ -291,6 +285,29 @@ function LeaveNode(props: {
 
 function HistoryIcons({ data }: { data: customNode }) {
   const mark = data.spec.mark;
+  const [specHistory] = useModelState('spec_history');
+
+  const hasAggregate =
+    Object.values(data.spec.encoding).filter((encodingInfo) => {
+      return 'aggregate' in encodingInfo;
+    }).length !== 0;
+
+  let changes = {
+    aggregateChanged: hasAggregate,
+    filterChanged: data.spec.transform.length !== 0,
+  };
+
+  if (data.parentId) {
+    // from parent
+    const parentNode = findNodes(data.parentId, specHistory)[0];
+    changes = checkChanges(parentNode.spec, data.spec);
+  } else {
+    // closest sibling
+    const idx = specHistory.findIndex((change) => change.id === data.id);
+    if (idx !== 0) {
+      changes = checkChanges(specHistory[idx - 1].spec, data.spec);
+    }
+  }
 
   return (
     <div className={'history-icons-wrapper'}>
@@ -300,17 +317,31 @@ function HistoryIcons({ data }: { data: customNode }) {
           <Icon style={{ margin: '0 5px' }} />
         ))}
       {filterIcons.map(({ icon: Icon, filter }) => {
-        if (filter === 'range' && data.spec.transform.length) {
+        if (filter === 'range' && changes['filterChanged']) {
           return <Icon style={{ margin: '0 5px' }} />;
         }
-        const hasAggregate =
-          Object.values(data.spec.encoding).filter((encodingInfo) => {
-            return filter in encodingInfo;
-          }).length !== 0;
-        if (filter === 'aggregate' && hasAggregate) {
+        if (filter === 'aggregate' && changes['aggregateChanged']) {
           return <Icon style={{ margin: '0 5px' }} />;
         }
       })}
     </div>
   );
+}
+
+function checkChanges(prevSpec: GraphSpec, currSpec: GraphSpec) {
+  const aggregateChanged = Object.keys(prevSpec.encoding)
+    .map((channel) => {
+      if (channel in prevSpec.encoding && channel in currSpec.encoding) {
+        return (
+          prevSpec.encoding[channel as VegaEncoding]['aggregate'] !==
+          currSpec.encoding[channel as VegaEncoding]['aggregate']
+        );
+      }
+      return false;
+    })
+    .filter(Boolean);
+
+  const filterChanged = currSpec.transform !== prevSpec.transform;
+
+  return { aggregateChanged: aggregateChanged.length !== 0, filterChanged };
 }

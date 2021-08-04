@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { GraphSpec, SpecHistoryTree, useModelState } from './bifrost-model';
+import { findNodes, findHistoriesOnSameLevel } from '../modules/BifrostHistory';
 
 interface SpecHistoryOptions {
   saveOnDismount?: boolean;
@@ -30,22 +31,6 @@ export default function useSpecHistory(
     };
   }, []);
 
-  function findHistoriesOnSameLevel(node: SpecHistoryTree): SpecHistoryTree[] {
-    const nodesOnSameLevel = opHistory
-      .map((history) =>
-        history.find((change) => change.parentId === node.parentId)
-      )
-      .filter((node) => node) as SpecHistoryTree[]; // we sure it's not null
-    return nodesOnSameLevel;
-  }
-
-  function findNodes(id: number) {
-    const nodes = opHistory
-      .map((history) => history.find((change) => change.id === id))
-      .filter((node) => node) as SpecHistoryTree[]; // we sure it's not null
-    return nodes;
-  }
-
   /**
    * Saves graph spec to the current history branch
    * @param spec Graph Spec to save
@@ -59,10 +44,10 @@ export default function useSpecHistory(
     let node: SpecHistoryTree | null = null;
 
     if (historyNode.parentId) {
-      const parentNode = findNodes(historyNode.parentId)[0];
+      const parentNode = findNodes(historyNode.parentId, opHistory)[0];
       node = parentNode.addChild(spec);
     } else {
-      const siblings = findHistoriesOnSameLevel(historyNode);
+      const siblings = findHistoriesOnSameLevel(historyNode, opHistory);
       if (!siblings.length) {
         node = new SpecHistoryTree(spec, null);
         setOpHistory([...opHistory, node]);
