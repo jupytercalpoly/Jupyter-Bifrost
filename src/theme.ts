@@ -8,6 +8,10 @@ const theme = {
       light: '#E4D2E4',
     },
     pill: ['#E5F2DE', '#F5DFDF', '#D4ECEE', '#E1DFEB'],
+    secondary: {
+      dark: '#1C7958',
+      standard: '#77AFA2',
+    },
   },
   shadow: {
     handle: '0 0 10px #781c7932',
