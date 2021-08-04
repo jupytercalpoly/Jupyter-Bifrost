@@ -225,6 +225,7 @@ export default function VariablesTab({
           encoding,
           aggregation: '',
           type: '',
+          scale: '',
           filters: [],
         });
       }
@@ -318,6 +319,7 @@ interface PillState {
   filters: string[];
   aggregation: string;
   field: string;
+  scale: string;
 }
 type PillMap = Record<string, PillState[]>;
 
@@ -335,6 +337,7 @@ function extractPillProps(spec: GraphSpec) {
         aggregation: info.aggregate || '',
         type: info.type,
         filters: [],
+        scale: '',
       };
       pillMap[field]
         ? pillMap[field].push(pillConfig)
@@ -358,6 +361,7 @@ function extractPillProps(spec: GraphSpec) {
           aggregation: '',
           type: 'filter',
           filters: stringifyFilter(filter),
+          scale: '',
         },
       ];
     }

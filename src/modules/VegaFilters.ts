@@ -195,6 +195,7 @@ export function stringifyFilter(filter: {
   return Object.keys(filter)
     .filter((k) => filterTypes.has(k))
     .map((type) => {
+      let categoriesString: string;
       switch (type as VegaParamPredicate) {
         case 'gte':
           return '> ' + filter.gte.toFixed(2);
@@ -205,7 +206,10 @@ export function stringifyFilter(filter: {
             2
           )}`;
         case 'oneOf':
-          return filter.oneOf.join(', ');
+          categoriesString = filter.oneOf.join(', ');
+          return categoriesString.length > 20
+            ? categoriesString.slice(0, 20) + '...'
+            : categoriesString;
 
         default:
           return '';

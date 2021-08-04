@@ -276,7 +276,8 @@ function CategoricalFilters(props: FilterGroupProps) {
     const category = e.target.value;
     updateFilter('oneOf', (currentCategories) => {
       if (!currentCategories) {
-        return [category];
+        const categories = Array.from(selectedCategories);
+        return categories.filter((cat) => cat !== category);
       }
       if (e.target.checked) {
         return [...currentCategories, category];
