@@ -52,43 +52,29 @@ export default function useSpecHistory(
    */
   function save(spec: GraphSpec = graphSpec) {
     const hasChanged = originalSpec !== spec;
-    console.log(hasChanged);
-    console.log(originalSpec);
-    console.log(spec);
     const hasNoEncoding = !Object.keys(spec.encoding).length;
     if (!hasChanged || hasNoEncoding) {
       return;
     }
     let node: SpecHistoryTree | null = null;
-    const siblings = findHistoriesOnSameLevel(historyNode);
-    if (!siblings.length) {
-      {
-        const parentNode = findNodes(historyNode.id)[0];
-        node = parentNode.addChild(spec);
-      }
+
+    if (historyNode.parentId) {
+      const parentNode = findNodes(historyNode.parentId)[0];
+      node = parentNode.addChild(spec);
     } else {
-      const youngerSiblings = siblings.find(
-        (sibling) => sibling.id > historyNode.id
-      );
-      if (!youngerSiblings) {
-        if (!historyNode.parentId) {
+      const siblings = findHistoriesOnSameLevel(historyNode);
+      if (!siblings.length) {
+        node = new SpecHistoryTree(spec, null);
+        setOpHistory([...opHistory, node]);
+      } else {
+        const youngerSiblings = siblings.find(
+          (sibling) => sibling.id > historyNode.id
+        );
+        if (!youngerSiblings) {
           node = new SpecHistoryTree(spec, null);
           setOpHistory([...opHistory, node]);
         } else {
-          const parentNode = findNodes(historyNode.parentId)[0];
-          parentNode.addChild(spec);
-        }
-      } else {
-        if (!historyNode.parentId) {
-          historyNode.addChild(spec);
-        } else {
-          const parentNode = findNodes(historyNode.parentId)[0];
-          parentNode.children.splice(
-            parentNode.children.indexOf(historyNode),
-            1
-          );
           node = historyNode.addChild(spec);
-          setOpHistory([...opHistory, historyNode]);
         }
       }
     }

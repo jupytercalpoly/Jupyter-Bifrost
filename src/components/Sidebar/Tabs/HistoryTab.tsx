@@ -1,7 +1,7 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 // import produce from 'immer';
-import { useEffect /*useState */ } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   GraphSpec,
   SpecHistoryTree,
@@ -11,6 +11,8 @@ import theme from '../../../theme';
 import Tree, { Node } from '@naisutech/react-tree';
 import { ChevronUp } from 'react-feather';
 import { chartIcons } from '../../../assets/icons/ChartIcons';
+import { filterIcons } from '../../../assets/icons/FilterIcons';
+import HistoryMergeIcon from '../../../assets/icons/HistoryMergeIcon';
 // import SearchBar from '../../ui-widgets/SearchBar';
 
 const historyCss = css`
@@ -18,6 +20,14 @@ const historyCss = css`
   padding: 0;
   max-height: 300px;
   overflow-y: scroll;
+  background-color: none;
+  font-size: 14px;
+
+  .leaf-node-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
   .history-el {
     padding: 10px;
     transition: background-color 0.5s;
@@ -25,24 +35,60 @@ const historyCss = css`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 15px;
+    border-left: 10px solid ${theme.color.primary.standard};
+
+    * {
+      font-size: 14px;
+    }
+
     &:hover {
       border: 3px solid ${theme.color.primary.standard};
+      border-left: 10px solid ${theme.color.primary.standard};
       background-color: whitesmoke;
     }
-    &.leaf {
-      margin-left: 20px;
-    }
     &.active {
-      border-left: 3px solid ${theme.color.primary.standard};
       font-weight: 700;
+      border: 3px solid ${theme.color.primary.dark};
+      border-left: 10px solid ${theme.color.primary.dark};
     }
+
+    &.leaf {
+      margin-left: 40px;
+      border-left: 10px solid ${theme.color.secondary.standard};
+      flex-grow: 1;
+
+      &.hasMergeButton {
+        margin-left: 8px;
+      }
+      &:hover {
+        border: 3px solid ${theme.color.secondary.standard};
+        border-left: 10px solid ${theme.color.secondary.standard};
+        background-color: whitesmoke;
+      }
+      &.active {
+        font-weight: 700;
+        border: 3px solid ${theme.color.secondary.dark};
+        border-left: 10px solid ${theme.color.secondary.dark};
+      }
+      .merge-history-button {
+        cursor: pointer;
+      }
+    }
+
     .arrowIcon {
       transition: transform 0.2s ease-in-out;
+      margin: 0 5px;
+      color: grey;
 
       &.open {
         transform: rotate(180deg);
       }
+    }
+
+    .history-text,
+    .history-icons-wrapper {
+      display: flex;
+      align-items: center;
     }
   }
 `;
@@ -85,6 +131,7 @@ export default function HistoryTab() {
       <Tree
         nodes={treeHist}
         onSelect={(nodeIds) => setHistoryPosition(nodeIds as string[])}
+        containerStyle={{ background: 'white' }}
         theme={'light'}
         NodeRenderer={(props) =>
           TreeNode({
@@ -113,15 +160,12 @@ function generateDescription(
   const fieldString = Object.values(spec.encoding)
     .map((info) => info.field)
     .join(' vs ');
-  const mark = spec.mark;
-  return `${parentIndex}${
-    childIndex ? `-${childIndex}.` : '.'
-  } ${fieldString} ${mark} chart`;
+  return `${parentIndex}${childIndex ? `-${childIndex}.` : '.'} ${fieldString}`;
 }
 
 interface customNode {
-  id: string;
-  parentId: string | number | null;
+  id: number;
+  parentId: number | null;
   label: string;
   items: Node[];
   spec: GraphSpec;
@@ -133,8 +177,8 @@ function generateTreeSpec(
   childIndex: number
 ): customNode {
   return {
-    id: node.id.toString(),
-    parentId: node.parentId ? node.parentId.toString() : node.parentId,
+    id: node.id,
+    parentId: node.parentId ? node.parentId : node.parentId,
     label: node.parentId
       ? generateDescription(node.spec, parentIndex, childIndex)
       : generateDescription(node.spec, parentIndex),
@@ -157,9 +201,7 @@ function TreeNode(props: {
     ['history-el', true],
     [
       'active',
-      props.selected
-        ? props.selected
-        : props.currentNodeId === parseInt(props.data.id),
+      props.selected ? props.selected : props.currentNodeId === props.data.id,
     ],
   ]
     .filter((pair) => pair[1])
@@ -167,21 +209,18 @@ function TreeNode(props: {
     .join(' ');
 
   const isOpen = props.data.items ? props.isOpen : false;
-  const mark = props.data.spec.mark;
 
   return (
     <div className={classes} key={props.data.id}>
-      {props.data.label}
-      {!!props.data.items.length && (
-        <div className={isOpen ? 'arrowIcon open' : 'arrowIcon'}>
-          <ChevronUp size={15} />
-        </div>
-      )}
-      {chartIcons
-        .filter((icon) => icon.mark === mark)
-        .map(({ icon: Icon }) => (
-          <Icon />
-        ))}
+      <div className={'history-text'}>
+        {props.data.label}
+        {!!props.data.items.length && (
+          <div className={isOpen ? 'arrowIcon open' : 'arrowIcon'}>
+            <ChevronUp size={15} />
+          </div>
+        )}
+      </div>
+      <HistoryIcons data={props.data} />
     </div>
   );
 }
@@ -192,30 +231,86 @@ function LeaveNode(props: {
   level: number;
   currentNodeId: number;
 }) {
+  const [specHistory, setSpecHistory] = useModelState('spec_history');
+
+  const parentNode = useMemo(
+    () =>
+      (
+        specHistory
+          .map((history) =>
+            history.find((change) => change.id === props.data.parentId)
+          )
+          .filter((node) => node) as SpecHistoryTree[]
+      )[0],
+    [props.data]
+  );
+
+  const idx = parentNode.children.findIndex(
+    (child) => child.id === props.data.id
+  );
+
   const classes = [
     ['history-el', true],
     ['leaf', true],
     [
       'active',
-      props.selected
-        ? props.selected
-        : props.currentNodeId === parseInt(props.data.id),
+      props.selected ? props.selected : props.currentNodeId === props.data.id,
     ],
+    ['hasMergeButton', idx === 0],
   ]
     .filter((pair) => pair[1])
     .map((pair) => pair[0])
     .join(' ');
 
-  const mark = props.data.spec.mark;
+  function handleOnClick() {
+    const childrenNodes = parentNode.children.slice();
+    childrenNodes.forEach((childNode) => (childNode.parentId = null));
+    parentNode.children = [];
+
+    const idxToInsert = specHistory.indexOf(parentNode) + 1;
+    const newSpecHistory = specHistory.slice();
+    newSpecHistory.splice(idxToInsert, 0, ...childrenNodes);
+
+    setSpecHistory(newSpecHistory);
+  }
 
   return (
-    <div className={classes} key={props.data.id}>
-      {props.data.label}
+    <div className={'leaf-node-wrapper'}>
+      {idx === 0 ? (
+        <div className={'merge-history-button'} onClick={handleOnClick}>
+          <HistoryMergeIcon />
+        </div>
+      ) : null}
+      <div className={classes} key={props.data.id}>
+        <div className={'history-text'}>{props.data.label}</div>
+        <HistoryIcons data={props.data} />
+      </div>
+    </div>
+  );
+}
+
+function HistoryIcons({ data }: { data: customNode }) {
+  const mark = data.spec.mark;
+
+  return (
+    <div className={'history-icons-wrapper'}>
       {chartIcons
         .filter((icon) => icon.mark === mark)
         .map(({ icon: Icon }) => (
-          <Icon />
+          <Icon style={{ margin: '0 5px' }} />
         ))}
+      {filterIcons.map(({ icon: Icon, filter }) => {
+        if (filter === 'range' && data.spec.transform.length) {
+          return <Icon style={{ margin: '0 5px' }} />;
+        }
+        const hasAggregate =
+          Object.values(data.spec.encoding).filter((encodingInfo) => {
+            return filter in encodingInfo;
+          }).length !== 0;
+        if (filter === 'aggregate' && hasAggregate) {
+          return <Icon style={{ margin: '0 5px' }} />;
+        }
+      })}
     </div>
   );
 }
