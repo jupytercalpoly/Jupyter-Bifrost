@@ -16,7 +16,7 @@ const typeIconMap: Record<string, typeof NumericalIcon> = {
 
 const filterIconMap: Record<string, any> = {
   quantitative: SliderIcon,
-  nominal: () => <CheckSquare size={10} />,
+  nominal: () => <CheckSquare size={12} />,
 };
 
 interface GraphPillProps extends React.LiHTMLAttributes<HTMLLIElement> {
@@ -182,7 +182,7 @@ export default function GraphPill(props: GraphPillProps) {
           {scale && (
             <Fragment>
               <button className="wrapper" onClick={props.onAggregationSelected}>
-                <Maximize2 size={15} />
+                <Maximize2 size={12} />
               </button>
               <div style={{ padding: '0 5px' }}>{scale}</div>
             </Fragment>

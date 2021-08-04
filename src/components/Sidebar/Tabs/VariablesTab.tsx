@@ -134,6 +134,9 @@ export default function VariablesTab({
           config.aggregation =
             graphSpec.encoding[config.encoding as VegaEncoding]?.aggregate ||
             '';
+          const scale =
+            graphSpec.encoding[config.encoding as VegaEncoding]?.scale?.type;
+          config.scale = scale === 'linear' || !scale ? '' : scale;
         });
         getFilterList(graphSpec).forEach((filter) => {
           // Apply filters to all pills with the same field
@@ -337,7 +340,7 @@ function extractPillProps(spec: GraphSpec) {
         aggregation: info.aggregate || '',
         type: info.type,
         filters: [],
-        scale: '',
+        scale: info.scale?.type || '',
       };
       pillMap[field]
         ? pillMap[field].push(pillConfig)
