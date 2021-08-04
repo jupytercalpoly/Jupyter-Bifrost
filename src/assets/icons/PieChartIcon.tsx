@@ -1,13 +1,16 @@
 import React from 'react';
-import { BifrostIconProps } from './Icon';
 
-export default function PieChartIcon(props: BifrostIconProps) {
-  const color = props.color || '#6E7776';
+export default function PieChartIcon({
+  color = '#6E7776',
+  width = 26,
+  height = 24,
+  ...props
+}: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      width="26"
-      height="24"
-      viewBox="0 0 26 24"
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       style={props.style}
