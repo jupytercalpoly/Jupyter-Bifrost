@@ -46,6 +46,7 @@ const bifrostModelPropDefaults = {
   plot_function_args: {} as Args,
   column_types: {} as Record<EncodingInfo['field'], EncodingInfo['type']>,
   column_name_map: {} as Record<string, string>,
+  children_nodes: [] as SpecHistoryTree[],
 };
 
 export type ModelState = typeof bifrostModelPropDefaults;

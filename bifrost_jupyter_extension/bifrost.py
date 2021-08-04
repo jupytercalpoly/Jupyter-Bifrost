@@ -16,7 +16,7 @@ TODO: Add module docstring
 """
 import numpy as np
 from ipywidgets import DOMWidget, register
-from traitlets import Unicode, List, Int, Dict, Bool
+from traitlets import Unicode, List, Int, Dict, Set
 from ._frontend import module_name, module_version
 from IPython.core.display import JSON, display
 import json
@@ -54,6 +54,7 @@ class BifrostWidget(DOMWidget):
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
+    children_nodes = List([]).tag(sync=True)
 
     def __init__(self, df:pd.DataFrame, column_name_map: dict, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)

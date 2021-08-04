@@ -53,6 +53,19 @@ const historyCss = css`
       border: 3px solid ${theme.color.primary.dark};
       border-left: 10px solid ${theme.color.primary.dark};
     }
+    &.wasChild {
+      border-left: 10px solid ${theme.color.secondary.standard};
+      &:hover {
+        border: 3px solid ${theme.color.secondary.standard};
+        border-left: 10px solid ${theme.color.secondary.standard};
+        background-color: whitesmoke;
+      }
+      &.active {
+        font-weight: 700;
+        border: 3px solid ${theme.color.secondary.dark};
+        border-left: 10px solid ${theme.color.secondary.dark};
+      }
+    }
 
     &.leaf {
       margin-left: 40px;
@@ -103,6 +116,11 @@ export default function HistoryTab() {
   const treeHist = specHistory.map((change, i) =>
     generateTreeSpec(change, i + 1, 1)
   );
+  const [childrenNodes, setChildrenNodes] = useModelState('children_nodes');
+
+  function updateChildrenNodes(childrenSpecs: SpecHistoryTree[]) {
+    setChildrenNodes(childrenSpecs);
+  }
 
   // Select the last valid spec if current spec has no encoding
   useEffect(() => {
@@ -110,7 +128,6 @@ export default function HistoryTab() {
     if (hasNoEncodings) {
       const lastLeaves = specHistory.map((change) => change.mainLeaf);
       const lastValidSpec = lastLeaves.sort((a, b) => b[0] - a[0])[0];
-      // const lastValidSpec = produce(specHistory.mainLeaf, (gs) => gs);
       setSpec(lastValidSpec[1]);
     }
   }, []);
@@ -139,6 +156,7 @@ export default function HistoryTab() {
             ...props,
             data: props.data as unknown as customNode,
             currentNodeId: historyNode.id,
+            childrenNodes: childrenNodes,
           })
         }
         LeafRenderer={(props) =>
@@ -146,6 +164,8 @@ export default function HistoryTab() {
             ...props,
             data: props.data as unknown as customNode,
             currentNodeId: historyNode.id,
+            childrenNodes: childrenNodes,
+            updateChildrenNodes: updateChildrenNodes,
           })
         }
       />
@@ -197,9 +217,15 @@ function TreeNode(props: {
   selected: boolean;
   level: number;
   currentNodeId: number;
+  childrenNodes: SpecHistoryTree[];
 }) {
+  const wasChild =
+    Array.from(props.childrenNodes).filter(
+      (childNode) => childNode.id === props.data.id
+    ).length !== 0;
   const classes = [
     ['history-el', true],
+    ['wasChild', wasChild],
     [
       'active',
       props.selected ? props.selected : props.currentNodeId === props.data.id,
@@ -231,6 +257,8 @@ function LeaveNode(props: {
   selected: boolean;
   level: number;
   currentNodeId: number;
+  childrenNodes: SpecHistoryTree[];
+  updateChildrenNodes: (childrenNodes: SpecHistoryTree[]) => void;
 }) {
   const [specHistory, setSpecHistory] = useModelState('spec_history');
 
@@ -257,13 +285,18 @@ function LeaveNode(props: {
     .join(' ');
 
   function handleOnClick() {
-    const childrenNodes = parentNode.children.slice();
-    childrenNodes.forEach((childNode) => (childNode.parentId = null));
+    const newChildrenNodes = parentNode.children.slice();
+    newChildrenNodes.forEach((childNode) => {
+      childNode.parentId = null;
+    });
+
+    props.updateChildrenNodes(props.childrenNodes.concat(newChildrenNodes));
+
     parentNode.children = [];
 
     const idxToInsert = specHistory.indexOf(parentNode) + 1;
     const newSpecHistory = specHistory.slice();
-    newSpecHistory.splice(idxToInsert, 0, ...childrenNodes);
+    newSpecHistory.splice(idxToInsert, 0, ...newChildrenNodes);
 
     setSpecHistory(newSpecHistory);
   }
