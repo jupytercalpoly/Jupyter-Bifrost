@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react';
 import React, { useState } from 'react';
-import VariablesTab from './Tabs/VariablesTab';
+import VariablesTab from './Tabs/DataTab';
 import HistoryTab from './Tabs/HistoryTab';
 import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
 import { GraphSpec, useModelState } from '../../hooks/bifrost-model';

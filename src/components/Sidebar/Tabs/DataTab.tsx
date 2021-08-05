@@ -1,16 +1,19 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react';
 import produce from 'immer';
-
-import { PlusCircle } from 'react-feather';
 import { useEffect, useState } from 'react';
+import { PlusCircle } from 'react-feather';
 import {
   EncodingInfo,
   GraphSpec,
   useModelState,
 } from '../../../hooks/bifrost-model';
+import {
+  VegaEncoding,
+  vegaMarkEncodingMap,
+  BifrostVegaMark,
+} from '../../../modules/VegaEncodings';
 import useSpecHistory from '../../../hooks/useSpecHistory';
-import { VegaEncoding, vegaEncodingList } from '../../../modules/VegaEncodings';
 import Pill from '../../ui-widgets/Pill';
 import SearchBar from '../../ui-widgets/SearchBar';
 import FilterScreen from './FilterScreen';
@@ -62,8 +65,7 @@ const variableTabCss = css`
     }
   }
 `;
-const sortedEncodingList = [...vegaEncodingList];
-sortedEncodingList.sort();
+
 export default function VariablesTab({
   clickedAxis,
   updateClickedAxis,
@@ -274,11 +276,13 @@ export default function VariablesTab({
       <ul className="encoding-list">{encodingList}</ul>
       {showEncodings && (
         <ul className="encoding-choices">
-          {sortedEncodingList.map((encoding) => (
-            <Pill onClick={() => addEncoding(encoding)}>
-              <span style={{ padding: '3px 10px' }}>{encoding}</span>
-            </Pill>
-          ))}
+          {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]
+            .filter((encoding) => !(encoding in graphSpec.encoding))
+            .map((encoding) => (
+              <Pill onClick={() => addEncoding(encoding as VegaEncoding)}>
+                <span style={{ padding: '3px 10px' }}>{encoding}</span>
+              </Pill>
+            ))}
         </ul>
       )}
       {activeEncoding && (
