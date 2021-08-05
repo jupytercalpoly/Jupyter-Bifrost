@@ -25,7 +25,7 @@ const bifrostWidgetCss = css`
 
   .side-bar-collapsible-button {
     transition: transform 0.4s ease-in-out;
-    transform-origin: 35% 35%;
+    transform-origin: 40% 35%;
     cursor: pointer;
 
     &.open {

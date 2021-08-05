@@ -45,12 +45,8 @@ const sidebarCss = css`
   height: 100%;
   display: flex;
   flex-direction: column;
-  /* border: 2px solid ${theme.color.primary.standard}; */
-  /* border-radius: 2.5%; */
-
   border-radius: 2.5% 2.5% 0 0;
   box-shadow: ${theme.shadow.handle};
-  /* box-shadow: 0px 0px 0px 1px ${theme.color.primary.light}; */
 
   .sidebar-content {
     border: 2px solid #e4e4e4;
