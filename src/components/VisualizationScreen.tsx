@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import NavBar from './NavBar';
 import Graph from './Graph';
 import { VegaEncoding } from '../modules/VegaEncodings';
+import SideBarCollapsibleButtonIcon from '../assets/icons/SideBarCollapsibleButtonIcon';
+import theme from '../theme';
 
 const bifrostWidgetCss = css`
   // Element-based styles
@@ -20,6 +22,16 @@ const bifrostWidgetCss = css`
   @media screen and (max-width: 1300px) {
     display: block;
   }
+
+  .side-bar-collapsible-button {
+    transition: transform 0.4s ease-in-out;
+    transform-origin: 40% 35%;
+    cursor: pointer;
+
+    &.open {
+      transform: rotate(-270deg);
+    }
+  }
 `;
 
 interface VisualizationProps {
@@ -32,16 +44,37 @@ export default function VisualizationScreen({
   const sidebarRef = React.useRef<HTMLDivElement>(null);
   const graphRef = React.useRef<HTMLDivElement>(null);
   const [clickedAxis, setClickedAxis] = useState<VegaEncoding | ''>('');
+  const [sideBarOpen, setSideBarOpen] = useState<boolean>(false);
 
   function updateClickedAxis(encoding: VegaEncoding | ''): void {
     setClickedAxis(encoding);
+  }
+
+  function onClickCollapsibleButton() {
+    setSideBarOpen(!sideBarOpen);
   }
 
   return (
     <article className="BifrostWidget" css={bifrostWidgetCss}>
       {onPrevious ? (
         <GridArea area="nav">
-          <NavBar onBack={onPrevious} />
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <NavBar onBack={onPrevious} />
+            <div
+              className={`side-bar-collapsible-button${
+                sideBarOpen ? ' open' : ''
+              }`}
+              onClick={onClickCollapsibleButton}
+            >
+              <SideBarCollapsibleButtonIcon
+                color={
+                  sideBarOpen
+                    ? theme.color.primary.standard
+                    : theme.color.primary.light
+                }
+              />
+            </div>
+          </div>
         </GridArea>
       ) : null}
       <GridArea area="graph" ref={graphRef}>
@@ -52,13 +85,15 @@ export default function VisualizationScreen({
           updateClickedAxis={updateClickedAxis}
         />
       </GridArea>
-      <GridArea area="sidebar" ref={sidebarRef}>
-        <Sidebar
-          graphRef={graphRef}
-          clickedAxis={clickedAxis}
-          updateClickedAxis={updateClickedAxis}
-        />
-      </GridArea>
+      {sideBarOpen ? (
+        <GridArea area="sidebar" ref={sidebarRef}>
+          <Sidebar
+            graphRef={graphRef}
+            clickedAxis={clickedAxis}
+            updateClickedAxis={updateClickedAxis}
+          />
+        </GridArea>
+      ) : null}
     </article>
   );
 }
