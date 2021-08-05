@@ -3,6 +3,8 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
     'compassql/build/src/*': '<rootDir>/src/__tests__/mocks/compassql',
+    'draco-core/build/*': '<rootDir>/src/__tests__/mocks/draco-core',
+    'draco-vis/build/*': '<rootDir>/src/__tests__/mocks/draco-core'
   },
   preset: 'ts-jest/presets/js-with-babel',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],

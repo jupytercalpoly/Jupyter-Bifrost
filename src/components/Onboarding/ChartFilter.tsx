@@ -4,6 +4,7 @@ import ScatterChartIcon from '../../assets/icons/ScatterChartIcon';
 import BarChartIcon from '../../assets/icons/BarChartIcon';
 import LineChartIcon from '../../assets/icons/LineChartIcon';
 import PieChartIcon from '../../assets/icons/PieChartIcon';
+import TickChartIcon from '../../assets/icons/TickChartIcon';
 import { BifrostTheme } from '../../theme';
 import theme from '../../theme';
 
@@ -12,6 +13,7 @@ const chartFilters = [
   { icon: ScatterChartIcon, mark: 'point' },
   { icon: LineChartIcon, mark: 'line' },
   { icon: PieChartIcon, mark: 'arc' },
+  { icon: TickChartIcon, mark: 'tick' },
 ];
 
 const chartFilterCss = (theme: BifrostTheme) => css`

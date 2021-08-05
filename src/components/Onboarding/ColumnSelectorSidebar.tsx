@@ -4,10 +4,6 @@ import { jsx, css } from '@emotion/react';
 import React, { useState, useRef } from 'react';
 import SearchBar from '../ui-widgets/SearchBar';
 
-import { build } from 'compassql/build/src/schema';
-import { recommend } from 'compassql/build/src/recommend';
-import { mapLeaves } from 'compassql/build/src/result';
-import { SpecQueryModel } from 'compassql/build/src/model';
 import { Query } from 'compassql/build/src/query/query';
 import { Lock, X } from 'react-feather';
 import { useEffect } from 'react';
@@ -21,6 +17,9 @@ import {
 import Pill from '../ui-widgets/Pill';
 import { useMemo } from 'react';
 import { BifrostTheme } from '../../theme';
+import { data2schema, schema2asp, cql2asp } from 'draco-core';
+import Draco from 'draco-vis';
+import produce from 'immer';
 
 const columnSelectorCss = (theme: BifrostTheme) => css`
   width: 320px;
@@ -138,11 +137,12 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   }, []);
 
   // Create charts whenever the column selection changes
-  useEffect(createChartsFromColumns, [selectedColumns]);
+  useEffect(draco_rec, [selectedColumns]);
 
-  function createChartsFromColumns() {
-    const opt = {};
-    const schema = build(data, opt);
+  function draco_rec() {
+    const dataSchema = data2schema(data);
+    const dataAsp = schema2asp(dataSchema);
+
     const selectedEncodings = Array.from(selectedColumns).map((column) => {
       if (preSelectedColumns.has(column)) {
         return spec.spec.encodings.filter(
@@ -180,20 +180,28 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
       });
     }
 
-    const recommendedSpecs = preRecommendedSpecs
-      .map((spec) => recommend(spec, schema, opt).result)
-      .map((res) =>
-        mapLeaves(res, (item: SpecQueryModel) => {
-          const newSpec: Record<string, any> = item.toSpec();
-          newSpec['params'] = (spec.spec as Record<string, any>)['params'];
-          return newSpec;
-        })
-      )
-      .map((leaves) => leaves.items)
-      .flat()
-      .filter((spec) => Object.keys((spec as any).encoding).length);
+    const queryAsps = preRecommendedSpecs.map((spec) => {
+      return cql2asp(spec.spec);
+    });
 
-    setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
+    const draco = new Draco();
+
+    draco.init().then(() => {
+      const queryAsp = queryAsps[0];
+      const program = 'data("data").\n' + dataAsp.concat(queryAsp).join('\n');
+      const solution = draco.solve(program, { models: 5 });
+
+      if (solution) {
+        const recommendedSpecs = solution.specs.map((spec) =>
+          produce(spec, (gs) => {
+            delete (gs['data'] as any).url;
+            gs['data']['name'] = 'data';
+            gs['transform'] = [];
+          })
+        );
+        setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
+      }
+    });
   }
 
   function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {

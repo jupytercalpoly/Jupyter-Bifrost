@@ -62,7 +62,7 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
   }
 `;
 
-const defaultMarks = new Set(['point', 'bar', 'arc', 'line']);
+const defaultMarks = new Set(['point', 'bar', 'arc', 'line', 'tick']);
 
 export default function ChartChooser(props: { onOnboarded: () => void }) {
   const [activeMarks, setActiveMarks] = useState(defaultMarks);
@@ -74,6 +74,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
       ),
     [activeMarks, suggestedGraphs]
   );
+
   const availableMarks = useMemo(
     () =>
       (suggestedGraphs as GraphSpec[]).reduce((markSet, { mark }) => {
