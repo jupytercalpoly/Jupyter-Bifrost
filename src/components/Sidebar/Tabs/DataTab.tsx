@@ -2,11 +2,14 @@
 import { css, jsx } from '@emotion/react';
 import produce from 'immer';
 import { useEffect, useState } from 'react';
-import { Filter, PlusCircle, XCircle } from 'react-feather';
-import { EncodingInfo, GraphSpec, useModelState } from '../../../hooks/bifrost-model';
+import { PlusCircle } from 'react-feather';
+import {
+  EncodingInfo,
+  GraphSpec,
+  useModelState,
+} from '../../../hooks/bifrost-model';
 import {
   VegaEncoding,
-  vegaEncodingList
   vegaMarkEncodingMap,
   BifrostVegaMark,
 } from '../../../modules/VegaEncodings';
