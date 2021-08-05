@@ -1,6 +1,9 @@
 import produce from 'immer';
 import { GraphData, GraphSpec } from '../hooks/bifrost-model';
 import { isFunction } from './utils';
+import { VegaParamPredicate, vegaParamPredicatesList } from './VegaEncodings';
+
+const filterTypes = new Set<string>(vegaParamPredicatesList);
 
 /**
  *
@@ -79,7 +82,7 @@ export function deleteSpecFilter(
   graphSpec: GraphSpec,
   field: string,
   type: string,
-  options?: SpecFilterOptions
+  options?: SpecFilterOptions & { deleteCompound?: boolean }
 ) {
   const compoundOperator = options?.compoundOperator || 'or';
   const [compoundIndex, index] = locateFilter(graphSpec, field, type, options);
@@ -91,7 +94,7 @@ export function deleteSpecFilter(
       if (compoundIndex !== -1) {
         const lastMember =
           gs.transform[compoundIndex].filter[compoundOperator].length === 1;
-        if (lastMember) {
+        if (lastMember || options?.deleteCompound) {
           gs.transform.splice(compoundIndex, 1);
         } else {
           gs.transform[compoundIndex].filter[compoundOperator].splice(index, 1);
@@ -167,6 +170,51 @@ export function getBounds(
     },
     [Infinity, -Infinity]
   );
+}
+/** Creates a flat array of all filters in a spec.
+ */
+export function getFilterList(
+  spec: GraphSpec
+): { field: string; [other: string]: any }[] {
+  return spec.transform.flatMap((t) => {
+    const compoundOperator =
+      'or' in t.filter ? 'or' : 'and' in t.filter ? 'and' : null;
+    return compoundOperator ? t.filter[compoundOperator] : t.filter;
+  });
+}
+
+/**
+ * Turns filter into a human readable string.
+ * @param filter A single filter config object from the vega transform array
+ * @returns array of string representation
+ */
+export function stringifyFilter(filter: {
+  field: string;
+  [other: string]: any;
+}): string[] {
+  return Object.keys(filter)
+    .filter((k) => filterTypes.has(k))
+    .map((type) => {
+      let categoriesString: string;
+      switch (type as VegaParamPredicate) {
+        case 'gte':
+          return '> ' + filter.gte.toFixed(2);
+        case 'lte':
+          return '< ' + filter.lte.toFixed(2);
+        case 'range':
+          return `${filter.range[0].toFixed(2)} - ${filter.range[1].toFixed(
+            2
+          )}`;
+        case 'oneOf':
+          categoriesString = filter.oneOf.join(', ');
+          return categoriesString.length > 20
+            ? categoriesString.slice(0, 20) + '...'
+            : categoriesString;
+
+        default:
+          return '';
+      }
+    });
 }
 
 /**

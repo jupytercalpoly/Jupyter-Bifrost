@@ -7,6 +7,7 @@ const theme = {
       standard: '#AD77AF',
       light: '#E4D2E4',
     },
+    pill: ['#E5F2DE', '#F5DFDF', '#D4ECEE', '#E1DFEB'],
   },
   shadow: {
     handle: '0 0 10px #781c7932',
