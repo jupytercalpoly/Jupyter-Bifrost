@@ -32,6 +32,11 @@ const bifrostWidgetCss = css`
       transform: rotate(-270deg);
     }
   }
+  .nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    background: transparent;
+  }
 `;
 
 interface VisualizationProps {
@@ -58,7 +63,7 @@ export default function VisualizationScreen({
     <article className="BifrostWidget" css={bifrostWidgetCss}>
       {onPrevious ? (
         <GridArea area="nav">
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className={'nav-wrapper'}>
             <NavBar onBack={onPrevious} />
             <div
               className={`side-bar-collapsible-button${
