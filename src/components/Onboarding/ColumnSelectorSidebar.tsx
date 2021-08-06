@@ -137,7 +137,12 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   }, []);
 
   // Create charts whenever the column selection changes
-  useEffect(draco_rec, [selectedColumns]);
+  useEffect(() => {
+    if (!selectedColumns.length) {
+      return;
+    }
+    draco_rec();
+  }, [selectedColumns]);
 
   function draco_rec() {
     const dataSchema = data2schema(data);
@@ -194,6 +199,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
       if (solution) {
         const recommendedSpecs = solution.specs.map((spec) =>
           produce(spec, (gs) => {
+            delete gs['$schema'];
             delete (gs['data'] as any).url;
             gs['data']['name'] = 'data';
             gs['transform'] = [];

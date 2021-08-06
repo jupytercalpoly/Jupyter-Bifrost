@@ -4,7 +4,12 @@ import produce from 'immer';
 import { useMemo } from 'react';
 import { useState } from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
-import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
+import {
+  // EncodingInfo,
+  GraphSpec,
+  useModelState,
+} from '../../hooks/bifrost-model';
+// import { VegaEncoding } from '../../modules/VegaEncodings';
 import { BifrostTheme } from '../../theme';
 import ChartFilter from './ChartFilter';
 
