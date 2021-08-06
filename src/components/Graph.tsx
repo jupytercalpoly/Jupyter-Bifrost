@@ -104,7 +104,8 @@ export default function Graph(props: GraphProps) {
   }
 
   function updateGraphBounds() {
-    const brushIsActive = Object.keys(selectedData[1]).length;
+    const brushIsActive =
+      selectedData[1] && Object.keys(selectedData[1]).length;
     if (!brushIsActive) {
       return;
     }
