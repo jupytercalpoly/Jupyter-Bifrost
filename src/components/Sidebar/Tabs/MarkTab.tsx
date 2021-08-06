@@ -6,7 +6,6 @@ import {
   vegaCategoricalChartList,
   vegaChartList,
   vegaTemporalChartList,
-  preprocessEncoding,
   convertToCategoricalChartsEncoding,
 } from '../../../modules/VegaEncodings';
 import SearchBar from '../../ui-widgets/SearchBar';
@@ -52,14 +51,17 @@ export default function MarkTab() {
     string | Record<string, any>
   >(spec.mark);
 
-  function handleOnClick(spec: GraphSpec) {
-    const mark = typeof spec.mark === 'object' ? spec.mark.type : spec.mark;
+  function handleOnClick(graphSpec: GraphSpec) {
+    const mark =
+      typeof graphSpec.mark === 'object' ? graphSpec.mark.type : graphSpec.mark;
     if (mark === selectedMark) {
       return;
     }
-    const newSpec = produce(spec, (draftSpec: GraphSpec) => {
+    const newSpec = produce(graphSpec, (draftSpec: GraphSpec) => {
       draftSpec['width'] = spec.width;
       draftSpec['height'] = spec.height;
+      draftSpec.params = [{ name: 'brush', select: 'interval' }];
+      draftSpec.config!.mark!.tooltip = true;
 
       if (draftSpec.mark === 'bar') {
         draftSpec.params[0].select = { type: 'interval', encodings: ['x'] };
@@ -97,20 +99,16 @@ export default function MarkTab() {
               return !(kind === 'arc');
             }
 
-            const graphSpec = produce(spec, (draftSpec: GraphSpec) => {
-              preprocessEncoding(draftSpec);
-            });
-
             if (vegaCategoricalChartList.includes(kind)) {
-              const x = graphSpec['encoding']['x'];
-              const y = graphSpec['encoding']['y'];
+              const x = spec['encoding']['x'];
+              const y = spec['encoding']['y'];
               return (
                 (x['type'] === 'quantitative' && y['type'] === 'nominal') ||
                 (y['type'] === 'quantitative' && x['type'] === 'nominal')
               );
             } else if (vegaTemporalChartList.includes(kind)) {
-              const xType = graphSpec['encoding']['x']['type'];
-              const yType = graphSpec['encoding']['y']['type'];
+              const xType = spec['encoding']['x']['type'];
+              const yType = spec['encoding']['y']['type'];
 
               return (
                 ['temporal', 'ordinal'].includes(xType) &&
@@ -124,9 +122,11 @@ export default function MarkTab() {
             const graphSpec = produce(spec, (draftSpec: GraphSpec) => {
               draftSpec['width'] = 100;
               draftSpec['height'] = 100;
+              draftSpec.params = [];
               draftSpec.mark = kind;
-
-              preprocessEncoding(draftSpec);
+              if (draftSpec.config?.mark?.tooltip) {
+                draftSpec.config.mark.tooltip = false;
+              }
 
               if (vegaCategoricalChartList.includes(kind)) {
                 convertToCategoricalChartsEncoding(draftSpec, kind);

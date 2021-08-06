@@ -1,44 +1,13 @@
 import { GraphSpec } from '../hooks/bifrost-model';
 
-// preprocess graph encoding to x y encoding
-export function preprocessEncoding(spec: GraphSpec) {
-  if ('theta' in spec['encoding'] && 'color' in spec['encoding']) {
-    const theta = (spec as any)['encoding']['theta'];
-    const color = (spec as any)['encoding']['color'];
-
-    if (theta['type'] === 'quantitative') {
-      spec['encoding']['x'] = theta;
-      spec['encoding']['y'] = color;
-    } else {
-      spec['encoding']['x'] = color;
-      spec['encoding']['y'] = theta;
-    }
-    delete (spec as any)['encoding']['theta'];
-    delete (spec as any)['encoding']['color'];
-  }
-}
-
 export function convertToCategoricalChartsEncoding(
   spec: GraphSpec,
   kind: string
 ) {
-  const x = spec.encoding['x'];
-  const y = spec.encoding['y'];
   if (kind === 'errorband') {
     spec.mark = { type: kind, extent: 'ci', borders: true };
   } else if (kind === 'errorbar') {
     spec.mark = { type: kind, extent: 'ci', ticks: true };
-  } else if (kind === 'arc') {
-    delete (spec as any)['params'];
-    delete (spec as any)['encoding']['x'];
-    delete (spec as any)['encoding']['y'];
-    if (x['type'] === 'quantitative') {
-      spec['encoding']['theta'] = x;
-      spec['encoding']['color'] = y;
-    } else {
-      spec['encoding']['theta'] = y;
-      spec['encoding']['color'] = x;
-    }
   } else if (kind === 'boxplot') {
     delete (spec as any)['params'];
     spec.mark = { type: kind, extent: 'min-max' };
@@ -169,7 +138,6 @@ export const vegaChartList = [
 ];
 
 export const vegaCategoricalChartList = [
-  'arc',
   'bar',
   'boxplot',
   'errorband',
