@@ -74,7 +74,13 @@ const columnSelectorCss = (theme: BifrostTheme) => css`
     outline: auto;
   }
 
+  form {
+    margin-top: 12px;
+  }
+
   fieldset {
+    max-height: 270px;
+    overflow: auto;
     border: none;
   }
 
@@ -137,14 +143,9 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   }, []);
 
   // Create charts whenever the column selection changes
-  useEffect(() => {
-    if (!selectedColumns.length) {
-      return;
-    }
-    draco_rec();
-  }, [selectedColumns]);
+  useEffect(recommendCharts, [selectedColumns]);
 
-  function draco_rec() {
+  function recommendCharts() {
     const dataSchema = data2schema(data);
     const dataAsp = schema2asp(dataSchema);
 
@@ -203,6 +204,8 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
             delete (gs['data'] as any).url;
             gs['data']['name'] = 'data';
             gs['transform'] = [];
+            gs.width = 400;
+            gs.height = 200;
           })
         );
         setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);

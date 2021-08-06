@@ -27,7 +27,11 @@ const screenCss = (theme: BifrostTheme) => css`
     overflow-y: scroll;
   }
   nav {
+    position: sticky;
+    top: 0;
+    left: 0;
     padding-bottom: 5px;
+    background: #ffffffb8;
   }
 
   h1 {

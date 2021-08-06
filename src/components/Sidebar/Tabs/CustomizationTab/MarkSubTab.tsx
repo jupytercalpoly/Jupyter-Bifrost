@@ -21,9 +21,9 @@ const markOptionsListCss = css`
   flex-wrap: wrap;
   overflow-y: scroll;
   list-style: none;
-  height: 247px;
+  height: 100%;
   padding: 0px;
-  max-height: 250px;
+  max-height: 100%;
 `;
 
 const markOptionCss = css`

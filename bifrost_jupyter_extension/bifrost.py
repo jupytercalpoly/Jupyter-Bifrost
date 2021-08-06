@@ -61,7 +61,7 @@ class BifrostWidget(DOMWidget):
         column_types = self.get_column_types(df)
         graph_info = self.create_graph_data(df, data, column_types, kind=kind, x=x, y=y, color=color)
 
-        self.set_trait("df_columns", list(df.columns))
+        self.set_trait("df_columns", sorted(list(df.columns)))
         self.set_trait("selected_data", [])
         self.set_trait("query_spec", graph_info["query_spec"])
         self.set_trait("graph_data", graph_info["data"])

@@ -59,9 +59,7 @@ export default function ChartFilter({
             <button className="wrapper" onClick={() => toggleMark(mark)}>
               <Icon
                 color={
-                  activeMarks.has(mark)
-                    ? theme.color.primary.standard
-                    : undefined
+                  activeMarks.has(mark) ? theme.color.primary.dark : '#bbbbbb'
                 }
               />
             </button>

@@ -15,7 +15,6 @@ const globalStyles = (theme: any) => css`
     width: 100%;
     height: 100%;
     max-height: fit-content;
-    overflow: auto;
 
     * {
       box-sizing: border-box;

@@ -159,7 +159,10 @@ export function getBounds(
 ): [number, number] {
   return graphData.reduce(
     (minMax, cur) => {
-      const val = cur[field] as number;
+      const val = cur[field] as number | null;
+      if (val === null) {
+        return minMax;
+      }
       if (minMax[0] > val) {
         minMax[0] = val;
       }
