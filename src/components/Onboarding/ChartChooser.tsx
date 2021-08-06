@@ -72,6 +72,7 @@ const defaultMarks = new Set(['point', 'bar', 'arc', 'line', 'tick']);
 export default function ChartChooser(props: { onOnboarded: () => void }) {
   const [activeMarks, setActiveMarks] = useState(defaultMarks);
   const suggestedGraphs = useModelState('suggested_graphs')[0];
+  const selectedColumns = useModelState('selected_columns')[0];
   const filteredGraphs = useMemo(
     () =>
       suggestedGraphs.filter((spec) =>
@@ -124,7 +125,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
     displayChart(index);
   }
 
-  return suggestedGraphs.length ? (
+  return suggestedGraphs.length && selectedColumns.length ? (
     <section tabIndex={-1} className="ChartChooser" css={suggestedChartCss}>
       <ChartFilter
         activeMarks={activeMarks}

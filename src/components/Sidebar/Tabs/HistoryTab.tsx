@@ -11,7 +11,7 @@ const historyCss = (theme: any) => css`
   .history-list {
     list-style: none;
     padding: 0;
-    max-height: 300px;
+    max-height: 370px;
     overflow-y: scroll;
 
     .history-el {

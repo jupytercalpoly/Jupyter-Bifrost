@@ -27,7 +27,6 @@ import GraphPill from '../../ui-widgets/GraphPill';
 const variableTabCss = css`
   position: relative;
   width: 100%;
-  height: 100%;
   .encoding-list,
   .encoding-choices {
     margin: 0;
@@ -54,6 +53,8 @@ const variableTabCss = css`
   .columns-list {
     list-style: none;
     padding: 0;
+    height: 300px;
+    overflow: auto;
 
     .column-el {
       padding: 10px;
@@ -66,7 +67,7 @@ const variableTabCss = css`
   }
 `;
 
-export default function VariablesTab({
+export default function DataTab({
   clickedAxis,
   updateClickedAxis,
 }: {
@@ -104,12 +105,23 @@ export default function VariablesTab({
       return;
     }
     const dtype = columnTypes[field];
-    const newSpec = produce(graphSpec, (gs) => {
+
+    // Delete all filters on the old field.
+    let newSpec = deleteSpecFilter(
+      graphSpec,
+      field,
+      columnTypes[field] === 'quantitative' ? 'range' : 'oneOf',
+      { deleteCompound: true }
+    );
+
+    // change the encoded field.
+    newSpec = produce(newSpec, (gs) => {
       (gs.encoding[activeEncoding] as EncodingInfo) = {
         field: field,
         type: dtype,
       };
     });
+
     const newPillsInfo = produce(pillsInfo, (info) => {
       const pill = info.find((pill) => pill.encoding === activeEncoding);
       if (!pill) {
@@ -245,7 +257,9 @@ export default function VariablesTab({
     <GraphPill
       onClose={() => deletePill(props)}
       onAggregationSelected={() => openFilters(props.encoding as VegaEncoding)}
-      onFilterSelected={() => openFilters(props.encoding as VegaEncoding)}
+      onFilterSelected={() =>
+        props.field && openFilters(props.encoding as VegaEncoding)
+      }
       onEncodingSelected={() => {
         setActiveEncoding(props.encoding as VegaEncoding);
         setShowEncodings((show) => !show);
@@ -272,7 +286,7 @@ export default function VariablesTab({
   );
 
   return (
-    <section className="VariablesTab" css={variableTabCss}>
+    <section className="DataTab" css={variableTabCss}>
       <ul className="encoding-list">{encodingList}</ul>
       {showEncodings && (
         <ul className="encoding-choices">

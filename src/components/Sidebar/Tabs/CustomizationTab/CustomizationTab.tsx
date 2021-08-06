@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react';
 import { useState } from 'react';
-import MarkSubTab from './MarkSubTab';
 import ScaleSubTab from './ScaleSubTab';
 import StyleSubTab from './StyleSubTab';
 
@@ -51,7 +50,7 @@ const subTabCss = css`
 const subtabMapping: {
   [name: string]: (props: CustomizeSubTapProps) => jsx.JSX.Element;
 } = {
-  Mark: MarkSubTab,
+  // Mark: MarkSubTab,
   Scale: ScaleSubTab,
   Style: StyleSubTab,
 };

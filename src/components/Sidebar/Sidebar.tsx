@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/react';
 import React, { useState } from 'react';
 import VariablesTab from './Tabs/DataTab';
 import HistoryTab from './Tabs/HistoryTab';
-import CustomizationTab from './Tabs/CustomizationTab/CustomizationTab';
+import MarkTab from './Tabs/MarkTab';
 import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 import { VegaEncoding } from '../../modules/VegaEncodings';
@@ -43,19 +43,18 @@ const sidebarCss = css`
   width: 100%;
   max-width: 600px;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  min-height: 400px;
   border-radius: 2.5% 2.5% 0 0;
   box-shadow: ${theme.shadow.handle};
 
   .sidebar-content {
+    position: relative;
     border: 2px solid #e4e4e4;
     border-top: none;
     border-bottom: none;
     padding: 10px;
-    /* overflow: auto; */
     padding-bottom: 0;
-    height: 100%;
+    height: 440px;
   }
 `;
 const tabMapping: {
@@ -65,7 +64,7 @@ const tabMapping: {
   }) => jsx.JSX.Element;
 } = {
   Data: VariablesTab,
-  Customization: CustomizationTab,
+  Mark: MarkTab,
   History: HistoryTab,
 };
 
@@ -74,7 +73,7 @@ export default function Sidebar(props: {
   clickedAxis: VegaEncoding | '';
   updateClickedAxis: (encoding: VegaEncoding | '') => void;
 }) {
-  const tabs = ['Data', 'Customization', 'History'];
+  const tabs = ['Data', 'Mark', 'History'];
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const TabContents = tabMapping[selectedTab];
   return (

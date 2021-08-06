@@ -18,6 +18,10 @@ const onboardingWidgetCss = css`
   padding: 20px;
   @media screen and (max-width: 1200px) {
     flex-direction: column;
+
+    .ChartChooser {
+      margin-top: 30px;
+    }
   }
 `;
 
