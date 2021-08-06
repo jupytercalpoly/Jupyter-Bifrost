@@ -14,7 +14,7 @@ const bifrostWidgetCss = css`
   //===========================================================
   display: grid;
   grid-template-columns: 720px minmax(450px, 600px);
-  grid-template-rows: auto 500px;
+  grid-template-rows: 40px 500px;
   grid-template-areas: 'nav sidebar' 'graph sidebar';
   height: 100%;
   max-height: 541px;
@@ -31,6 +31,11 @@ const bifrostWidgetCss = css`
     &.open {
       transform: rotate(-270deg);
     }
+  }
+  .nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    background: transparent;
   }
 `;
 
@@ -58,7 +63,7 @@ export default function VisualizationScreen({
     <article className="BifrostWidget" css={bifrostWidgetCss}>
       {onPrevious ? (
         <GridArea area="nav">
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className={'nav-wrapper'}>
             <NavBar onBack={onPrevious} />
             <div
               className={`side-bar-collapsible-button${

@@ -18,13 +18,13 @@ import useSpecHistory from '../hooks/useSpecHistory';
 const graphCss = css`
   padding-left: 34px;
   overflow-x: auto;
-  .vega-embed.has-actions {
+  /* .vega-embed.has-actions {
     details {
       position: absolute;
       top: -28px;
       left: 75px;
     }
-  }
+  } */
 
   g.mark-text.role-axis-title {
     text.hovered {
@@ -104,7 +104,8 @@ export default function Graph(props: GraphProps) {
   }
 
   function updateGraphBounds() {
-    const brushIsActive = Object.keys(selectedData[1]).length;
+    const brushIsActive =
+      selectedData[1] && Object.keys(selectedData[1]).length;
     if (!brushIsActive) {
       return;
     }

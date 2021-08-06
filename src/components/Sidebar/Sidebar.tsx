@@ -53,7 +53,7 @@ const sidebarCss = css`
     border-top: none;
     border-bottom: none;
     padding: 10px;
-    overflow: auto;
+    /* overflow: auto; */
     padding-bottom: 0;
     height: 100%;
   }
