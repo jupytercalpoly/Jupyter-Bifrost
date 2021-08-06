@@ -13,6 +13,7 @@ import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import produce from 'immer';
 import theme from '../../../theme';
+import useSpecHistory from '../../../hooks/useSpecHistory';
 
 const markOptionsListCss = css`
   display: flex;
@@ -51,6 +52,8 @@ export default function MarkTab() {
     string | Record<string, any>
   >(spec.mark);
 
+  const saveSpecToHistory = useSpecHistory();
+
   function handleOnClick(graphSpec: GraphSpec) {
     const mark =
       typeof graphSpec.mark === 'object' ? graphSpec.mark.type : graphSpec.mark;
@@ -69,6 +72,7 @@ export default function MarkTab() {
         draftSpec.params[0].select = 'interval';
       }
     });
+    saveSpecToHistory(newSpec);
     setSelectedMark(mark);
     setSpec(newSpec);
   }
