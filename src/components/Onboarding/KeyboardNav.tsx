@@ -123,8 +123,9 @@ export function useKeyboardNavigation({
       e.key in keyEvents && keyEvents[e.key](e);
     }
 
-    window.addEventListener('keydown', handleKeypress);
-    return () => void window.removeEventListener('keydown', handleKeypress);
+    containerRef.current?.addEventListener('keydown', handleKeypress);
+    return () =>
+      void containerRef.current?.removeEventListener('keydown', handleKeypress);
   }, [containerRef.current]);
 
   return containerRef;

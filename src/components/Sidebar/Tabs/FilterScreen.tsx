@@ -60,7 +60,7 @@ const screenCss = (theme: BifrostTheme) => css`
     display: block;
     font-size: 17px;
     font-weight: 500;
-    margin-right: 10px;
+    margin-bottom: 2px;
   }
 
   .filters {
@@ -239,7 +239,12 @@ function QuantitativeFilters(props: FilterGroupProps) {
             style={{ display: 'inline-block' }}
           />
 
-          <span className="field-label">Bin</span>
+          <span
+            className="field-label"
+            style={{ display: 'inline-block', marginLeft: 5 }}
+          >
+            Bin
+          </span>
         </label>
 
         <h2>Filter</h2>
