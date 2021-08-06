@@ -8,22 +8,20 @@ import {
   vegaTemporalChartList,
   preprocessEncoding,
   convertToCategoricalChartsEncoding,
-} from '../../../../modules/VegaEncodings';
-import SearchBar from '../../../ui-widgets/SearchBar';
-import { CustomizeSubTapProps } from './CustomizationTab';
-import { GraphSpec, useModelState } from '../../../../hooks/bifrost-model';
+} from '../../../modules/VegaEncodings';
+import SearchBar from '../../ui-widgets/SearchBar';
+import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import produce from 'immer';
-import theme from '../../../../theme';
+import theme from '../../../theme';
 
 const markOptionsListCss = css`
   display: flex;
   flex-wrap: wrap;
   overflow-y: scroll;
   list-style: none;
-  height: 100%;
+  height: 380px;
   padding: 0px;
-  max-height: 100%;
 `;
 
 const markOptionCss = css`
@@ -39,8 +37,9 @@ const markOptionCss = css`
   }
 `;
 
-export default function MarkSubTab(props: CustomizeSubTapProps) {
+export default function MarkTab() {
   const [searchValue, setSearchValue] = useState<string>('');
+  const [spec, setSpec] = useModelState('graph_spec');
   const [results, setResults] = useState(
     vegaChartList.map((choice, index) => ({ choice, index }))
   );
@@ -51,7 +50,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
 
   const [selectedMark, setSelectedMark] = useState<
     string | Record<string, any>
-  >(props.spec.mark);
+  >(spec.mark);
 
   function handleOnClick(spec: GraphSpec) {
     const mark = typeof spec.mark === 'object' ? spec.mark.type : spec.mark;
@@ -59,8 +58,8 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
       return;
     }
     const newSpec = produce(spec, (draftSpec: GraphSpec) => {
-      draftSpec['width'] = props.spec.width;
-      draftSpec['height'] = props.spec.height;
+      draftSpec['width'] = spec.width;
+      draftSpec['height'] = spec.height;
 
       if (draftSpec.mark === 'bar') {
         draftSpec.params[0].select = { type: 'interval', encodings: ['x'] };
@@ -69,7 +68,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
       }
     });
     setSelectedMark(mark);
-    props.setSpec(newSpec);
+    setSpec(newSpec);
   }
 
   return (
@@ -83,35 +82,35 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
       <ul className="mark-options" css={markOptionsListCss}>
         {results
           .filter(({ choice: kind }) => {
-            const channels = Object.keys(props.spec.encoding);
+            const channels = Object.keys(spec.encoding);
             if (
               channels.length === 0 ||
-              (!('x' in props.spec.encoding) && !('y' in props.spec.encoding))
+              (!('x' in spec.encoding) && !('y' in spec.encoding))
             ) {
               return false;
             }
 
             if (
-              ('x' in props.spec.encoding && !('y' in props.spec.encoding)) ||
-              ('y' in props.spec.encoding && !('x' in props.spec.encoding))
+              ('x' in spec.encoding && !('y' in spec.encoding)) ||
+              ('y' in spec.encoding && !('x' in spec.encoding))
             ) {
               return !(kind === 'arc');
             }
 
-            const spec = produce(props.spec, (draftSpec: GraphSpec) => {
+            const graphSpec = produce(spec, (draftSpec: GraphSpec) => {
               preprocessEncoding(draftSpec);
             });
 
             if (vegaCategoricalChartList.includes(kind)) {
-              const x = spec['encoding']['x'];
-              const y = spec['encoding']['y'];
+              const x = graphSpec['encoding']['x'];
+              const y = graphSpec['encoding']['y'];
               return (
                 (x['type'] === 'quantitative' && y['type'] === 'nominal') ||
                 (y['type'] === 'quantitative' && x['type'] === 'nominal')
               );
             } else if (vegaTemporalChartList.includes(kind)) {
-              const xType = spec['encoding']['x']['type'];
-              const yType = spec['encoding']['y']['type'];
+              const xType = graphSpec['encoding']['x']['type'];
+              const yType = graphSpec['encoding']['y']['type'];
 
               return (
                 ['temporal', 'ordinal'].includes(xType) &&
@@ -122,7 +121,7 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
             }
           })
           .map(({ choice: kind }) => {
-            const spec = produce(props.spec, (draftSpec: GraphSpec) => {
+            const graphSpec = produce(spec, (draftSpec: GraphSpec) => {
               draftSpec['width'] = 100;
               draftSpec['height'] = 100;
               draftSpec.mark = kind;
@@ -141,11 +140,11 @@ export default function MarkSubTab(props: CustomizeSubTapProps) {
                     : `option_${kind}`
                 }
                 key={kind}
-                onClick={() => handleOnClick(spec)}
+                onClick={() => handleOnClick(graphSpec)}
                 css={markOptionCss}
               >
                 <VegaLite
-                  spec={spec as VisualizationSpec}
+                  spec={graphSpec as VisualizationSpec}
                   data={data}
                   actions={false}
                 />

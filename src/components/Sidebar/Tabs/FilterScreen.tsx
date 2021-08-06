@@ -22,16 +22,9 @@ const screenCss = (theme: BifrostTheme) => css`
   height: 100%;
 
   .filter-contents {
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
   }
   nav {
-    position: sticky;
-    top: 0;
-    left: 0;
     padding-bottom: 5px;
-    background: #ffffffb8;
   }
 
   h1 {
@@ -56,6 +49,11 @@ const screenCss = (theme: BifrostTheme) => css`
     margin: 10px 0;
     margin-left: 10px;
     color: ${theme.color.primary.dark};
+  }
+
+  .filters {
+    overflow: auto;
+    height: 300px;
   }
 `;
 

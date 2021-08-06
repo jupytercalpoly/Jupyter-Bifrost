@@ -25,6 +25,7 @@ import {
 import GraphPill from '../../ui-widgets/GraphPill';
 
 const variableTabCss = css`
+  position: relative;
   width: 100%;
   .encoding-list,
   .encoding-choices {
