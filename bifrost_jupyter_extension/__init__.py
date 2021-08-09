@@ -47,7 +47,7 @@ class BifrostAccessor:
 
         w = BifrostWidget(self._obj, column_name_map, kind, formatted_x, formatted_y, formatted_color)
         display(w)
-        return w.df_history[-1]
+        return self._obj
 
 
     def format_string(self, s):

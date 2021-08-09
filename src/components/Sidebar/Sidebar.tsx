@@ -176,16 +176,22 @@ function ActionBar() {
 
   function exportCode() {
     // convert formatted columns to original
+    const updateField = (filter: { field: string }) =>
+      (filter.field = columnNameMap[filter.field]);
+
     const revertedSpec = produce(spec, (gs: GraphSpec) => {
-      Object.keys(gs.encoding).forEach((channel) => {
-        gs.encoding[channel as VegaEncoding].field =
-          columnNameMap[gs.encoding[channel as VegaEncoding].field];
+      const compounds = ['and', 'or', 'not'];
+      gs.transform.forEach(({ filter }) => {
+        const filterKeys = Object.keys(filter);
+        const compoundOp = compounds.find((c) =>
+          filterKeys.find((k) => c === k)
+        );
+        if (compoundOp) {
+          filter[compoundOp].forEach(updateField);
+        } else {
+          updateField(filter);
+        }
       });
-      gs.transform.forEach((obj) =>
-        obj['filter']['or'].forEach((el: any) => {
-          el.field = columnNameMap[el.field];
-        })
-      );
     });
 
     const translator = new VegaPandasTranslator();
