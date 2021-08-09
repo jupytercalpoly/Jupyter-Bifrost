@@ -53,11 +53,12 @@ class BifrostWidget(DOMWidget):
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
+    graph_data_config = Dict({"maxRows": 1, "sample": False}).tag(sync=True)
 
     def __init__(self, df:pd.DataFrame, column_name_map: dict, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)
         self.df_history.append(df)
-        data = self.get_data(df)
+        data = self.get_data(df, 10)
         column_types = self.get_column_types(df)
         graph_info = self.create_graph_data(df, data, column_types, kind=kind, x=x, y=y, color=color)
 
@@ -93,8 +94,20 @@ class BifrostWidget(DOMWidget):
         self.set_trait("graph_spec", graph_info["spec"])
         self.set_trait("graph_data", graph_info["data"])
 
+    @observe("graph_data_config")
+    def update_dataset(self, changes):
+        config = changes["new"]
+        if changes["old"]["sample"] == config["sample"]:
+            return
+        if config["sample"]:
+            self.set_trait("graph_data", self.get_data(self.df_history[-1], config["maxRows"]))
+        else:
+            self.set_trait("graph_data", self.get_data(self.df_history[-1]))
 
-    def get_data(self, df: pd.DataFrame):
+
+    def get_data(self, df: pd.DataFrame, sampleLimit:int=None):
+        if sampleLimit:
+            df = df.sample(n=sampleLimit)
         return json.loads(df.to_json(orient="records"))
 
     def get_column_types(self, df: pd.DataFrame):

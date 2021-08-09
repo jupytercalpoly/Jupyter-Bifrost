@@ -4,8 +4,9 @@ import { jsx, css } from '@emotion/react';
 import ChartChooser from './ChartChooser';
 import ColumnSelectorSidebar from './ColumnSelectorSidebar';
 
-import { Args } from '../../hooks/bifrost-model';
+import { Args, useModelState } from '../../hooks/bifrost-model';
 import { useKeyboardNavigation } from './KeyboardNav';
+import { useEffect } from 'react';
 
 interface OnboardingWidgetProps {
   onOnboarded: () => void;
@@ -29,6 +30,14 @@ export default function OnboardingWidget(props: OnboardingWidgetProps) {
   const ref = useKeyboardNavigation({
     jumpTo: { ArrowLeft: 'search', ArrowRight: 'chart0' },
   });
+
+  const [graphConfig, setGraphConfig] = useModelState('graph_data_config');
+
+  // Handle downsampling with multiple charts
+  useEffect(() => {
+    setGraphConfig({ ...graphConfig, sample: true });
+    return () => void setGraphConfig({ ...graphConfig, sample: false });
+  }, []);
 
   return (
     <article className="OnboardingWidget" css={onboardingWidgetCss} ref={ref}>

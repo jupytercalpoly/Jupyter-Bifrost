@@ -173,6 +173,7 @@ function ActionBar() {
   const spec = useModelState('graph_spec')[0];
   const columnNameMap = useModelState('column_name_map')[0];
   const [dataframeName] = useModelState('df_variable_name');
+  const [dataConfig, setDataConfig] = useModelState('graph_data_config');
 
   function exportCode() {
     // convert formatted columns to original
@@ -200,6 +201,18 @@ function ActionBar() {
       <ul>
         <li>
           <button onClick={exportCode}>Export Code</button>
+        </li>
+        <li>
+          <button
+            onClick={() =>
+              setDataConfig({
+                sample: !dataConfig.sample,
+                maxRows: dataConfig.maxRows + 1,
+              })
+            }
+          >
+            Change Config
+          </button>
         </li>
       </ul>
     </nav>
