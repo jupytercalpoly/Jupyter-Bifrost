@@ -4,10 +4,8 @@ import React, { useState } from 'react';
 import VariablesTab from './Tabs/DataTab';
 import HistoryTab from './Tabs/HistoryTab';
 import MarkTab from './Tabs/MarkTab';
-import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
-import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
+import { useModelState } from '../../hooks/bifrost-model';
 import { VegaEncoding } from '../../modules/VegaEncodings';
-import produce from 'immer';
 import { CSSTransitionGroup } from 'react-transition-group';
 import theme from '../../theme';
 
@@ -170,35 +168,10 @@ const actionBarCss = css`
 `;
 
 function ActionBar() {
-  const spec = useModelState('graph_spec')[0];
-  const columnNameMap = useModelState('column_name_map')[0];
-  const [dataframeName] = useModelState('df_variable_name');
+  const dfCode = useModelState('df_code')[0];
 
   function exportCode() {
-    // convert formatted columns to original
-    const updateField = (filter: { field: string }) =>
-      (filter.field = columnNameMap[filter.field]);
-
-    const revertedSpec = produce(spec, (gs: GraphSpec) => {
-      const compounds = ['and', 'or', 'not'];
-      gs.transform.forEach(({ filter }) => {
-        const filterKeys = Object.keys(filter);
-        const compoundOp = compounds.find((c) =>
-          filterKeys.find((k) => c === k)
-        );
-        if (compoundOp) {
-          filter[compoundOp].forEach(updateField);
-        } else {
-          updateField(filter);
-        }
-      });
-    });
-
-    const translator = new VegaPandasTranslator();
-    const query = translator
-      .convertSpecToCode(revertedSpec)
-      .replace(/\$df/g, dataframeName || 'df');
-    navigator.clipboard.writeText(query);
+    navigator.clipboard.writeText(dfCode);
   }
 
   return (
