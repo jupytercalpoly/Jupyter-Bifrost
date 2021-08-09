@@ -17,6 +17,7 @@ const onboardingWidgetCss = css`
   position: relative;
   display: flex;
   padding: 20px;
+  width: 100%;
   @media screen and (max-width: 1200px) {
     flex-direction: column;
 

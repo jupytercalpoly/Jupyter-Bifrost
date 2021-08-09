@@ -80,7 +80,6 @@ export class BifrostModel extends DOMWidgetModel {
 export class BifrostView extends DOMWidgetView {
   render() {
     this.el.classList.add('bifrost-widget');
-    this.el.style.width = '100%';
 
     const component = React.createElement(BifrostReactWidget, {
       model: this.model,

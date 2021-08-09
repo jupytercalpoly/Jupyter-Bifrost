@@ -12,7 +12,7 @@ const globalStyles = (theme: any) => css`
   // Global styles for the widget
   //===========================================================
   .bifrost-widget {
-    width: 100%;
+    width: calc(100vw - 3 * var(--jp-cell-prompt-width));
     height: 100%;
     max-height: fit-content;
 
