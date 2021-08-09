@@ -174,6 +174,19 @@ export function getBounds(
     [Infinity, -Infinity]
   );
 }
+
+/**
+ * Gets all possible categories in a categorical field used in the current graph
+ */
+export function getCategories(graphData: GraphData, field: string): string[] {
+  const categorySet = graphData.reduce((categories, row) => {
+    categories.add((row[field] as any).toString());
+    return categories;
+  }, new Set<string>());
+
+  return Array.from(categorySet);
+}
+
 /** Creates a flat array of all filters in a spec.
  */
 export function getFilterList(

@@ -12,7 +12,11 @@ import {
 } from '../../../modules/VegaEncodings';
 import RangeSlider from '../../ui-widgets/RangeSlider';
 import useSpecHistory from '../../../hooks/useSpecHistory';
-import { updateSpecFilter, getBounds } from '../../../modules/VegaFilters';
+import {
+  updateSpecFilter,
+  getBounds,
+  getCategories,
+} from '../../../modules/VegaFilters';
 
 const screenCss = (theme: BifrostTheme) => css`
   position: absolute;
@@ -241,17 +245,8 @@ function CategoricalFilters(props: FilterGroupProps) {
   const [graphData] = useModelState('graph_data');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const { field } = graphSpec.encoding[props.encoding];
-  const categories = useMemo(getCategories, []);
+  const categories = useMemo(() => getCategories(graphData, field), []);
   const selectedCategories = useMemo(getSelectedCategories, [graphSpec]);
-
-  function getCategories() {
-    const categorySet = graphData.reduce((categories, row) => {
-      categories.add(row[field] as string);
-      return categories;
-    }, new Set<string>());
-
-    return Array.from(categorySet);
-  }
 
   function getSelectedCategories() {
     const type = 'oneOf';

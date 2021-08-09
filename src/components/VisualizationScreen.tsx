@@ -48,7 +48,7 @@ export default function VisualizationScreen({
   const sidebarRef = React.useRef<HTMLDivElement>(null);
   const graphRef = React.useRef<HTMLDivElement>(null);
   const [clickedAxis, setClickedAxis] = useState<VegaEncoding | ''>('');
-  const [sideBarOpen, setSideBarOpen] = useState<boolean>(false);
+  const [sideBarOpen, setSideBarOpen] = useState<boolean>(true);
 
   function updateClickedAxis(encoding: VegaEncoding | ''): void {
     setClickedAxis(encoding);
@@ -87,6 +87,8 @@ export default function VisualizationScreen({
           graphRef={graphRef}
           clickedAxis={clickedAxis}
           updateClickedAxis={updateClickedAxis}
+          sideBarOpen={sideBarOpen}
+          clickSidebarButton={onClickCollapsibleButton}
         />
       </GridArea>
       {sideBarOpen ? (

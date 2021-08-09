@@ -43,7 +43,7 @@ export default function GraphPill(props: GraphPillProps) {
     filters,
     aggregation,
     scale,
-    ...rest
+    // ...rest
   } = props;
   const color = theme.color.pill[position % theme.color.pill.length];
   const TypeIcon = type in typeIconMap ? typeIconMap[type] : FunnelIcon;
@@ -139,7 +139,7 @@ export default function GraphPill(props: GraphPillProps) {
   `;
 
   return (
-    <li css={graphPillCss} {...rest}>
+    <li css={graphPillCss}>
       <div className="pill-header">
         <TypeIcon />
         <div className="divider"></div>
@@ -163,8 +163,8 @@ export default function GraphPill(props: GraphPillProps) {
                 <FilterIcon />
               </button>
               <ul className="filter-list">
-                {filters.map((filter) => (
-                  <li>{filter}</li>
+                {filters.map((filter, i) => (
+                  <li key={`filter_${i}`}>{filter}</li>
                 ))}
               </ul>
             </Fragment>

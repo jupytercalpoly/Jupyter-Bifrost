@@ -118,7 +118,7 @@ export const vegaParamPredicatesList = [
 ] as const;
 
 export const vegaChartList = [
-  'arc',
+  // 'arc',
   'area',
   'bar',
   'boxplot',
