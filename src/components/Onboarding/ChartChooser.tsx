@@ -130,8 +130,8 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
 
     const spec = produce(suggestedGraphs[selectedIndex] as GraphSpec, (gs) => {
       // Resize the spec to fit a single graph view
-      gs.height = 405;
-      gs.width = 550;
+      gs.height = 'container'; // 405;
+      gs.width = 'container'; //550;
       gs.config = {
         mark: { tooltip: true },
       };

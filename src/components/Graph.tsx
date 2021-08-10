@@ -14,17 +14,29 @@ import theme from '../theme';
 import { VegaEncoding } from '../modules/VegaEncodings';
 import RangeSlider from './ui-widgets/RangeSlider';
 import useSpecHistory from '../hooks/useSpecHistory';
+// import { useResizeDetector } from 'react-resize-detector';
+// import produce from 'immer';
 
 const graphCss = css`
   padding-left: 34px;
   overflow-x: auto;
-  /* .vega-embed.has-actions {
+  width: 100%;
+  height: 100%;
+  resize: both;
+  /* max-width: 100%;
+  max-height: 100%; */
+
+  .vega-embed {
+    width: 100%;
+    height: 100%;
+  }
+  .vega-embed.has-actions {
     details {
       position: absolute;
-      top: -28px;
-      left: 75px;
+      top: 10px;
+      right: 10px;
     }
-  } */
+  }
 
   g.mark-text.role-axis-title {
     text.hovered {
@@ -55,6 +67,18 @@ export default function Graph(props: GraphProps) {
     activeAxis: props.clickedAxis,
   });
   const data = useModelState('graph_data')[0];
+
+  // const { width, height, ref } = useResizeDetector();
+
+  // useEffect(() => {
+  //   console.log('graph');
+  //   console.log(width, height);
+  //   const newSpec = produce(spec, (gs) => {
+  //     gs.height = height ?? 'container';
+  //     gs.width = width ?? 'container';
+  //   });
+  //   setSpec(newSpec);
+  // }, [width, height]);
 
   useEffect(() => {
     if (['x', 'y'].includes(props.clickedAxis)) {
@@ -247,6 +271,7 @@ export default function Graph(props: GraphProps) {
   }
 
   function onNewView(view: View) {
+    console.log(view);
     setTimeout(() => placeAxisWrappers(), 100);
   }
 
@@ -289,8 +314,10 @@ export default function Graph(props: GraphProps) {
   return (
     <div css={graphCss} onDoubleClick={resetBrushView}>
       <div
+        style={{ width: '100%', height: '100%' }}
         onMouseUp={updateGraphBounds}
         onMouseLeave={() => setSelectedData(['brush', {}])}
+        // ref={ref}
       >
         <BifrostVega
           spec={spec}
