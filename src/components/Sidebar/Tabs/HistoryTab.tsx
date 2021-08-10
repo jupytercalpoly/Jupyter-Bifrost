@@ -12,7 +12,7 @@ import Tree, { Node } from '@naisutech/react-tree';
 import { ChevronUp } from 'react-feather';
 import { chartIcons } from '../../../assets/icons/ChartIcons';
 import { filterIcons } from '../../../assets/icons/FilterIcons';
-import HistoryMergeIcon from '../../../assets/icons/HistoryMergeIcon';
+// import HistoryMergeIcon from '../../../assets/icons/HistoryMergeIcon';
 import { VegaEncoding } from '../../../modules/VegaEncodings';
 import { findNodes } from '../../../modules/BifrostHistory';
 // import SearchBar from '../../ui-widgets/SearchBar';
@@ -260,7 +260,7 @@ function LeaveNode(props: {
   childrenNodes: SpecHistoryTree[];
   updateChildrenNodes: (childrenNodes: SpecHistoryTree[]) => void;
 }) {
-  const [specHistory, setSpecHistory] = useModelState('spec_history');
+  const [specHistory] = useModelState('spec_history');
 
   const parentNode = useMemo(
     () => findNodes(props.data.parentId as number, specHistory)[0],
@@ -284,30 +284,8 @@ function LeaveNode(props: {
     .map((pair) => pair[0])
     .join(' ');
 
-  function handleOnClick() {
-    const newChildrenNodes = parentNode.children.slice();
-    newChildrenNodes.forEach((childNode) => {
-      childNode.parentId = null;
-    });
-
-    props.updateChildrenNodes(props.childrenNodes.concat(newChildrenNodes));
-
-    parentNode.children = [];
-
-    const idxToInsert = specHistory.indexOf(parentNode) + 1;
-    const newSpecHistory = specHistory.slice();
-    newSpecHistory.splice(idxToInsert, 0, ...newChildrenNodes);
-
-    setSpecHistory(newSpecHistory);
-  }
-
   return (
     <div className={'leaf-node-wrapper'}>
-      {idx === 0 ? (
-        <div className={'merge-history-button'} onClick={handleOnClick}>
-          <HistoryMergeIcon />
-        </div>
-      ) : null}
       <div className={classes} key={props.data.id}>
         <div className={'history-text'}>{props.data.label}</div>
         <HistoryIcons data={props.data} />
