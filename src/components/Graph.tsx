@@ -20,16 +20,7 @@ import useSpecHistory from '../hooks/useSpecHistory';
 const graphCss = css`
   padding-left: 34px;
   overflow-x: auto;
-  width: 100%;
-  height: 100%;
-  resize: both;
-  /* max-width: 100%;
-  max-height: 100%; */
 
-  .vega-embed {
-    width: 100%;
-    height: 100%;
-  }
   .vega-embed.has-actions {
     details {
       position: absolute;
@@ -252,7 +243,7 @@ export default function Graph(props: GraphProps) {
         }px;
         position: absolute;
         left: ${xAxisBoundingBox.left - parentBoundingBox.left}px;
-        bottom: ${parentBoundingBox.bottom - xAxisBoundingBox.bottom}px;
+        top: ${xAxisBoundingBox.top - parentBoundingBox.top + 40}px;
         `
       );
     }
@@ -265,13 +256,12 @@ export default function Graph(props: GraphProps) {
         }px;
         position: absolute;
         left: ${yAxisBoundingBox.left - parentBoundingBox.left}px;
-        bottom: ${parentBoundingBox.bottom - yAxisBoundingBox.bottom}px;`
+        top: ${yAxisBoundingBox.top - parentBoundingBox.top + 40}px;`
       );
     }
   }
 
   function onNewView(view: View) {
-    console.log(view);
     setTimeout(() => placeAxisWrappers(), 100);
   }
 
@@ -314,7 +304,7 @@ export default function Graph(props: GraphProps) {
   return (
     <div css={graphCss} onDoubleClick={resetBrushView}>
       <div
-        style={{ width: '100%', height: '100%' }}
+        // style={{ width: '100%', height: '100%' }}
         onMouseUp={updateGraphBounds}
         onMouseLeave={() => setSelectedData(['brush', {}])}
         // ref={ref}
