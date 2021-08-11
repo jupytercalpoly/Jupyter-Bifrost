@@ -254,7 +254,6 @@ export default function DataTab({
   }
 
   function updateFieldType(field: string, oldType: string) {
-    console.log(oldType, columnTypes);
     const newType = oldType === 'nominal' ? 'quantitative' : 'nominal';
     setColumnTypes({
       ...columnTypes,

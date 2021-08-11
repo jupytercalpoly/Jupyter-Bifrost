@@ -109,7 +109,7 @@ export default function GraphPill(props: GraphPillProps) {
 
       padding: 8px;
 
-      button.wrapper {
+      button.icon {
         background-color: transparent;
         transition: background-color 0.3s;
         height: 1em;
@@ -151,7 +151,7 @@ export default function GraphPill(props: GraphPillProps) {
         <span onClick={props.onFieldSelected} className={field ? '' : 'tag'}>
           <b>{field}</b>
         </span>
-        <button className="wrapper" onClick={onClose}>
+        <button className="wrapper icon" onClick={onClose}>
           <X size={15} />
         </button>
       </div>
@@ -162,7 +162,7 @@ export default function GraphPill(props: GraphPillProps) {
         <div className="modifiers">
           {!!filters.length && (
             <Fragment>
-              <button className="wrapper" onClick={props.onFilterSelected}>
+              <button className="wrapper icon" onClick={props.onFilterSelected}>
                 <FilterIcon />
               </button>
               <ul className="filter-list">
@@ -175,7 +175,7 @@ export default function GraphPill(props: GraphPillProps) {
 
           {aggregation && (
             <Fragment>
-              <button className="wrapper" onClick={props.onFilterSelected}>
+              <button className="wrapper icon" onClick={props.onFilterSelected}>
                 <AggregateIcon />
               </button>
               <div style={{ padding: '0 5px' }}>{aggregation}</div>
@@ -184,7 +184,10 @@ export default function GraphPill(props: GraphPillProps) {
 
           {scale && (
             <Fragment>
-              <button className="wrapper" onClick={props.onAggregationSelected}>
+              <button
+                className="wrapper icon"
+                onClick={props.onAggregationSelected}
+              >
                 <Maximize2 size={12} />
               </button>
               <div style={{ padding: '0 5px' }}>{scale}</div>
