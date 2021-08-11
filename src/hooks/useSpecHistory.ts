@@ -21,6 +21,7 @@ export default function useSpecHistory(
   const setDfCode = useModelState('df_code')[1];
   const [columnMap] = useModelState('column_name_map');
   const [outputVar] = useModelState('output_variable');
+  const [inputVar] = useModelState('df_variable_name');
   const [originalSpec, setOriginalSpec] = useState(graphSpec);
   const saveRef = useRef<(spec?: GraphSpec) => void>(save);
 
@@ -50,7 +51,7 @@ export default function useSpecHistory(
     setOpHistory(newHist);
     setIndex(newHist.length - 1);
     setOriginalSpec(spec);
-    setDfCode(updateDfCode(outputVar, spec, columnMap));
+    setDfCode(updateDfCode(spec, inputVar, outputVar, columnMap));
   }
 
   saveRef.current = save;
@@ -58,15 +59,10 @@ export default function useSpecHistory(
   return save;
 }
 
-/**
- *
- * @param dataframeName Name of output dataframe ex. foo in `foo=df.bifrost.plot()`
- * @param spec Updated graph spec.
- * @param columnNameMap Mapping from Draco-compliant column names to originals.
- */
 function updateDfCode(
-  dataframeName: string,
   spec: GraphSpec,
+  inputDfName: string,
+  outputDfName: string,
   columnNameMap: Record<string, string>
 ): string {
   const updateField = (filter: { field: string }) =>
@@ -86,7 +82,5 @@ function updateDfCode(
   });
 
   const translator = new VegaPandasTranslator();
-  return translator
-    .convertSpecToCode(revertedSpec)
-    .replace(/\$df/g, dataframeName || 'df');
+  return translator.convertSpecToCode(revertedSpec, inputDfName, outputDfName);
 }
