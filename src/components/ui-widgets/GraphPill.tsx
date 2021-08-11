@@ -4,7 +4,7 @@ import { X, Sliders, CheckSquare } from 'react-feather';
 import theme from '../../theme';
 import NumericalIcon from '../../assets/NumericalIcon';
 import CategoryIcon from '../../assets/CategoryIcon';
-import FunnelIcon from '../../assets/FilterIcon';
+import FunnelIcon from '../../assets/FunnelIcon';
 import AggregateIcon from '../../assets/AggregateIcon';
 import SliderIcon from '../../assets/icons/SliderIcon';
 import ScaleIcon from '../../assets/icons/ScaleIcon';

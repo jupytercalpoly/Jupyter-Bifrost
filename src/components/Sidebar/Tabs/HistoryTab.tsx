@@ -1,7 +1,7 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 // import produce from 'immer';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   GraphSpec,
   SpecHistoryTree,
@@ -10,7 +10,7 @@ import {
 import theme from '../../../theme';
 import Tree, { Node } from '@naisutech/react-tree';
 import { ChevronUp } from 'react-feather';
-import { chartIcons } from '../../../assets/icons/ChartIcons';
+import { chartIcons } from '../../../assets/icons/chartIcons/ChartIcons';
 import { filterIcons } from '../../../assets/icons/FilterIcons';
 // import HistoryMergeIcon from '../../../assets/icons/HistoryMergeIcon';
 import { VegaEncoding } from '../../../modules/VegaEncodings';
@@ -95,16 +95,11 @@ const historyCss = css`
 export default function HistoryTab() {
   const [spec, setSpec] = useModelState('graph_spec');
   const [specHistory] = useModelState('spec_history');
-  // each node is HistorySpecTree instance
   const [historyNode, setHistoryNode] = useModelState('history_node');
+  const [selectedId, setSelectedId] = useState<string>('');
   const treeHist = specHistory.map((change, i) =>
     generateTreeSpec(change, i + 1, 1)
   );
-  // const [childrenNodes, setChildrenNodes] = useModelState('children_nodes');
-
-  // function updateChildrenNodes(childrenSpecs: SpecHistoryTree[]) {
-  //   setChildrenNodes(childrenSpecs);
-  // }
 
   // Select the last valid spec if current spec has no encoding
   useEffect(() => {
@@ -127,7 +122,13 @@ export default function HistoryTab() {
     const spec = selectedNode?.spec;
     spec && setSpec(spec);
     selectedNode && setHistoryNode(selectedNode);
+    setSelectedId(selectedId);
   }
+
+  useEffect(() => {
+    const previouslySelectedNode = findNodes(parseInt(selectedId), specHistory);
+  }, [specHistory]);
+
   return (
     <section className="HistoryTab" css={historyCss}>
       <Tree
@@ -261,39 +262,34 @@ function LeaveNode(props: {
 function HistoryIcons({ data }: { data: customNode }) {
   const mark = data.spec.mark;
   const [specHistory] = useModelState('spec_history');
+  const [changes, setChanges] = useState<Record<string, boolean>>({
+    aggregateChanged: false,
+    scaleChanged: false,
+    rangeChanged: false,
+    categoryChanged: false,
+  });
 
-  const hasAggregate =
-    Object.values(data.spec.encoding).filter((encodingInfo) => {
-      return 'aggregate' in encodingInfo;
-    }).length !== 0;
-
-  const hasScale =
-    Object.values(data.spec.encoding).filter((encodingInfo) => {
-      return 'scale' in encodingInfo && !('zero' in encodingInfo['scale']);
-    }).length !== 0;
-
-  let changes = {
-    aggregateChanged: hasAggregate,
-    scaleChanged: hasScale,
-    rangeChanged: data.spec.transform.length !== 0,
-    categoryChanged: data.spec.transform.length !== 0,
-  };
-
-  if (data.parentId) {
-    // Closest sibling from the same parent
-    const parentNode = findNodes(data.parentId, specHistory)[0];
-    const idx = parentNode.children.findIndex((child) => child.id === data.id);
-    const closestSibling = parentNode.children[idx - 1];
-    changes = closestSibling
-      ? checkChanges(closestSibling.spec, data.spec)
-      : checkChanges(parentNode.spec, data.spec);
-  } else {
-    // closest sibling from the root
-    const idx = specHistory.findIndex((change) => change.id === data.id);
-    if (idx !== 0) {
-      changes = checkChanges(specHistory[idx - 1].spec, data.spec);
+  useEffect(() => {
+    if (data.parentId) {
+      // Closest sibling from the same parent
+      const parentNode = findNodes(data.parentId, specHistory)[0];
+      const idx = parentNode.children.findIndex(
+        (child) => child.id === data.id
+      );
+      const closestSibling = parentNode.children[idx - 1];
+      setChanges(
+        closestSibling
+          ? checkChanges(closestSibling.spec, data.spec)
+          : checkChanges(parentNode.spec, data.spec)
+      );
+    } else {
+      // closest sibling from the root
+      const idx = specHistory.findIndex((change) => change.id === data.id);
+      if (idx !== 0) {
+        setChanges(checkChanges(specHistory[idx - 1].spec, data.spec));
+      }
     }
-  }
+  }, []);
 
   return (
     <div className={'history-icons-wrapper'}>
@@ -329,9 +325,6 @@ function checkChanges(
   rangeChanged: boolean;
   categoryChanged: boolean;
 } {
-  console.log(prevSpec);
-  console.log(currSpec);
-
   const aggregateChanged = Object.keys(prevSpec.encoding)
     .map((channel) => {
       if (channel in prevSpec.encoding && channel in currSpec.encoding) {

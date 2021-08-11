@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { chartIcons } from '../../assets/icons/ChartIcons';
+import { chartIcons } from '../../assets/icons/chartIcons/ChartIcons';
 import { BifrostTheme } from '../../theme';
 import theme from '../../theme';
 
