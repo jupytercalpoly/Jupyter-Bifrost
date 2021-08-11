@@ -1,7 +1,7 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 // import produce from 'immer';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import {
   GraphSpec,
   SpecHistoryTree,
@@ -53,28 +53,12 @@ const historyCss = css`
       border: 3px solid ${theme.color.primary.dark};
       border-left: 10px solid ${theme.color.primary.dark};
     }
-    &.wasChild {
-      border-left: 10px solid ${theme.color.secondary.standard};
-      &:hover {
-        border: 3px solid ${theme.color.secondary.standard};
-        border-left: 10px solid ${theme.color.secondary.standard};
-        background-color: whitesmoke;
-      }
-      &.active {
-        font-weight: 700;
-        border: 3px solid ${theme.color.secondary.dark};
-        border-left: 10px solid ${theme.color.secondary.dark};
-      }
-    }
 
     &.leaf {
-      margin-left: 40px;
+      margin-left: 8px;
       border-left: 10px solid ${theme.color.secondary.standard};
       flex-grow: 1;
 
-      &.hasMergeButton {
-        margin-left: 8px;
-      }
       &:hover {
         border: 3px solid ${theme.color.secondary.standard};
         border-left: 10px solid ${theme.color.secondary.standard};
@@ -116,11 +100,11 @@ export default function HistoryTab() {
   const treeHist = specHistory.map((change, i) =>
     generateTreeSpec(change, i + 1, 1)
   );
-  const [childrenNodes, setChildrenNodes] = useModelState('children_nodes');
+  // const [childrenNodes, setChildrenNodes] = useModelState('children_nodes');
 
-  function updateChildrenNodes(childrenSpecs: SpecHistoryTree[]) {
-    setChildrenNodes(childrenSpecs);
-  }
+  // function updateChildrenNodes(childrenSpecs: SpecHistoryTree[]) {
+  //   setChildrenNodes(childrenSpecs);
+  // }
 
   // Select the last valid spec if current spec has no encoding
   useEffect(() => {
@@ -156,7 +140,7 @@ export default function HistoryTab() {
             ...props,
             data: props.data as unknown as customNode,
             currentNodeId: historyNode.id,
-            childrenNodes: childrenNodes,
+            // childrenNodes: childrenNodes,
           })
         }
         LeafRenderer={(props) =>
@@ -164,8 +148,8 @@ export default function HistoryTab() {
             ...props,
             data: props.data as unknown as customNode,
             currentNodeId: historyNode.id,
-            childrenNodes: childrenNodes,
-            updateChildrenNodes: updateChildrenNodes,
+            // childrenNodes: childrenNodes,
+            // updateChildrenNodes: updateChildrenNodes,
           })
         }
       />
@@ -217,15 +201,9 @@ function TreeNode(props: {
   selected: boolean;
   level: number;
   currentNodeId: number;
-  childrenNodes: SpecHistoryTree[];
 }) {
-  const wasChild =
-    Array.from(props.childrenNodes).filter(
-      (childNode) => childNode.id === props.data.id
-    ).length !== 0;
   const classes = [
     ['history-el', true],
-    ['wasChild', wasChild],
     [
       'active',
       props.selected ? props.selected : props.currentNodeId === props.data.id,
@@ -257,20 +235,7 @@ function LeaveNode(props: {
   selected: boolean;
   level: number;
   currentNodeId: number;
-  childrenNodes: SpecHistoryTree[];
-  updateChildrenNodes: (childrenNodes: SpecHistoryTree[]) => void;
 }) {
-  const [specHistory] = useModelState('spec_history');
-
-  const parentNode = useMemo(
-    () => findNodes(props.data.parentId as number, specHistory)[0],
-    [props.data]
-  );
-
-  const idx = parentNode.children.findIndex(
-    (child) => child.id === props.data.id
-  );
-
   const classes = [
     ['history-el', true],
     ['leaf', true],
@@ -278,7 +243,6 @@ function LeaveNode(props: {
       'active',
       props.selected ? props.selected : props.currentNodeId === props.data.id,
     ],
-    ['hasMergeButton', idx === 0],
   ]
     .filter((pair) => pair[1])
     .map((pair) => pair[0])
@@ -303,17 +267,28 @@ function HistoryIcons({ data }: { data: customNode }) {
       return 'aggregate' in encodingInfo;
     }).length !== 0;
 
+  const hasScale =
+    Object.values(data.spec.encoding).filter((encodingInfo) => {
+      return 'scale' in encodingInfo && !('zero' in encodingInfo['scale']);
+    }).length !== 0;
+
   let changes = {
     aggregateChanged: hasAggregate,
-    filterChanged: data.spec.transform.length !== 0,
+    scaleChanged: hasScale,
+    rangeChanged: data.spec.transform.length !== 0,
+    categoryChanged: data.spec.transform.length !== 0,
   };
 
   if (data.parentId) {
-    // from parent
+    // Closest sibling from the same parent
     const parentNode = findNodes(data.parentId, specHistory)[0];
-    changes = checkChanges(parentNode.spec, data.spec);
+    const idx = parentNode.children.findIndex((child) => child.id === data.id);
+    const closestSibling = parentNode.children[idx - 1];
+    changes = closestSibling
+      ? checkChanges(closestSibling.spec, data.spec)
+      : checkChanges(parentNode.spec, data.spec);
   } else {
-    // closest sibling
+    // closest sibling from the root
     const idx = specHistory.findIndex((change) => change.id === data.id);
     if (idx !== 0) {
       changes = checkChanges(specHistory[idx - 1].spec, data.spec);
@@ -328,18 +303,35 @@ function HistoryIcons({ data }: { data: customNode }) {
           <Icon style={{ margin: '0 5px' }} />
         ))}
       {filterIcons.map(({ icon: Icon, filter }) => {
-        if (filter === 'range' && changes['filterChanged']) {
+        if (filter === 'range' && changes['rangeChanged']) {
           return <Icon style={{ margin: '0 5px' }} />;
         }
         if (filter === 'aggregate' && changes['aggregateChanged']) {
           return <Icon style={{ margin: '0 5px' }} />;
+        }
+        if (filter === 'scale' && changes['scaleChanged']) {
+          return <Icon style={{ margin: '0 5px' }} />;
+        }
+        if (filter === 'category' && changes['categoryChanged']) {
+          return <Icon style={{ margin: '0 5px' }} size={12} />;
         }
       })}
     </div>
   );
 }
 
-function checkChanges(prevSpec: GraphSpec, currSpec: GraphSpec) {
+function checkChanges(
+  prevSpec: GraphSpec,
+  currSpec: GraphSpec
+): {
+  aggregateChanged: boolean;
+  scaleChanged: boolean;
+  rangeChanged: boolean;
+  categoryChanged: boolean;
+} {
+  console.log(prevSpec);
+  console.log(currSpec);
+
   const aggregateChanged = Object.keys(prevSpec.encoding)
     .map((channel) => {
       if (channel in prevSpec.encoding && channel in currSpec.encoding) {
@@ -352,7 +344,43 @@ function checkChanges(prevSpec: GraphSpec, currSpec: GraphSpec) {
     })
     .filter(Boolean);
 
-  const filterChanged = currSpec.transform !== prevSpec.transform;
+  const scaleChanged = Object.keys(prevSpec.encoding)
+    .map((channel) => {
+      if (channel in prevSpec.encoding && channel in currSpec.encoding) {
+        return (
+          prevSpec.encoding[channel as VegaEncoding].scale?.['type'] !==
+          currSpec.encoding[channel as VegaEncoding].scale?.['type']
+        );
+      }
+      return false;
+    })
+    .filter(Boolean);
 
-  return { aggregateChanged: aggregateChanged.length !== 0, filterChanged };
+  let rangeChanged = false;
+  let categoryChanged = false;
+
+  if (currSpec.transform.length !== prevSpec.transform.length) {
+    const currFilterSet = new Set(currSpec.transform);
+    const prevFilterSet = new Set(prevSpec.transform);
+
+    const difference = new Set(
+      [...currFilterSet].filter((x) => !prevFilterSet.has(x))
+    );
+
+    difference.forEach((change) => {
+      if ('oneOf' in change.filter) {
+        categoryChanged = true;
+      }
+      if ('or' in change.filter) {
+        rangeChanged = true;
+      }
+    });
+  }
+
+  return {
+    aggregateChanged: aggregateChanged.length !== 0,
+    scaleChanged: scaleChanged.length !== 0,
+    rangeChanged,
+    categoryChanged,
+  };
 }

@@ -199,6 +199,7 @@ export default function DataTab({
     });
     setPillsInfo(newPills);
     setGraphSpec(newSpec);
+    saveSpecToHistory(newSpec);
 
     if (encoding === activeEncoding) {
       updateClickedAxis('');

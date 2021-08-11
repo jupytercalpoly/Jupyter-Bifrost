@@ -1,12 +1,13 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { X, Sliders, Maximize2, CheckSquare } from 'react-feather';
+import { X, Sliders, CheckSquare } from 'react-feather';
 import theme from '../../theme';
 import NumericalIcon from '../../assets/NumericalIcon';
 import CategoryIcon from '../../assets/CategoryIcon';
 import FunnelIcon from '../../assets/FilterIcon';
 import AggregateIcon from '../../assets/AggregateIcon';
 import SliderIcon from '../../assets/icons/SliderIcon';
+import ScaleIcon from '../../assets/icons/ScaleIcon';
 import { Fragment } from 'react';
 
 const typeIconMap: Record<string, typeof NumericalIcon> = {
@@ -182,7 +183,7 @@ export default function GraphPill(props: GraphPillProps) {
           {scale && (
             <Fragment>
               <button className="wrapper" onClick={props.onAggregationSelected}>
-                <Maximize2 size={12} />
+                <ScaleIcon />
               </button>
               <div style={{ padding: '0 5px' }}>{scale}</div>
             </Fragment>
