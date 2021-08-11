@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function FilterIcon({
+export default function FunnelIcon({
   color = 'rgba(0,0,0,0.4)',
   width = 15,
   height = 14,

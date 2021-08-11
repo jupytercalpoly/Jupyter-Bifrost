@@ -1,5 +1,5 @@
 import React from 'react';
-import { BifrostIconProps } from './Icon';
+import { BifrostIconProps } from '../Icon';
 
 export default function TickChartIcon(props: BifrostIconProps) {
   const color = props.color || '#6E7776';
