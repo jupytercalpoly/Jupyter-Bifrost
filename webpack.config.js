@@ -28,7 +28,7 @@ module.exports = [
     entry: './src/extension.ts',
     output: {
       filename: 'index.js',
-      path: path.resolve(__dirname, 'bifrost_jupyter_extension', 'nbextension'),
+      path: path.resolve(__dirname, 'jupyter_bifrost', 'nbextension'),
       libraryTarget: 'amd',
       publicPath: '',
     },
@@ -41,7 +41,7 @@ module.exports = [
   },
 
   /**
-   * Embeddable bifrost-jupyter-extension bundle
+   * Embeddable jupyter_bifrost bundle
    *
    * This bundle is almost identical to the notebook extension bundle. The only
    * difference is in the configuration of the webpack public path for the
@@ -53,19 +53,20 @@ module.exports = [
   {
     entry: './src/index.ts',
     output: {
-      filename: 'index.js',
-      path: path.resolve(__dirname, 'dist'),
-      libraryTarget: 'amd',
-      library: "bifrost-jupyter-extension",
-      publicPath: 'https://unpkg.com/bifrost-jupyter-extension@' + version + '/dist/'
+        filename: 'index.js',
+        path: path.resolve(__dirname, 'dist'),
+        libraryTarget: 'amd',
+        library: "jupyter_bifrost",
+        publicPath: 'https://unpkg.com/jupyter_bifrost@' + version + '/dist/'
     },
     devtool: 'source-map',
     module: {
-      rules: rules
+        rules: rules
     },
     externals,
     resolve,
   },
+
 
   /**
    * Documentation widget bundle
@@ -77,7 +78,7 @@ module.exports = [
     output: {
       filename: 'embed-bundle.js',
       path: path.resolve(__dirname, 'docs', 'source', '_static'),
-      library: "bifrost-jupyter-extension",
+      library: "jupyter_bifrost",
       libraryTarget: 'amd'
     },
     module: {
@@ -89,3 +90,4 @@ module.exports = [
   }
 
 ];
+

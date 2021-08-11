@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = bifrost_jupyter_extension
+SPHINXPROJ    = jupyter_bifrost
 SOURCEDIR     = source
 BUILDDIR      = build
 

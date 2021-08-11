@@ -1,5 +1,5 @@
 
-name: bifrost_jupyter_extension_docs
+name: jupyter_bifrost_docs
 channels:
   - conda-forge
 dependencies:

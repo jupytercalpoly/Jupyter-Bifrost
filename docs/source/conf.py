@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# bifrost_jupyter_extension documentation build configuration file
+# jupyter_bifrost documentation build configuration file
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -58,9 +58,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'bifrost_jupyter_extension'
-copyright = '2021, waidhoferj'
-author = 'waidhoferj'
+project = 'jupyter_bifrost'
+copyright = '2021, John Waidhofer(waidhoferj), Jay Ahn(jahn96)'
+author = 'John Waidhofer(waidhoferj), Jay Ahn(jahn96)'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -73,7 +73,7 @@ author = 'waidhoferj'
 import os
 here = os.path.dirname(__file__)
 repo = os.path.join(here, '..', '..')
-_version_py = os.path.join(repo, 'bifrost_jupyter_extension', '_version.py')
+_version_py = os.path.join(repo, 'jupyter_bifrost', '_version.py')
 version_ns = {}
 with open(_version_py) as f:
     exec(f.read(), version_ns)
@@ -120,7 +120,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'bifrost_jupyter_extensiondoc'
+htmlhelp_basename = 'jupyter_bifrostdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -147,8 +147,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'bifrost_jupyter_extension.tex', 'bifrost_jupyter_extension Documentation',
-     'waidhoferj', 'manual'),
+    (master_doc, 'jupyter_bifrost.tex', 'jupyter_bifrost Documentation',
+     'John Waidhofer(waidhoferj), Jay Ahn(jahn96)', 'manual'),
 ]
 
 
@@ -158,8 +158,8 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc,
-    'bifrost_jupyter_extension',
-    'bifrost_jupyter_extension Documentation',
+    'jupyter_bifrost',
+    'jupyter_bifrost Documentation',
      [author], 1)
 ]
 
@@ -171,11 +171,11 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc,
-     'bifrost_jupyter_extension',
-     'bifrost_jupyter_extension Documentation',
+     'jupyter_bifrost',
+     'jupyter_bifrost Documentation',
      author,
-     'bifrost_jupyter_extension',
-     'A Jupyter Widget for data visualization',
+     'jupyter_bifrost',
+     'A Jupyter Widget for Interactive Data Visualization',
      'Miscellaneous'),
 ]
 

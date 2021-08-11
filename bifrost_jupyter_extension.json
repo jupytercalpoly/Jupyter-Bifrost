@@ -1,5 +1,0 @@
-{
-  "load_extensions": {
-    "bifrost_jupyter_extension/extension": true
-  }
-}

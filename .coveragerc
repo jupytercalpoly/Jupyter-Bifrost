@@ -1,2 +1,2 @@
 [run]
-omit = bifrost_jupyter_extension/tests/*
+omit = jupyter_bifrost/tests/*

@@ -1,22 +1,22 @@
 
-bifrost_jupyter_extension
+jupyter_bifrost
 =====================================
 
 Version: |release|
 
-A Jupyter Widget for data visualization
+A Jupyter Widget for Interactive Data Visualization
 
 
 Quickstart
 ----------
 
-To get started with bifrost_jupyter_extension, install with pip::
+To get started with jupyter_bifrost, install with pip::
 
-    pip install bifrost_jupyter_extension
+    pip install jupyter_bifrost
 
 or with conda::
 
-    conda install bifrost_jupyter_extension
+    conda install jupyter_bifrost
 
 
 Contents
