@@ -53,7 +53,7 @@ class BifrostWidget(DOMWidget):
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
-    graph_data_config = Dict({"maxRows": 1, "sample": False}).tag(sync=True)
+    graph_data_config = Dict({"maxRows": 100, "sample": False}).tag(sync=True)
 
     def __init__(self, df:pd.DataFrame, column_name_map: dict, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)
@@ -97,7 +97,7 @@ class BifrostWidget(DOMWidget):
     @observe("graph_data_config")
     def update_dataset(self, changes):
         config = changes["new"]
-        if changes["old"]["sample"] == config["sample"]:
+        if changes["old"]["sample"] == config["sample"] or config["maxRows"] >= len(self.df_history[-1]):
             return
         if config["sample"]:
             self.set_trait("graph_data", self.get_data(self.df_history[-1], config["maxRows"]))

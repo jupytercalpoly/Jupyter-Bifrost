@@ -36,7 +36,9 @@ export default function OnboardingWidget(props: OnboardingWidgetProps) {
   // Handle downsampling with multiple charts
   useEffect(() => {
     setGraphConfig({ ...graphConfig, sample: true });
-    return () => void setGraphConfig({ ...graphConfig, sample: false });
+    return () => {
+      setGraphConfig({ ...graphConfig, sample: false });
+    };
   }, []);
 
   return (
