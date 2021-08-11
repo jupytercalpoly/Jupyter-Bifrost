@@ -76,6 +76,8 @@ export default function DataTab({
 }) {
   const columns = useModelState('df_columns')[0];
   const [columnTypes, setColumnTypes] = useModelState('column_types');
+  const graphData = useModelState('graph_data')[0];
+
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(
     columns.map((choice, index) => ({ choice, index }))
@@ -254,6 +256,9 @@ export default function DataTab({
   }
 
   function updateFieldType(field: string, oldType: string) {
+    if (typeof graphData[0][field] === 'string') {
+      return;
+    }
     const newType = oldType === 'nominal' ? 'quantitative' : 'nominal';
     setColumnTypes({
       ...columnTypes,
