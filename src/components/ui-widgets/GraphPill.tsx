@@ -43,7 +43,11 @@ export default function GraphPill(props: GraphPillProps) {
     filters,
     aggregation,
     scale,
-    // ...rest
+    onAggregationSelected,
+    onFilterSelected,
+    onEncodingSelected,
+    onFieldSelected,
+    ...rest
   } = props;
   const color = theme.color.pill[position % theme.color.pill.length];
   const TypeIcon = type in typeIconMap ? typeIconMap[type] : FunnelIcon;
@@ -139,13 +143,13 @@ export default function GraphPill(props: GraphPillProps) {
   `;
 
   return (
-    <li css={graphPillCss}>
+    <li css={graphPillCss} {...rest}>
       <div className="pill-header">
         <TypeIcon />
         <div className="divider"></div>
-        <span onClick={props.onEncodingSelected}>{encoding}</span>
+        <span onClick={onEncodingSelected}>{encoding}</span>
         <div className="divider"></div>
-        <span onClick={props.onFieldSelected} className={field ? '' : 'tag'}>
+        <span onClick={onFieldSelected} className={field ? '' : 'tag'}>
           <b>{field}</b>
         </span>
         <button className="wrapper" onClick={onClose}>
@@ -153,18 +157,18 @@ export default function GraphPill(props: GraphPillProps) {
         </button>
       </div>
       <div className="options">
-        <button className="slider-button" onClick={props.onFilterSelected}>
+        <button className="slider-button" onClick={onFilterSelected}>
           <Sliders size={15} color="white" />
         </button>
         <div className="modifiers">
           {!!filters.length && (
             <Fragment>
-              <button className="wrapper" onClick={props.onFilterSelected}>
+              <button className="wrapper" onClick={onFilterSelected}>
                 <FilterIcon />
               </button>
               <ul className="filter-list">
                 {filters.map((filter, i) => (
-                  <li key={`filter_${i}`}>{filter}</li>
+                  <li key={i}>{filter}</li>
                 ))}
               </ul>
             </Fragment>

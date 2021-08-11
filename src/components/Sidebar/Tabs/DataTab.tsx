@@ -103,7 +103,7 @@ export default function DataTab({
   useEffect(() => {
     const newSpec = initializeDefaultFilter(graphSpec, data, columnTypes);
     setGraphSpec(newSpec);
-    setPillsInfo(extractPillProps(graphSpec));
+    setPillsInfo(extractPillProps(newSpec));
   }, []);
 
   // update pill filters and aggregations on spec change
@@ -115,28 +115,23 @@ export default function DataTab({
     }
     const dtype = columnTypes[field];
 
-    let newSpec =
-      // check if the filter is being used in another pill
-      hasDuplicateField(graphSpec, field)
-        ? (Object.assign(graphSpec) as GraphSpec)
-        : // Delete all filters on the old field.
-          deleteSpecFilter(
-            graphSpec,
-            field,
-            columnTypes[field] === 'quantitative' ? 'range' : 'oneOf',
-            { deleteCompound: true }
-          );
-
     // change the encoded field.
-    newSpec = produce(newSpec, (gs) => {
+    let newSpec = produce(graphSpec, (gs) => {
       (gs.encoding[activeEncoding] as EncodingInfo) = {
         field: field,
         type: dtype,
       };
     });
 
-    // add default filters
-    newSpec = addDefaultFilter(newSpec, data, columnTypes, field);
+    console.log(hasDuplicateField(newSpec, field));
+
+    newSpec =
+      // check if the filter is being used in another pill
+      hasDuplicateField(newSpec, field)
+        ? // keep the same filter
+          newSpec
+        : // add default filter
+          addDefaultFilter(newSpec, data, columnTypes, field);
 
     const newPillsInfo = produce(pillsInfo, (info) => {
       const pill = info.find((pill) => pill.encoding === activeEncoding);
@@ -302,7 +297,7 @@ export default function DataTab({
         );
       }}
       position={i}
-      key={`graph-pill-${i}`}
+      key={i}
       {...props}
     />
   ));
@@ -384,11 +379,11 @@ function initializeDefaultFilter(
   spec: GraphSpec,
   data: GraphData,
   columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>
-) {
+): GraphSpec {
   const filters = getFilterList(spec);
   let newSpec = Object.assign({}, spec);
   if (!filters.length) {
-    Object.values(spec.encoding).map((info) => {
+    Object.values(newSpec.encoding).map((info) => {
       const field = info.field;
       if (['ordinal', 'nominal'].includes(columnTypes[field])) {
         newSpec = updateSpecFilter(
@@ -399,7 +394,9 @@ function initializeDefaultFilter(
         );
       } else {
         const range = getBounds(data, field);
-        newSpec = updateSpecFilter(newSpec, field, 'range', range);
+        if (isFinite(range[0])) {
+          newSpec = updateSpecFilter(newSpec, field, 'range', range);
+        }
       }
     });
   }
