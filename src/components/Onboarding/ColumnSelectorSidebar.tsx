@@ -245,7 +245,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
 
   return (
     <aside className="ColumnSelectorSidebar" css={columnSelectorCss}>
-      <h2>Select Columns</h2>
+      <h2>Columns</h2>
       <h3 className="subtitle">Select up to 3 columns</h3>
       <ul className="column-tags">
         {Array.from(selectedColumns).map((column: string, i) => {

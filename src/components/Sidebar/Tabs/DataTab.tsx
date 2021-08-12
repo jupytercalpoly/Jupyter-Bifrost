@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { PlusCircle } from 'react-feather';
 import {
   EncodingInfo,
+  GraphData,
   GraphSpec,
   useModelState,
 } from '../../../hooks/bifrost-model';
@@ -19,10 +20,14 @@ import SearchBar from '../../ui-widgets/SearchBar';
 import FilterScreen from './FilterScreen';
 import {
   deleteSpecFilter,
+  getBounds,
+  getCategories,
   getFilterList,
   stringifyFilter,
+  updateSpecFilter,
 } from '../../../modules/VegaFilters';
 import GraphPill from '../../ui-widgets/GraphPill';
+import { useRef } from 'react';
 
 const variableTabCss = css`
   position: relative;
@@ -81,9 +86,11 @@ export default function DataTab({
     columns.map((choice, index) => ({ choice, index }))
   );
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+  const [data] = useModelState('graph_data');
   const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>('');
   const [showEncodings, setShowEncodings] = useState(false);
   const [filterEncoding, setFilterEncoding] = useState<VegaEncoding | ''>('');
+  const isInitialMount = useRef<boolean>(true);
 
   useEffect(() => {
     setActiveEncoding(clickedAxis);
@@ -94,7 +101,9 @@ export default function DataTab({
 
   // Set initial pills based off of spec.
   useEffect(() => {
-    setPillsInfo(extractPillProps(graphSpec));
+    const newSpec = initializeDefaultFilter(graphSpec, data, columnTypes);
+    setGraphSpec(newSpec);
+    setPillsInfo(extractPillProps(newSpec));
   }, []);
 
   // update pill filters and aggregations on spec change
@@ -106,21 +115,23 @@ export default function DataTab({
     }
     const dtype = columnTypes[field];
 
-    // Delete all filters on the old field.
-    let newSpec = deleteSpecFilter(
-      graphSpec,
-      field,
-      columnTypes[field] === 'quantitative' ? 'range' : 'oneOf',
-      { deleteCompound: true }
-    );
-
     // change the encoded field.
-    newSpec = produce(newSpec, (gs) => {
+    let newSpec = produce(graphSpec, (gs) => {
       (gs.encoding[activeEncoding] as EncodingInfo) = {
         field: field,
         type: dtype,
       };
     });
+
+    console.log(hasDuplicateField(newSpec, field));
+
+    newSpec =
+      // check if the filter is being used in another pill
+      hasDuplicateField(newSpec, field)
+        ? // keep the same filter
+          newSpec
+        : // add default filter
+          addDefaultFilter(newSpec, data, columnTypes, field);
 
     const newPillsInfo = produce(pillsInfo, (info) => {
       const pill = info.find((pill) => pill.encoding === activeEncoding);
@@ -130,6 +141,7 @@ export default function DataTab({
       pill.field = field;
       pill.type = dtype;
     });
+
     setGraphSpec(newSpec);
 
     if (clickedAxis) {
@@ -141,6 +153,10 @@ export default function DataTab({
   };
 
   function updatePillFilters() {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     setPillsInfo((pillsInfo) =>
       produce(pillsInfo, (info) => {
         info.forEach((config) => {
@@ -165,17 +181,28 @@ export default function DataTab({
     );
   }
 
+  function hasDuplicateField(graphSpec: GraphSpec, field: string): boolean {
+    const countFieldUsage = Object.values(graphSpec.encoding).filter(
+      (encodingInfo: EncodingInfo) => encodingInfo.field === field
+    ).length;
+    return countFieldUsage !== 1;
+  }
+
   function deletePill(pillState: PillState) {
     const encoding = pillState.encoding as VegaEncoding;
     const isFilter = pillState.type === 'filter';
 
-    // Remove all filters associated with the pill
-    let newSpec = deleteSpecFilter(
-      graphSpec,
-      pillState.field,
-      columnTypes[pillState.field] === 'quantitative' ? 'range' : 'oneOf',
-      { deleteCompound: true }
-    );
+    let newSpec =
+      // check if the filter is being used in another pill
+      hasDuplicateField(graphSpec, pillState.field)
+        ? (Object.assign(graphSpec) as GraphSpec)
+        : // Remove all filters associated with the pill
+          deleteSpecFilter(
+            graphSpec,
+            pillState.field,
+            columnTypes[pillState.field] === 'quantitative' ? 'range' : 'oneOf',
+            { deleteCompound: true }
+          );
 
     // Remove encodings if the pill has them
     if (!isFilter) {
@@ -308,6 +335,7 @@ export default function DataTab({
 
   encodingList.push(
     <button
+      key={'add-new-pill'}
       className="wrapper"
       style={{ margin: '0 10px' }}
       onClick={() => setShowEncodings(true)}
@@ -324,7 +352,10 @@ export default function DataTab({
           {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]
             .filter((encoding) => !(encoding in graphSpec.encoding))
             .map((encoding) => (
-              <Pill onClick={() => addEncoding(encoding as VegaEncoding)}>
+              <Pill
+                // key={encoding}
+                onClick={() => addEncoding(encoding as VegaEncoding)}
+              >
                 <span style={{ padding: '3px 10px' }}>{encoding}</span>
               </Pill>
             ))}
@@ -375,6 +406,44 @@ interface PillState {
 }
 type PillMap = Record<string, PillState[]>;
 
+function initializeDefaultFilter(
+  spec: GraphSpec,
+  data: GraphData,
+  columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>
+): GraphSpec {
+  const filters = getFilterList(spec);
+  let newSpec = Object.assign({}, spec);
+  if (!filters.length) {
+    Object.values(newSpec.encoding).map((info) => {
+      const field = info.field;
+      if (['ordinal', 'nominal'].includes(columnTypes[field])) {
+        newSpec = updateSpecFilter(
+          newSpec,
+          field,
+          'oneOf',
+          getCategories(data, field)
+        );
+      } else {
+        const range = getBounds(data, field);
+        if (isFinite(range[0])) {
+          newSpec = updateSpecFilter(newSpec, field, 'range', range);
+        }
+      }
+    });
+  }
+  return newSpec;
+}
+
+function addDefaultFilter(
+  spec: GraphSpec,
+  data: GraphData,
+  columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>,
+  field: string
+) {
+  return ['ordinal', 'nominal'].includes(columnTypes[field])
+    ? updateSpecFilter(spec, field, 'oneOf', getCategories(data, field))
+    : updateSpecFilter(spec, field, 'range', getBounds(data, field));
+}
 /**
  * Converts a graph spec to a list of GraphPill props.
  */

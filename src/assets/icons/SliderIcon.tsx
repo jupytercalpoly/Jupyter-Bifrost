@@ -32,8 +32,8 @@ export default function SliderIcon({
       <path
         d="M1.02637 2.05273H12.6579"
         stroke={color}
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

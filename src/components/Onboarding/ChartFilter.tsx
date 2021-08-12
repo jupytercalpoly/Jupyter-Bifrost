@@ -55,7 +55,7 @@ export default function ChartFilter({
       {chartFilters
         .filter(({ mark }) => availableMarks.has(mark))
         .map(({ mark, icon: Icon }) => (
-          <li>
+          <li key={mark}>
             <button className="wrapper" onClick={() => toggleMark(mark)}>
               <Icon
                 color={

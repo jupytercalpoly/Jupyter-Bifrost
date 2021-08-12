@@ -42,6 +42,8 @@ interface GraphProps {
   graphRef: React.RefObject<HTMLDivElement>;
   clickedAxis: VegaEncoding | '';
   updateClickedAxis: (encoding: VegaEncoding | '') => void;
+  sideBarOpen: boolean;
+  clickSidebarButton: () => void;
 }
 
 export default function Graph(props: GraphProps) {
@@ -157,6 +159,10 @@ export default function Graph(props: GraphProps) {
   }
 
   function handleClickOnAxis(channel: VegaEncoding) {
+    if (!props.sideBarOpen) {
+      props.clickSidebarButton();
+      return;
+    }
     const field = spec.encoding[channel].field;
 
     const variableTab = props.sideBarRef.current?.querySelectorAll(

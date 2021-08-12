@@ -63,8 +63,19 @@ export default function MarkTab() {
       draftSpec.params = [{ name: 'brush', select: 'interval' }];
       draftSpec.config!.mark!.tooltip = true;
 
-      if (draftSpec.mark === 'bar') {
-        draftSpec.params[0].select = { type: 'interval', encodings: ['x'] };
+      const hasAggregate =
+        Object.entries(draftSpec.encoding).filter(
+          ([key, encodingInfo]) => 'aggregate' in encodingInfo
+        ).length !== 0;
+      if (
+        draftSpec.mark === 'bar' &&
+        !hasAggregate &&
+        Object.keys(draftSpec.encoding).length !== 0
+      ) {
+        draftSpec.params[0].select = {
+          type: 'interval',
+          encodings: ['x' in draftSpec.encoding ? 'x' : 'y'],
+        };
       } else {
         draftSpec.params[0].select = 'interval';
       }
@@ -122,7 +133,7 @@ export default function MarkTab() {
             const graphSpec = produce(spec, (draftSpec: GraphSpec) => {
               draftSpec['width'] = 100;
               draftSpec['height'] = 100;
-              draftSpec.params = [];
+              draftSpec.params[0].select = '';
               draftSpec.mark = kind;
               if (draftSpec.config?.mark?.tooltip) {
                 draftSpec.config.mark.tooltip = false;

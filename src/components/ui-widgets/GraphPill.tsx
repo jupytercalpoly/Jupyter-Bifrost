@@ -44,6 +44,10 @@ export default function GraphPill(props: GraphPillProps) {
     filters,
     aggregation,
     scale,
+    onAggregationSelected,
+    onFilterSelected,
+    onEncodingSelected,
+    onFieldSelected,
     ...rest
   } = props;
   const color = theme.color.pill[position % theme.color.pill.length];
@@ -146,9 +150,9 @@ export default function GraphPill(props: GraphPillProps) {
           <TypeIcon />
         </button>
         <div className="divider"></div>
-        <span onClick={props.onEncodingSelected}>{encoding}</span>
+        <span onClick={onEncodingSelected}>{encoding}</span>
         <div className="divider"></div>
-        <span onClick={props.onFieldSelected} className={field ? '' : 'tag'}>
+        <span onClick={onFieldSelected} className={field ? '' : 'tag'}>
           <b>{field}</b>
         </span>
         <button className="wrapper icon" onClick={onClose}>
@@ -156,18 +160,18 @@ export default function GraphPill(props: GraphPillProps) {
         </button>
       </div>
       <div className="options">
-        <button className="slider-button" onClick={props.onFilterSelected}>
+        <button className="slider-button" onClick={onFilterSelected}>
           <Sliders size={15} color="white" />
         </button>
         <div className="modifiers">
           {!!filters.length && (
             <Fragment>
-              <button className="wrapper icon" onClick={props.onFilterSelected}>
+              <button className="wrapper icon" onClick={onFilterSelected}>
                 <FilterIcon />
               </button>
               <ul className="filter-list">
-                {filters.map((filter) => (
-                  <li>{filter}</li>
+                {filters.map((filter, i) => (
+                  <li key={i}>{filter}</li>
                 ))}
               </ul>
             </Fragment>
