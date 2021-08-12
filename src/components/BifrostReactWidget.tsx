@@ -7,12 +7,12 @@ import { useModelState, BifrostModelContext } from '../hooks/bifrost-model';
 import theme from '../theme';
 import OnboardingWidget from './Onboarding/OnboardingWidget';
 import VisualizationScreen from './VisualizationScreen';
+import { useMemo } from 'react';
 
 const globalStyles = (theme: any) => css`
   // Global styles for the widget
   //===========================================================
   .bifrost-widget {
-    width: calc(100vw - 3 * var(--jp-cell-prompt-width));
     height: 100%;
     max-height: fit-content;
 
@@ -101,8 +101,19 @@ function BifrostReactWidgetDisplay() {
   const [onboarded, setOnboarded] = useState(
     Boolean(plotArgs['x'] && plotArgs['y'])
   );
+
+  const displayWidth = useMemo(
+    () => document.getElementById('filebrowser')?.clientWidth ?? 0,
+    [document.getElementById('filebrowser')?.clientWidth]
+  );
+
   return (
-    <div className="bifrost-widget-display">
+    <div
+      className="bifrost-widget-display"
+      style={{
+        width: `calc(100vw - 3 * var(--jp-cell-prompt-width) - ${displayWidth}px)`,
+      }}
+    >
       {onboarded ? (
         <VisualizationScreen onPrevious={() => setOnboarded(false)} />
       ) : (
