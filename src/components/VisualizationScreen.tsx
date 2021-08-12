@@ -8,6 +8,7 @@ import Graph from './Graph';
 import { VegaEncoding } from '../modules/VegaEncodings';
 import SideBarCollapsibleButtonIcon from '../assets/icons/SideBarCollapsibleButtonIcon';
 import theme from '../theme';
+import HelpScreen from './HelpScreen/HelpScreen';
 
 const bifrostWidgetCss = css`
   // Element-based styles
@@ -49,6 +50,7 @@ export default function VisualizationScreen({
   const graphRef = React.useRef<HTMLDivElement>(null);
   const [clickedAxis, setClickedAxis] = useState<VegaEncoding | ''>('');
   const [sideBarOpen, setSideBarOpen] = useState<boolean>(true);
+  const [showHelpScreen, setShowHelpScreen] = useState(false);
 
   function updateClickedAxis(encoding: VegaEncoding | ''): void {
     setClickedAxis(encoding);
@@ -63,7 +65,10 @@ export default function VisualizationScreen({
       {onPrevious ? (
         <GridArea area="nav">
           <div className={'nav-wrapper'}>
-            <NavBar onBack={onPrevious} />
+            <NavBar
+              onBack={onPrevious}
+              onHelpRequested={() => setShowHelpScreen(true)}
+            />
             <div
               className={`side-bar-collapsible-button${
                 sideBarOpen ? ' open' : ''
@@ -91,6 +96,9 @@ export default function VisualizationScreen({
           clickSidebarButton={onClickCollapsibleButton}
         />
       </GridArea>
+      {showHelpScreen && (
+        <HelpScreen onDismiss={() => setShowHelpScreen(false)} />
+      )}
       {sideBarOpen ? (
         <GridArea area="sidebar" ref={sidebarRef}>
           <Sidebar
