@@ -80,7 +80,7 @@ export default function DataTab({
   updateClickedAxis: (encoding: VegaEncoding | '') => void;
 }) {
   const columns = useModelState('df_columns')[0];
-  const columnTypes = useModelState('column_types')[0];
+  const [columnTypes, setColumnTypes] = useModelState('column_types');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(
     columns.map((choice, index) => ({ choice, index }))
@@ -280,6 +280,36 @@ export default function DataTab({
     setActiveEncoding('');
   }
 
+  function updateFieldType(field: string, oldType: string) {
+    const newType = oldType === 'nominal' ? 'quantitative' : 'nominal';
+    setColumnTypes({
+      ...columnTypes,
+      [field]: newType,
+    });
+    setGraphSpec(
+      produce(graphSpec, (gs) => {
+        const info: any = Object.values(gs.encoding).find(
+          (info: any) => info.field === field
+        );
+        if (!info) {
+          return;
+        }
+        info.type = newType;
+      })
+    );
+
+    // Update the pill list accordingly
+    const newPills = produce(pillsInfo, (info) => {
+      const pill = info.find((p) => p.field === field);
+      if (!pill) {
+        return;
+      }
+      pill.type = newType;
+    });
+
+    setPillsInfo(newPills);
+  }
+
   const encodingList = pillsInfo.map((props, i) => (
     <GraphPill
       onClose={() => deletePill(props)}
@@ -287,6 +317,7 @@ export default function DataTab({
       onFilterSelected={() =>
         props.field && openFilters(props.encoding as VegaEncoding)
       }
+      onFieldTypeSelected={() => updateFieldType(props.field, props.type)}
       onEncodingSelected={() => {
         setActiveEncoding(props.encoding as VegaEncoding);
         setShowEncodings((show) => !show);

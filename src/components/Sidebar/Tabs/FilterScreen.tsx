@@ -55,6 +55,18 @@ const screenCss = (theme: BifrostTheme) => css`
     color: ${theme.color.primary.dark};
   }
 
+  .field-wrapper {
+    display: inline-block;
+    margin: 10px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
   .filters {
     overflow: auto;
     height: 300px;
@@ -189,28 +201,53 @@ function QuantitativeFilters(props: FilterGroupProps) {
     );
   }
 
+  function updateBin(e: React.ChangeEvent<HTMLInputElement>) {
+    setGraphSpec(
+      produce(graphSpec, (gs) => {
+        gs.encoding[props.encoding].bin = e.target.checked;
+      })
+    );
+  }
+
   return (
     <div className="filters">
       <div>
-        <h2>Aggregate</h2>
-        <select
-          value={currentAggregation}
-          onChange={(e) => updateAggregation(e.target.value)}
-        >
-          {['none', ...vegaAggregationList].map((aggregation) => (
-            <option value={aggregation}>{aggregation}</option>
-          ))}
-        </select>
+        <label className="field-wrapper">
+          <span className="field-label">Aggregate</span>
+          <select
+            value={currentAggregation}
+            onChange={(e) => updateAggregation(e.target.value)}
+          >
+            {['none', ...vegaAggregationList].map((aggregation) => (
+              <option value={aggregation}>{aggregation}</option>
+            ))}
+          </select>
+        </label>
+        <label className="field-wrapper">
+          <span className="field-label">Scale</span>
+          <select
+            value={currentScale}
+            onChange={(e) => updateScale(e.target.value)}
+          >
+            {vegaScaleList.map((scale) => (
+              <option value={scale}>{scale}</option>
+            ))}
+          </select>
+        </label>
+        <label className="field-wrapper">
+          <input
+            type="checkbox"
+            onChange={updateBin}
+            style={{ display: 'inline-block' }}
+          />
 
-        <h2>Scale</h2>
-        <select
-          value={currentScale}
-          onChange={(e) => updateScale(e.target.value)}
-        >
-          {vegaScaleList.map((scale) => (
-            <option value={scale}>{scale}</option>
-          ))}
-        </select>
+          <span
+            className="field-label"
+            style={{ display: 'inline-block', marginLeft: 5 }}
+          >
+            Bin
+          </span>
+        </label>
 
         <h2>Filter</h2>
       </div>

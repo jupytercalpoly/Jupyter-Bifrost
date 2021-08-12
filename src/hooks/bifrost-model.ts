@@ -34,6 +34,7 @@ export interface EncodingInfo {
   scale?: {
     [scaleType: string]: any;
   };
+  bin?: boolean;
   aggregate?: string;
   axis?: {
     title?: string;
