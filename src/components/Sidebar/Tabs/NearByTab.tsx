@@ -8,6 +8,7 @@ import produce from 'immer';
 import { useState, useEffect } from 'react';
 import { VegaLite } from 'react-vega';
 import theme from '../../../theme';
+import { CircularProgress } from '@material-ui/core';
 
 const nearByTabCss = css`
   width: 100%;
@@ -21,12 +22,22 @@ const nearByTabCss = css`
   .vega-embed {
     cursor: pointer;
   }
+
+  .MuiCircularProgress-colorPrimary {
+    color: ${theme.color.primary.light};
+  }
+  .MuiCircularProgress-root {
+    position: absolute;
+    top: 45%;
+    left: 45%;
+  }
 `;
 
 export default function NearByTab() {
   const [spec, setSpec] = useModelState('graph_spec');
   const data = useModelState('graph_data')[0];
   const [nearByCharts, setNearbyCharts] = useState<GraphSpec[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const graphData = { data };
 
   useEffect(() => {
@@ -60,13 +71,13 @@ export default function NearByTab() {
         );
         setNearbyCharts(recommendedSpecs as GraphSpec[]);
       }
+      setLoading(false);
     });
   }
 
   function convertVlSpecToCqlSpec(spec: GraphSpec) {
     const cqlSpec_v1 = { ...spec, encodings: [] as Record<string, string>[] };
     const cqlSpec_v2 = produce(cqlSpec_v1, (gs) => {
-      // delete gs['config'];
       gs['encodings'] = Object.entries(cqlSpec_v1['encoding']).map(
         ([channel, value]) => {
           return { ...value, channel: channel };
@@ -84,22 +95,27 @@ export default function NearByTab() {
         mark: { tooltip: true },
       };
       gs.params = [{ name: 'brush', select: 'interval' }];
-      // gs.transform = spec.transform;
+      gs.transform = spec.transform;
     });
-    console.log(newSpec);
     setSpec(newSpec);
   }
 
   return (
     <section css={nearByTabCss}>
-      {nearByCharts.map((spec: GraphSpec, i: number) => (
-        <button
-          style={{ backgroundColor: 'transparent' }}
-          onClick={() => handleClickOnNearByChart(i)}
-        >
-          <VegaLite spec={spec} data={graphData} actions={false} />
-        </button>
-      ))}
+      {loading ? (
+        <CircularProgress />
+      ) : nearByCharts ? (
+        nearByCharts.map((spec: GraphSpec, i: number) => (
+          <button
+            style={{ backgroundColor: 'transparent' }}
+            onClick={() => handleClickOnNearByChart(i)}
+          >
+            <VegaLite spec={spec} data={graphData} actions={false} />
+          </button>
+        ))
+      ) : (
+        <div>Can't find the nearby charts!</div>
+      )}
     </section>
   );
 }

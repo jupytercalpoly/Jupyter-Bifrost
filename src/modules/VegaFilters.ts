@@ -181,7 +181,7 @@ export function getBounds(
 export function getCategories(graphData: GraphData, field: string): string[] {
   const categorySet = graphData.reduce((categories, row) => {
     // when data point is NA
-    if (!row[field]) {
+    if (row[field] === null) {
       return categories;
     }
     categories.add((row[field] as any).toString());
