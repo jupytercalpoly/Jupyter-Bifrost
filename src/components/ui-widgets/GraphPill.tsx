@@ -1,23 +1,13 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { X, Sliders, Maximize2, CheckSquare } from 'react-feather';
+import { X, Sliders } from 'react-feather';
 import theme from '../../theme';
-import NumericalIcon from '../../assets/NumericalIcon';
-import CategoryIcon from '../../assets/CategoryIcon';
-import FunnelIcon from '../../assets/FilterIcon';
-import AggregateIcon from '../../assets/AggregateIcon';
-import SliderIcon from '../../assets/icons/SliderIcon';
+import { typeIconMap } from '../../assets/icons/typeIcons/TypeIconMap';
+import { filterIconMap } from '../../assets/icons/filterIcons/FilterIconMap';
+import FunnelIcon from '../../assets/icons/filterIcons/FunnelIcon';
+import AggregateIcon from '../../assets/icons/filterIcons/AggregateIcon';
 import { Fragment } from 'react';
-
-const typeIconMap: Record<string, typeof NumericalIcon> = {
-  quantitative: NumericalIcon,
-  nominal: CategoryIcon,
-};
-
-const filterIconMap: Record<string, any> = {
-  quantitative: SliderIcon,
-  nominal: () => <CheckSquare size={12} />,
-};
+import ScaleIcon from '../../assets/icons/filterIcons/ScaleIcon';
 
 interface GraphPillProps extends React.LiHTMLAttributes<HTMLLIElement> {
   onClose: () => void;
@@ -172,7 +162,7 @@ export default function GraphPill(props: GraphPillProps) {
           {!!filters.length && (
             <Fragment>
               <button className="wrapper icon" onClick={onFilterSelected}>
-                <FilterIcon />
+                <FilterIcon size={12} />
               </button>
               <ul className="filter-list">
                 {filters.map((filter, i) => (
@@ -193,8 +183,11 @@ export default function GraphPill(props: GraphPillProps) {
 
           {scale && (
             <Fragment>
-              <button className="wrapper icon" onClick={props.onFilterSelected}>
-                <Maximize2 size={12} />
+              <button
+                className="wrapper icon"
+                onClick={props.onAggregationSelected}
+              >
+                <ScaleIcon />
               </button>
               <div style={{ padding: '0 5px' }}>{scale}</div>
             </Fragment>
