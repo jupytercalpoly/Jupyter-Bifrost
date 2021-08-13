@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import VariablesTab from './Tabs/DataTab';
 import HistoryTab from './Tabs/HistoryTab';
 import MarkTab from './Tabs/MarkTab';
+import NearByTab from './Tabs/NearByTab';
 import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 import { VegaEncoding } from '../../modules/VegaEncodings';
@@ -66,6 +67,7 @@ const tabMapping: {
   Data: VariablesTab,
   Mark: MarkTab,
   History: HistoryTab,
+  NearBy: NearByTab,
 };
 
 export default function Sidebar(props: {
@@ -73,7 +75,7 @@ export default function Sidebar(props: {
   clickedAxis: VegaEncoding | '';
   updateClickedAxis: (encoding: VegaEncoding | '') => void;
 }) {
-  const tabs = ['Data', 'Mark', 'History'];
+  const tabs = ['Data', 'Mark', 'History', 'NearBy'];
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const TabContents = tabMapping[selectedTab];
   return (
