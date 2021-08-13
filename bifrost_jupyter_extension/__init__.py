@@ -47,7 +47,7 @@ class BifrostAccessor:
 
         w = BifrostWidget(self._obj, column_name_map, kind, formatted_x, formatted_y, formatted_color)
         display(w)
-        return self._obj
+        return self._obj if w.output_variable else None
 
 
     def format_string(self, s):

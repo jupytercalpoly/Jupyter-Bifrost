@@ -86,7 +86,8 @@ class BifrostWidget(DOMWidget):
     @observe("df_code")
     def update_output_dataframe(self, changes):
         code = changes["new"]
-        get_ipython().run_cell(code).result
+        if self.output_variable != "":
+            get_ipython().run_cell(code).result
 
 
     @observe("graph_data_config")
