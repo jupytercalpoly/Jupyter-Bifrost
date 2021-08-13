@@ -64,6 +64,12 @@ export type SelectionData = [
   string,
   { [field: string]: [number, number] | string[] }
 ];
+
+export type GraphDataConfig = {
+  maxRows: number;
+  sample: boolean;
+};
+
 // HOOKS
 //============================================================================================
 
