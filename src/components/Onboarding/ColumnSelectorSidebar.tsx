@@ -166,7 +166,6 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
     const draco = new Draco();
 
     draco.init().then(() => {
-      // const queryAsp = queryAsps[0];
       const program = 'data("data").\n' + dataAsp.concat(queryAsp).join('\n');
       const solution = draco.solve(program, { models: 5 });
 
