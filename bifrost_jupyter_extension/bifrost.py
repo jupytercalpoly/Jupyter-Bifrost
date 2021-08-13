@@ -58,7 +58,7 @@ class BifrostWidget(DOMWidget):
     def __init__(self, df:pd.DataFrame, column_name_map: dict, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)
         self.df_history.append(df)
-        data = self.get_data(df, 10)
+        data = self.get_data(df, self.graph_data_config["maxRows"])
         column_types = self.get_column_types(df)
         graph_info = self.create_graph_data(df, data, column_types, kind=kind, x=x, y=y, color=color)
 
