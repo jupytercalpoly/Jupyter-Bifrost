@@ -10,13 +10,14 @@ bifrost_tracing = import_module("..", "jupyter-bifrost-tracing.bifrost_tracing.b
 df_watcher = bifrost_tracing.Watcher
 
 from traitlets.traitlets import observe
+from IPython import get_ipython
+
 
 """
 TODO: Add module docstring
 """
-import numpy as np
 from ipywidgets import DOMWidget, register
-from traitlets import Unicode, List, Int, Dict, Bool
+from traitlets import Unicode, List, Int, Dict
 from ._frontend import module_name, module_version
 from IPython.core.display import JSON, display
 import json
@@ -34,7 +35,6 @@ class BifrostWidget(DOMWidget):
     _view_module = Unicode(module_name).tag(sync=True)
     _view_module_version = Unicode(module_version).tag(sync=True)
 
-    df_history = list()
     spec_history = List([]).tag(sync=True)
     current_dataframe_index = Int(0).tag(sync=True)
     query_spec = Dict({}).tag(sync=True)
@@ -45,7 +45,8 @@ class BifrostWidget(DOMWidget):
     graph_encodings = Dict({}).tag(sync=True)
     df_variable_name = Unicode("").tag(sync=True)
     output_variable = Unicode("").tag(sync=True)
-    generate_random_dist = Int(0).tag(sync=True)
+    # Exported code that applies the graph spec changes to the original dataframe
+    df_code = Unicode("").tag(sync=True)
     df_columns = List([]).tag(sync=True)
     selected_columns = List([]).tag(sync=True)
     selected_mark = Unicode("").tag(sync=True)
@@ -54,6 +55,7 @@ class BifrostWidget(DOMWidget):
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
     graph_data_config = Dict({"maxRows": 100, "sample": False}).tag(sync=True)
+
 
     def __init__(self, df:pd.DataFrame, column_name_map: dict, kind=None, x=None, y=None, color=None, **kwargs):
         super().__init__(**kwargs)
@@ -71,7 +73,7 @@ class BifrostWidget(DOMWidget):
         self.set_trait("column_types", column_types)
         self.set_trait("column_name_map", column_name_map)
 
-        df.columns = column_name_map.values();
+        df.columns = column_name_map.values()
         if df_watcher.plot_output: self.set_trait("output_variable", df_watcher.plot_output)
         if df_watcher.bifrost_input: self.set_trait("df_variable_name", df_watcher.bifrost_input)
         
@@ -81,18 +83,12 @@ class BifrostWidget(DOMWidget):
         # Vega spec is updated from the frontend. To track history, respond to these changes here.
         pass
 
+    @observe("df_code")
+    def update_output_dataframe(self, changes):
+        code = changes["new"]
+        if self.output_variable != "":
+            get_ipython().run_cell(code).result
 
-    @observe("generate_random_dist")
-    def create_random_distribution(self, _):
-        graph_kinds = ['tick', 'bar', 'line', 'point']
-        kind = random.choice(graph_kinds)
-        dist = np.random.uniform(0,1, (random.randint(25,50), 4))
-        df = pd.DataFrame(dist, columns=["foo", "bar", "something", "else"])
-        self.df_history.append(df)
-        graph_info = self.create_graph_data(self.df_history[-1], kind)
-        self.set_trait("df_columns", list(df.columns))
-        self.set_trait("graph_spec", graph_info["spec"])
-        self.set_trait("graph_data", graph_info["data"])
 
     @observe("graph_data_config")
     def update_dataset(self, changes):

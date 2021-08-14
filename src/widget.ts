@@ -33,7 +33,6 @@ const bifrostModelPropDefaults = {
   graph_spec: {} as GraphSpec,
   query_spec: {} as QuerySpec,
   graph_encodings: {},
-  generate_random_dist: 0,
   df_columns: [] as string[],
   selected_data: ['', {}] as SelectionData,
   selected_columns: [] as string[],
@@ -46,6 +45,7 @@ const bifrostModelPropDefaults = {
   column_types: {} as Record<EncodingInfo['field'], EncodingInfo['type']>,
   column_name_map: {} as Record<string, string>,
   graph_data_config: { maxRows: 100, sample: false } as GraphDataConfig,
+  df_code: '$df',
 };
 
 export type ModelState = typeof bifrostModelPropDefaults;
