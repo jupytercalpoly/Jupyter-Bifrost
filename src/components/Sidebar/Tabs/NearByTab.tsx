@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { VegaLite } from 'react-vega';
 import theme from '../../../theme';
 
-const nearByTabCss = css`
+const nearbyTabCss = css`
   width: 100%;
   overflow: scroll;
   height: 100%;
@@ -24,11 +24,11 @@ const nearByTabCss = css`
   }
 `;
 
-export default function NearByTab() {
+export default function NearbyTab() {
   const [spec, setSpec] = useModelState('graph_spec');
   const data = useModelState('graph_data')[0];
   const [nearByCharts, setNearbyCharts] = useState<GraphSpec[]>([]);
-  const [loading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const graphData = { data };
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function NearByTab() {
         );
         setNearbyCharts(recommendedSpecs as GraphSpec[]);
       }
-      // setLoading(false);
+      setLoading(false);
     });
   }
 
@@ -92,7 +92,7 @@ export default function NearByTab() {
   }
 
   return (
-    <section css={nearByTabCss}>
+    <section css={nearbyTabCss}>
       {loading ? (
         <div
           style={{
