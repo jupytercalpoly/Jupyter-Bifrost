@@ -2,13 +2,13 @@
 import { jsx, css } from '@emotion/react';
 import { data2schema, schema2asp, cql2asp } from 'draco-core';
 import Draco from 'draco-vis';
+import Loader from '../../Loader';
 
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import produce from 'immer';
 import { useState, useEffect } from 'react';
 import { VegaLite } from 'react-vega';
 import theme from '../../../theme';
-import { CircularProgress } from '@material-ui/core';
 
 const nearByTabCss = css`
   width: 100%;
@@ -22,22 +22,13 @@ const nearByTabCss = css`
   .vega-embed {
     cursor: pointer;
   }
-
-  .MuiCircularProgress-colorPrimary {
-    color: ${theme.color.primary.light};
-  }
-  .MuiCircularProgress-root {
-    position: absolute;
-    top: 45%;
-    left: 45%;
-  }
 `;
 
 export default function NearByTab() {
   const [spec, setSpec] = useModelState('graph_spec');
   const data = useModelState('graph_data')[0];
   const [nearByCharts, setNearbyCharts] = useState<GraphSpec[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading] = useState<boolean>(true);
   const graphData = { data };
 
   useEffect(() => {
@@ -71,7 +62,7 @@ export default function NearByTab() {
         );
         setNearbyCharts(recommendedSpecs as GraphSpec[]);
       }
-      setLoading(false);
+      // setLoading(false);
     });
   }
 
@@ -103,7 +94,16 @@ export default function NearByTab() {
   return (
     <section css={nearByTabCss}>
       {loading ? (
-        <CircularProgress />
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <Loader />
+        </div>
       ) : nearByCharts ? (
         nearByCharts.map((spec: GraphSpec, i: number) => (
           <button
