@@ -2,7 +2,7 @@
 import { css, jsx } from '@emotion/react';
 import produce from 'immer';
 import { useEffect, useState } from 'react';
-import { PlusCircle } from 'react-feather';
+import { ChevronUp, PlusCircle } from 'react-feather';
 import {
   EncodingInfo,
   GraphData,
@@ -28,10 +28,39 @@ import {
 } from '../../../modules/VegaFilters';
 import GraphPill from '../../ui-widgets/GraphPill';
 import { useRef } from 'react';
+import { chartIcons } from '../../../assets/icons/chartIcons/ChartIcons';
+import theme from '../../../theme';
 
 const variableTabCss = css`
   position: relative;
   width: 100%;
+
+  h3 {
+    .data-section,
+    .sampling-section {
+      cursor: pointer;
+      transition: transform 0.5s ease-in-out;
+      &.open,
+      &.open {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .mark-list {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+
+    li {
+      padding: 5px;
+      border-radius: 25%;
+      cursor: pointer;
+    }
+  }
+
   .encoding-list,
   .encoding-choices {
     margin: 0;
@@ -77,7 +106,7 @@ interface ActiveOptions {
   encoding: VegaEncoding | '';
 }
 
-export default function DataTab({
+export default function EditTab({
   clickedAxis,
   updateClickedAxis,
 }: {
@@ -92,6 +121,7 @@ export default function DataTab({
   const [searchResults, setSearchResults] = useState(
     columns.map((choice, index) => ({ choice, index }))
   );
+  const [graphMark, setGraphMark] = useState<string>('');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const [data] = useModelState('graph_data');
   const [activeOptions, setActiveOptions] = useState<ActiveOptions>({
@@ -99,6 +129,8 @@ export default function DataTab({
     encoding: '',
   });
   const isInitialMount = useRef<boolean>(true);
+  const [dataSectionOpen, setDataSectionOpen] = useState<boolean>(true);
+  const [samplingSectionOpen, setSamplingSectionOpen] = useState<boolean>(true);
 
   useEffect(() => {
     setActiveOptions((opt) => ({ ...opt, encoding: clickedAxis }));
@@ -112,6 +144,11 @@ export default function DataTab({
     const newSpec = initializeDefaultFilter(graphSpec, data, columnTypes);
     setGraphSpec(newSpec);
     setPillsInfo(extractPillProps(newSpec));
+    if (typeof newSpec.mark === 'object') {
+      setGraphMark(newSpec.mark.type);
+    } else if (typeof newSpec.mark === 'string') {
+      setGraphMark(newSpec.mark);
+    }
   }, []);
 
   // update pill filters and aggregations on spec change
@@ -368,54 +405,119 @@ export default function DataTab({
     </button>
   );
 
+  function handleClickOnMark(mark: string) {
+    const newSpec = produce(graphSpec, (gs) => {
+      gs.mark = mark;
+    });
+    setGraphSpec(newSpec);
+    setGraphMark(mark);
+  }
+
+  function handleClickOnChevron(section: string) {
+    if (section === 'data') {
+      setDataSectionOpen(!dataSectionOpen);
+    } else if (section === 'sampling') {
+      setSamplingSectionOpen(!samplingSectionOpen);
+    }
+  }
+
   return (
     <section className="DataTab" css={variableTabCss}>
-      <ul className="encoding-list">{encodingList}</ul>
-      {activeOptions.menu === 'encoding' && (
-        <ul className="encoding-choices">
-          {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]
-            .filter((encoding) => !(encoding in graphSpec.encoding))
-            .map((encoding) => (
-              <Pill
-                // key={encoding}
-                onClick={() => addEncoding(encoding as VegaEncoding)}
-              >
-                <span style={{ padding: '3px 10px' }}>{encoding}</span>
-              </Pill>
-            ))}
-        </ul>
-      )}
-      {activeOptions.menu === 'field' && (
-        <div>
-          <SearchBar
-            choices={columns}
-            onChange={setSearchQuery}
-            value={searchQuery}
-            onResultsChange={setSearchResults}
-            placeholder="Search Columns"
-          />
-          <ul className="columns-list">
-            {searchResults.map(({ choice: col }) => {
-              return (
-                <li
-                  className="column-el"
-                  key={col}
-                  onClick={() => updateField(col)}
-                >
-                  {col}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
       {activeOptions.menu === 'filter' && (
         <FilterScreen
           encoding={activeOptions.encoding as VegaEncoding}
           onBack={() => setActiveOptions({ encoding: '', menu: '' })}
         />
       )}
+      <article>
+        <h3>
+          Data
+          <div
+            className={dataSectionOpen ? 'data-section open' : 'data-section'}
+            style={{ display: 'inline-block' }}
+            onClick={() => handleClickOnChevron('data')}
+          >
+            <ChevronUp size={12} />
+          </div>
+        </h3>
+        {dataSectionOpen ? (
+          <section>
+            <ul className="mark-list">
+              {chartIcons.map(({ icon: Icon, mark }) => (
+                <li
+                  key={mark}
+                  onClick={() => handleClickOnMark(mark)}
+                  style={
+                    mark === graphMark
+                      ? {
+                          backgroundColor: `${theme.color.primary.dark}`,
+                        }
+                      : {}
+                  }
+                >
+                  {mark === graphMark ? <Icon color={'white'} /> : <Icon />}
+                </li>
+              ))}
+            </ul>
+            <ul className="encoding-list">{encodingList}</ul>
+            {activeOptions.menu === 'encoding' && (
+              <ul className="encoding-choices">
+                {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]
+                  .filter((encoding) => !(encoding in graphSpec.encoding))
+                  .map((encoding) => (
+                    <Pill
+                      // key={encoding}
+                      onClick={() => addEncoding(encoding as VegaEncoding)}
+                    >
+                      <span style={{ padding: '3px 10px' }}>{encoding}</span>
+                    </Pill>
+                  ))}
+              </ul>
+            )}
+            {activeOptions.menu === 'field' && (
+              <div>
+                <SearchBar
+                  choices={columns}
+                  onChange={setSearchQuery}
+                  value={searchQuery}
+                  onResultsChange={setSearchResults}
+                  placeholder="Search Columns"
+                />
+                <ul className="columns-list">
+                  {searchResults.map(({ choice: col }) => {
+                    return (
+                      <li
+                        className="column-el"
+                        key={col}
+                        onClick={() => updateField(col)}
+                      >
+                        {col}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </section>
+        ) : (
+          <section></section>
+        )}
+      </article>
+      <article>
+        <h3>
+          Sampling
+          <div
+            className={
+              samplingSectionOpen ? 'sampling-section open' : 'sampling-section'
+            }
+            style={{ display: 'inline-block' }}
+            onClick={() => handleClickOnChevron('sampling')}
+          >
+            <ChevronUp size={12} />
+          </div>
+        </h3>
+        {samplingSectionOpen ? <section></section> : <section></section>}
+      </article>
     </section>
   );
 }

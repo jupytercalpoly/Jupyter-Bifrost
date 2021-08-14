@@ -1,13 +1,23 @@
 import ScatterChartIcon from './ScatterChartIcon';
 import BarChartIcon from './BarChartIcon';
 import LineChartIcon from './LineChartIcon';
-import PieChartIcon from './PieChartIcon';
+// import PieChartIcon from './PieChartIcon';
 import TickChartIcon from './TickChartIcon';
+import BoxPlotChartIcon from './BoxPlotChartIcon';
+import CircleChartIcon from './CircleChartIcon';
+import ErrorBandChartIcon from './ErrorBandChartIcon';
+import SquareChartIcon from './SquareChartIcon';
+import ErrorBarChartIcon from './ErrorBarChartIcon';
 
 export const chartIcons = [
   { icon: BarChartIcon, mark: 'bar' },
   { icon: ScatterChartIcon, mark: 'point' },
   { icon: LineChartIcon, mark: 'line' },
-  { icon: PieChartIcon, mark: 'arc' },
+  // { icon: PieChartIcon, mark: 'arc' },
   { icon: TickChartIcon, mark: 'tick' },
+  { icon: BoxPlotChartIcon, mark: 'boxplot' },
+  { icon: CircleChartIcon, mark: 'circle' },
+  { icon: ErrorBandChartIcon, mark: 'errorband' },
+  { icon: ErrorBarChartIcon, mark: 'errorbar' },
+  { icon: SquareChartIcon, mark: 'square' },
 ];
