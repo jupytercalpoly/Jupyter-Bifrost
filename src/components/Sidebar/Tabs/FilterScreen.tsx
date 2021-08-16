@@ -121,7 +121,6 @@ function QuantitativeFilters(props: FilterGroupProps) {
     [graphData, currentAggregation]
   );
   const ranges = getRanges();
-  console.log(graphSpec.encoding);
 
   // Initialize a slider if one doesn't exist
   useEffect(() => {
@@ -201,7 +200,6 @@ function QuantitativeFilters(props: FilterGroupProps) {
   function updateBin(e: React.ChangeEvent<HTMLInputElement>) {
     setGraphSpec(
       produce(graphSpec, (gs) => {
-        console.log(e.target.checked);
         gs.encoding[props.encoding].bin = e.target.checked;
       })
     );
