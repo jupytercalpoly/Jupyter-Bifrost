@@ -70,12 +70,12 @@ export default function GraphPill(props: GraphPillProps) {
       justify-content: stretch;
       height: 25px;
       border-radius: 20px;
-      background-color: ${color};
+      background-color: ${color.standard};
       border-radius: ${borderRadius} ${borderRadius} 0 0;
       overflow: hidden;
       .selected {
         color: white;
-        backdrop-filter: contrast(30%) saturate(660%);
+        background-color: ${color.active};
       }
       span {
         white-space: nowrap;
