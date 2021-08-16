@@ -1,8 +1,10 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
+import { useEffect, useRef } from 'react';
 import { useMemo } from 'react';
 import { useState } from 'react';
+import { HelpCircle } from 'react-feather';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import {
   // EncodingInfo,
@@ -11,6 +13,7 @@ import {
 } from '../../hooks/bifrost-model';
 // import { VegaEncoding } from '../../modules/VegaEncodings';
 import { BifrostTheme } from '../../theme';
+import HelpScreen from '../HelpScreen/HelpScreen';
 import ChartFilter from './ChartFilter';
 
 const suggestedChartCss = (theme: BifrostTheme) => css`
@@ -23,6 +26,15 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
   overflow: hidden;
   .title {
     margin: 0;
+  }
+
+  .center-col {
+    display: grid;
+    height: 100%;
+    button,
+    ul {
+      align-self: flex-start;
+    }
   }
 
   .chart-col {
@@ -73,6 +85,9 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
   const [activeMarks, setActiveMarks] = useState(defaultMarks);
   const suggestedGraphs = useModelState('suggested_graphs')[0];
   const selectedColumns = useModelState('selected_columns')[0];
+  const [showHelp, setShowHelp] = useState(false);
+  const [helpPos, setHelpPos] = useState<[number, number]>([0, 0]);
+  const helpRef = useRef<HTMLButtonElement>(null);
   const filteredGraphs = useMemo(
     () =>
       suggestedGraphs.filter((spec) =>
@@ -93,6 +108,14 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
   const setGraphSpec = useModelState('graph_spec')[1];
   const setOpHistory = useModelState('spec_history')[1];
   const graphData = { data };
+
+  useEffect(() => {
+    if (!helpRef.current) {
+      return;
+    }
+    const { x, y } = helpRef.current.getBoundingClientRect();
+    setHelpPos([x, y]);
+  }, [helpRef.current]);
 
   function displayChart(selectedIndex: number) {
     if (selectedIndex === -1) {
@@ -127,11 +150,17 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
 
   return suggestedGraphs.length && selectedColumns.length ? (
     <section tabIndex={-1} className="ChartChooser" css={suggestedChartCss}>
-      <ChartFilter
-        activeMarks={activeMarks}
-        availableMarks={availableMarks}
-        onChange={setActiveMarks}
-      />
+      <div className="center-col">
+        <button className="wrapper" onClick={() => setShowHelp(true)}>
+          <HelpCircle />
+        </button>
+        <ChartFilter
+          activeMarks={activeMarks}
+          availableMarks={availableMarks}
+          onChange={setActiveMarks}
+        />
+      </div>
+
       <div className="chart-col">
         {!!filteredGraphs.length && (
           <div style={{ paddingBottom: 10 }}>
@@ -158,6 +187,9 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
           ))}
         </div>
       </div>
+      {showHelp && (
+        <HelpScreen onDismiss={() => setShowHelp(false)} position={helpPos} />
+      )}
     </section>
   ) : (
     <div></div>
