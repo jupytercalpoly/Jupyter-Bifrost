@@ -9,4 +9,4 @@ coverage:
       default:
         target: 0%
 ignore:
-  - "bifrost_jupyter_extension/tests"
+  - "jupyter_bifrost/tests"

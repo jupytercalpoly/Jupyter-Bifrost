@@ -11,7 +11,7 @@ import * as widgetExports from './widget';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
-const EXTENSION_ID = 'bifrost-jupyter-extension:plugin';
+const EXTENSION_ID = 'bifrost:plugin';
 
 /**
  * The example plugin.

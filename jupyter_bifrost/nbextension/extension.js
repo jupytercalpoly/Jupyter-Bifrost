@@ -6,7 +6,7 @@ define(function() {
     window['requirejs'].config({
         map: {
             '*': {
-                'bifrost-jupyter-extension': 'nbextensions/bifrost_jupyter_extension/index',
+                'bifrost': 'nbextensions/bifrost/index',
             },
         }
     });

@@ -145,17 +145,12 @@ $RECYCLE.BIN/
 # ----
 
 **/node_modules/
-bifrost_jupyter_extension/nbextension/index.*
-bifrost_jupyter_extension/labextension/*.tgz
+jupyter_bifrost/nbextension/index.*
+jupyter_bifrost/labextension/*.tgz
 
 # Coverage data
 # -------------
 **/coverage/
 
 # Packed lab extensions
-bifrost_jupyter_extension/labextension
-
-# eslint
-.eslintcache
-
-.vscode
+jupyter_bifrost/labextension
