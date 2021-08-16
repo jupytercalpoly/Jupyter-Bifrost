@@ -8,7 +8,6 @@ import NearbyTab from './Tabs/NearbyTab';
 import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 import VegaPandasTranslator from '../../modules/VegaPandasTranslator';
 import { VegaEncoding } from '../../modules/VegaEncodings';
-import produce from 'immer';
 import { CSSTransitionGroup } from 'react-transition-group';
 import theme from '../../theme';
 
@@ -172,29 +171,10 @@ const actionBarCss = css`
 `;
 
 function ActionBar() {
-  const spec = useModelState('graph_spec')[0];
-  const columnNameMap = useModelState('column_name_map')[0];
-  const [dataframeName] = useModelState('df_variable_name');
+  const dfCode = useModelState('df_code')[0];
 
   function exportCode() {
-    // convert formatted columns to original
-    const revertedSpec = produce(spec, (gs: GraphSpec) => {
-      Object.keys(gs.encoding).forEach((channel) => {
-        gs.encoding[channel as VegaEncoding].field =
-          columnNameMap[gs.encoding[channel as VegaEncoding].field];
-      });
-      gs.transform.forEach((obj) =>
-        obj['filter']['or'].forEach((el: any) => {
-          el.field = columnNameMap[el.field];
-        })
-      );
-    });
-
-    const translator = new VegaPandasTranslator();
-    const query = translator
-      .convertSpecToCode(revertedSpec)
-      .replace(/\$df/g, dataframeName || 'df');
-    navigator.clipboard.writeText(query);
+    navigator.clipboard.writeText(dfCode);
   }
 
   return (
