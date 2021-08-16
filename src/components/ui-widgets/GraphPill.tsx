@@ -32,6 +32,7 @@ interface GraphPillProps extends React.LiHTMLAttributes<HTMLLIElement> {
   aggregation: string;
   scale: string;
   field: string;
+  selectedField: 'field' | 'encoding' | 'filter' | '';
 }
 export default function GraphPill(props: GraphPillProps) {
   const {
@@ -43,6 +44,7 @@ export default function GraphPill(props: GraphPillProps) {
     filters,
     aggregation,
     scale,
+    selectedField,
     onFilterSelected,
     onEncodingSelected,
     onFieldSelected,
@@ -52,44 +54,43 @@ export default function GraphPill(props: GraphPillProps) {
   const TypeIcon = type in typeIconMap ? typeIconMap[type] : FunnelIcon;
   const FilterIcon = type in filterIconMap ? filterIconMap[type] : FunnelIcon;
 
-  const borderRaidus = '5px';
+  const borderRadius = '5px';
 
   const graphPillCss = css`
     list-style: none;
     background: white;
-    border-radius: ${borderRaidus};
+    border-radius: ${borderRadius};
     width: min-content;
     margin: 5px;
     box-shadow: ${theme.shadow.handle};
 
     .pill-header {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: stretch;
+      justify-content: stretch;
+      height: 25px;
       border-radius: 20px;
       background-color: ${color};
-      border-radius: ${borderRaidus};
+      border-radius: ${borderRadius} ${borderRadius} 0 0;
       overflow: hidden;
+      .selected {
+        color: white;
+        backdrop-filter: contrast(30%) saturate(660%);
+      }
       span {
         white-space: nowrap;
-        margin: 0 5px;
         cursor: pointer;
-
-        &.tag {
-          width: 50px;
-          height: 16px;
-          background-color: ${theme.color.primary.light};
-          border-radius: ${borderRaidus};
-        }
+        width: 100%;
+        text-align: center;
 
         &:hover {
           text-decoration: underline;
         }
       }
-      .divider {
-        height: 30px;
-        width: 2px;
-        color: rgba(0, 0, 0, 0.6);
+
+      button {
+        width: 100%;
+        text-align: center;
       }
     }
 
@@ -147,10 +148,16 @@ export default function GraphPill(props: GraphPillProps) {
         <button className="wrapper" onClick={props.onFieldTypeSelected}>
           <TypeIcon />
         </button>
-        <div className="divider"></div>
-        <span onClick={onEncodingSelected}>{encoding}</span>
-        <div className="divider"></div>
-        <span onClick={onFieldSelected} className={field ? '' : 'tag'}>
+        <span
+          onClick={onEncodingSelected}
+          className={selectedField === 'encoding' ? 'selected' : undefined}
+        >
+          {encoding}
+        </span>
+        <span
+          onClick={onFieldSelected}
+          className={selectedField === 'field' ? 'selected' : undefined}
+        >
           <b>{field}</b>
         </span>
         <button className="wrapper icon" onClick={onClose}>

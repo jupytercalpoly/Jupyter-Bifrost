@@ -348,6 +348,9 @@ export default function DataTab({
           };
         });
       }}
+      selectedField={
+        activeOptions.encoding === props.encoding ? activeOptions.menu : ''
+      }
       position={i}
       key={i}
       {...props}
