@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# Copyright (c) waidhoferj.
+# Copyright (c) John Waidhofer(waidhoferj), Jay Ahn(jahn96).
 # Distributed under the terms of the Modified BSD License.
 
 version_info = (0, 1, 0, 'dev')

@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-set SPHINXPROJ=bifrost_jupyter_extension
+set SPHINXPROJ=jupyter_bifrost
 
 if "%1" == "" goto help
 

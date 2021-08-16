@@ -1,48 +1,37 @@
-# bifrost-jupyter-extension
 
-[![Build Status](https://travis-ci.org//bifrost-jupyter-extension.svg?branch=master)](https://travis-ci.org//bifrost_jupyter_extension)
-[![codecov](https://codecov.io/gh//bifrost-jupyter-extension/branch/master/graph/badge.svg)](https://codecov.io/gh//bifrost-jupyter-extension)
+# jupyter_bifrost
 
-A Jupyter Widget for data visualization.
-Read [Press Release](./docs/PRESS_RELEASE.md) for more information.
+[![Build Status](https://travis-ci.org//jupyter_bifrost.svg?branch=master)](https://travis-ci.org//jupyter_bifrost)
+[![codecov](https://codecov.io/gh//jupyter_bifrost/branch/master/graph/badge.svg)](https://codecov.io/gh//jupyter_bifrost)
+
+
+A Jupyter Widget for Interactive Data Visualization
 
 ## Installation
 
 You can install using `pip`:
 
 ```bash
-pip install bifrost_jupyter_extension
+pip install jupyter_bifrost
 ```
 
 If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
 the nbextension:
-
 ```bash
-jupyter nbextension enable --py [--sys-prefix|--user|--system] bifrost_jupyter_extension
+jupyter nbextension enable --py [--sys-prefix|--user|--system] jupyter_bifrost
 ```
 
 ## Development Installation
 
 Create a dev environment:
-
 ```bash
-conda create -n bifrost_jupyter_extension-dev -c conda-forge nodejs yarn python jupyterlab
-conda activate bifrost_jupyter_extension-dev
+conda create -n jupyter_bifrost-dev -c conda-forge nodejs yarn python jupyterlab
+conda activate jupyter_bifrost-dev
 ```
 
 Install the python. This will also build the TS package.
-
 ```bash
 pip install -e ".[test, examples]"
-```
-
-Instantiate Bifrost Tracing
-
-```
-git submodule init
-git submodule update
-cd jupyter-bifrost-tracing
-git checkout waidhoferj/tracing-integration
 ```
 
 When developing your extensions, you need to manually enable your extensions with the
@@ -56,8 +45,8 @@ yarn run build
 For classic notebook, you need to run:
 
 ```
-jupyter nbextension install --sys-prefix --symlink --overwrite --py bifrost_jupyter_extension
-jupyter nbextension enable --sys-prefix --py bifrost_jupyter_extension
+jupyter nbextension install --sys-prefix --symlink --overwrite --py jupyter_bifrost
+jupyter nbextension enable --sys-prefix --py jupyter_bifrost
 ```
 
 Note that the `--symlink` flag doesn't work on Windows, so you will here have to run
@@ -66,9 +55,7 @@ you might also need another flag instead of `--sys-prefix`, but we won't cover t
 of those flags here.
 
 ### How to see your changes
-
 #### Typescript:
-
 If you use JupyterLab to develop then you can watch the source directory and run JupyterLab at the same time in different
 terminals to watch for changes in the extension's source and automatically rebuild the widget.
 
@@ -82,5 +69,4 @@ jupyter lab
 After a change wait for the build to finish and then refresh your browser and the changes should take effect.
 
 #### Python:
-
 If you make a change to the python code then you will need to restart the notebook kernel to have it take effect.

@@ -1,7 +1,7 @@
 {
-  "name": "bifrost-jupyter-extension",
+  "name": "jupyter_bifrost",
   "version": "0.1.0",
-  "description": "A Jupyter Widget for data visualization",
+  "description": "A Jupyter Widget for Interactive Data Visualization",
   "keywords": [
     "jupyter",
     "jupyterlab",
@@ -11,29 +11,22 @@
   "files": [
     "lib/**/*.js",
     "dist/*.js",
-    "css/*.css",
-    "src/*.scss"
+    "css/*.css"
   ],
-  "homepage": "https://github.com//bifrost-jupyter-extension",
+  "homepage": "https://github.com//jupyter_bifrost",
   "bugs": {
-    "url": "https://github.com//bifrost-jupyter-extension/issues"
+    "url": "https://github.com//jupyter_bifrost/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
-    "name": "waidhoferj",
-    "email": "waidhoferj@gmail.com"
+    "name": "John Waidhofer(waidhoferj), Jay Ahn(jahn96)",
+    "email": "waidhoferj@gmail.com, aju960219@gmail.com"
   },
-  "contributors": [
-    {
-      "name": "Jay Ahn",
-      "email": "aju960219@gmail.com"
-    }
-  ],
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com//bifrost-jupyter-extension"
+    "url": "https://github.com//jupyter_bifrost"
   },
   "scripts": {
     "build": "yarn run build:lib && yarn run build:nbextension && yarn run build:labextension:dev",
@@ -45,8 +38,8 @@
     "build:nbextension": "webpack",
     "clean": "yarn run clean:lib && yarn run clean:nbextension && yarn run clean:labextension",
     "clean:lib": "rimraf lib",
-    "clean:labextension": "rimraf bifrost_jupyter_extension/labextension",
-    "clean:nbextension": "rimraf bifrost_jupyter_extension/nbextension/static/index.js",
+    "clean:labextension": "rimraf jupyter_bifrost/labextension",
+    "clean:nbextension": "rimraf jupyter_bifrost/nbextension/static/index.js",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "lint:check": "eslint . --ext .ts,.tsx",
     "prepack": "yarn run build:lib",
@@ -139,7 +132,7 @@
   },
   "jupyterlab": {
     "extension": "lib/plugin",
-    "outputDir": "bifrost_jupyter_extension/labextension/",
+    "outputDir": "jupyter_bifrost/labextension/",
     "sharedPackages": {
       "@jupyter-widgets/base": {
         "bundled": false,

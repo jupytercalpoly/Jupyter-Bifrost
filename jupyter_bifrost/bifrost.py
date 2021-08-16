@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# Copyright (c) waidhoferj.
+# Copyright (c) John Waidhofer(waidhoferj), Jay Ahn(jahn96).
 # Distributed under the terms of the Modified BSD License.
+
 import pandas as pd
-import random, typing
+import random
 from importlib import import_module
-bifrost_tracing = import_module("..", "jupyter-bifrost-tracing.bifrost_tracing.bifrost_tracing.")
+
+bifrost_tracing = import_module(
+    "..", "jupyter-bifrost-tracing.bifrost_tracing.bifrost_tracing."
+)
 df_watcher = bifrost_tracing.Watcher
 
 from traitlets.traitlets import observe
@@ -16,21 +20,21 @@ TODO: Add module docstring
 """
 import numpy as np
 from ipywidgets import DOMWidget, register
-from traitlets import Unicode, List, Int, Dict, Bool
+from traitlets import Unicode, List, Int, Dict
 from ._frontend import module_name, module_version
-from IPython.core.display import JSON, display
 import json
 
 
 @register
 class BifrostWidget(DOMWidget):
     """
-        Data representation of the graph visualization platform Bifrost
+    Data representation of the graph visualization platform Bifrost
     """
-    _model_name = Unicode('BifrostModel').tag(sync=True)
+
+    _model_name = Unicode("BifrostModel").tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
     _model_module_version = Unicode(module_version).tag(sync=True)
-    _view_name = Unicode('BifrostView').tag(sync=True)
+    _view_name = Unicode("BifrostView").tag(sync=True)
     _view_module = Unicode(module_name).tag(sync=True)
     _view_module_version = Unicode(module_version).tag(sync=True)
 
@@ -54,12 +58,24 @@ class BifrostWidget(DOMWidget):
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
 
-    def __init__(self, df:pd.DataFrame, column_name_map: dict, kind=None, x=None, y=None, color=None, **kwargs):
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        column_name_map: dict,
+        kind=None,
+        x=None,
+        y=None,
+        color=None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
         self.df_history.append(df)
         data = self.get_data(df)
         column_types = self.get_column_types(df)
-        graph_info = self.create_graph_data(df, data, column_types, kind=kind, x=x, y=y, color=color)
+        graph_info = self.create_graph_data(
+            df, data, column_types, kind=kind, x=x, y=y, color=color
+        )
+        df.columns = column_name_map.values()
 
         self.set_trait("df_columns", sorted(list(df.columns)))
         self.set_trait("selected_data", [])
@@ -69,30 +85,27 @@ class BifrostWidget(DOMWidget):
         self.set_trait("plot_function_args", graph_info["args"])
         self.set_trait("column_types", column_types)
         self.set_trait("column_name_map", column_name_map)
-
-        df.columns = column_name_map.values();
-        if df_watcher.plot_output: self.set_trait("output_variable", df_watcher.plot_output)
-        if df_watcher.bifrost_input: self.set_trait("df_variable_name", df_watcher.bifrost_input)
-        
+        if df_watcher.plot_output:
+            self.set_trait("output_variable", df_watcher.plot_output)
+        if df_watcher.bifrost_input:
+            self.set_trait("df_variable_name", df_watcher.bifrost_input)
 
     @observe("graph_spec")
     def update_graph_from_cols(self, changes):
         # Vega spec is updated from the frontend. To track history, respond to these changes here.
         pass
 
-
     @observe("generate_random_dist")
     def create_random_distribution(self, _):
-        graph_kinds = ['tick', 'bar', 'line', 'point']
+        graph_kinds = ["tick", "bar", "line", "point"]
         kind = random.choice(graph_kinds)
-        dist = np.random.uniform(0,1, (random.randint(25,50), 4))
+        dist = np.random.uniform(0, 1, (random.randint(25, 50), 4))
         df = pd.DataFrame(dist, columns=["foo", "bar", "something", "else"])
         self.df_history.append(df)
         graph_info = self.create_graph_data(self.df_history[-1], kind)
         self.set_trait("df_columns", list(df.columns))
         self.set_trait("graph_spec", graph_info["spec"])
         self.set_trait("graph_data", graph_info["data"])
-
 
     def get_data(self, df: pd.DataFrame):
         return json.loads(df.to_json(orient="records"))
@@ -101,8 +114,8 @@ class BifrostWidget(DOMWidget):
         graph_types = {
             "quantitative": ["int64", "float64"],
             "temporal": ["datetime", "timedelta[ns]"],
-            "nominal": ["object", "category", "bool"]
-        } # TODO add more  
+            "nominal": ["object", "category", "bool"],
+        }  # TODO add more
 
         def map_to_graph_type(dtype: str) -> str:
             for graph_type, dtypes in graph_types.items():
@@ -111,34 +124,40 @@ class BifrostWidget(DOMWidget):
             return "nominal"
 
         types = df.dtypes
-        types = {k: map_to_graph_type(str(v)) for k,v in types.items()}
+        types = {k: map_to_graph_type(str(v)) for k, v in types.items()}
         return types
 
+    def create_graph_data(
+        self,
+        df: pd.DataFrame,
+        data: dict,
+        types: dict,
+        kind: str = None,
+        x: str = None,
+        y: str = None,
+        color: str = None,
+    ) -> dict:
+        """
+        Converts a dataframe into a Vega Lite Graph JSON string.
+        """
 
-    def create_graph_data(self, df: pd.DataFrame, data: dict, types: dict, kind: str = None, x:str=None, y:str=None, color:str=None) -> dict:
-        """
-            Converts a dataframe into a Vega Lite Graph JSON string.
-        """
-        
-        x_provided = (x != None)
-        y_provided = (y != None)
+        x_provided = x != None
+        y_provided = y != None
         kind_provided = kind != None
 
         graph_spec = {}
         query_spec = {}
         query_spec_template = {
-                "width": 400,
-                "height": 200,
-                "data": {"name": "data"},
-                "transform": [],
-                "chooseBy": "effectiveness"
-            }
+            "width": 400,
+            "height": 200,
+            "data": {"name": "data"},
+            "transform": [],
+            "chooseBy": "effectiveness",
+        }
 
         if x_provided and y_provided and kind_provided:
             graph_spec = {
-                "config":{
-                    "mark": {"tooltip": True}
-                },
+                "config": {"mark": {"tooltip": True}},
                 "width": 550,
                 "height": 405,
                 "mark": kind,
@@ -146,20 +165,25 @@ class BifrostWidget(DOMWidget):
                 "data": {"name": "data"},
                 "transform": [],
                 "encoding": {
-                    encoding : {"field": col, "type": types[col]} for encoding, col in zip(["x", "y", "color"], [x, y, color]) if col
-                }
+                    encoding: {"field": col, "type": types[col]}
+                    for encoding, col in zip(["x", "y", "color"], [x, y, color])
+                    if col
+                },
             }
 
         query_spec = {
             **query_spec_template,
             "mark": kind if kind_provided else "?",
-            "encodings": [{"field": col, "type": types[col], "channel": encoding } for encoding, col in zip(["x", "y", "color"],  [x, y, color]) if col],
+            "encodings": [
+                {"field": col, "type": types[col], "channel": encoding}
+                for encoding, col in zip(["x", "y", "color"], [x, y, color])
+                if col
+            ],
         }
 
-        # TODO: Figure out aggregation etc.
-
-        return {"data": data, "query_spec" :{"spec": query_spec}, "graph_spec": graph_spec, "args": {"x": x, "y": y, "color": color, "kind": kind}}
-
-
-
-
+        return {
+            "data": data,
+            "query_spec": {"spec": query_spec},
+            "graph_spec": graph_spec,
+            "args": {"x": x, "y": y, "color": color, "kind": kind},
+        }

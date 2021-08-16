@@ -22,8 +22,10 @@ from jupyter_packaging import (
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
+
+
 # The name of the project
-name = 'bifrost_jupyter_extension'
+name = 'jupyter_bifrost'
 
 # Get the version
 version = get_version(pjoin(name, '_version.py'))
@@ -31,46 +33,45 @@ version = get_version(pjoin(name, '_version.py'))
 
 # Representative files that should exist after a successful build
 jstargets = [
-    # pjoin(HERE, name, 'nbextension', 'index.js'),
+    pjoin(HERE, name, 'nbextension', 'index.js'),
     pjoin(HERE, 'lib', 'plugin.js'),
 ]
 
 
 package_data_spec = {
     name: [
-        # 'nbextension/**js*',
+        'nbextension/**js*',
         'labextension/**'
     ]
 }
 
 
 data_files_spec = [
-    # ('share/jupyter/nbextensions/bifrost_jupyter_extension', 'bifrost_jupyter_extension/nbextension', '**'),
-    ('share/jupyter/labextensions/bifrost-jupyter-extension', 'bifrost_jupyter_extension/labextension', '**'),
-    ('share/jupyter/labextensions/bifrost-jupyter-extension', '.', 'install.json'),
-    ('etc/jupyter/nbconfig/notebook.d', '.', 'bifrost_jupyter_extension.json'),
+    # ('share/jupyter/nbextensions/jupyter_bifrost', 'jupyter_bifrost/nbextension', '**'),
+    ('share/jupyter/labextensions/jupyter_bifrost', 'jupyter_bifrost/labextension', '**'),
+    ('share/jupyter/labextensions/jupyter_bifrost', '.', 'install.json'),
+    ('etc/jupyter/nbconfig/notebook.d', '.', 'jupyter_bifrost.json'),
 ]
 
 
 cmdclass = create_cmdclass('jsdeps', package_data_spec=package_data_spec,
     data_files_spec=data_files_spec)
 cmdclass['jsdeps'] = combine_commands(
-    # change this to build:prod for production
-    install_npm(HERE, build_cmd='build:binder'),
+    install_npm(HERE, build_cmd='build:prod'),
     ensure_targets(jstargets),
 )
 
 
 setup_args = dict(
     name            = name,
-    description     = 'A Jupyter Widget for data visualization',
+    description     = 'A Jupyter Widget for Interactive Data Visualization',
     version         = version,
     scripts         = glob(pjoin('scripts', '*')),
     cmdclass        = cmdclass,
     packages        = find_packages(),
-    author          = 'waidhoferj',
-    author_email    = 'waidhoferj@gmail.com',
-    url             = 'https://github.com//bifrost-jupyter-extension',
+    author          = 'John Waidhofer(waidhoferj), Jay Ahn(jahn96)',
+    author_email    = 'waidhoferj@gmail.com, aju960219@gmail.com',
+    url             = 'https://github.com//jupyter_bifrost',
     license         = 'BSD',
     platforms       = "Linux, Mac OS X, Windows",
     keywords        = ['Jupyter', 'Widgets', 'IPython'],
