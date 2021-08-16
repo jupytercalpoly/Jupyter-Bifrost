@@ -1,10 +1,13 @@
 /**@jsx jsx */
 
 import { jsx, css } from '@emotion/react';
-import { ArrowLeft } from 'react-feather';
+import { ArrowLeft, HelpCircle } from 'react-feather';
 
 const graphNavCss = css`
   ul {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -16,6 +19,7 @@ const graphNavCss = css`
 
 interface NavBarProps {
   onBack?(): void;
+  onHelpRequested?(): void;
 }
 
 export default function NavBar(props: NavBarProps) {
@@ -25,6 +29,11 @@ export default function NavBar(props: NavBarProps) {
         <li>
           <button className="wrapper" onClick={props.onBack}>
             <ArrowLeft />
+          </button>
+        </li>
+        <li>
+          <button className="wrapper" onClick={props.onHelpRequested}>
+            <HelpCircle />
           </button>
         </li>
       </ul>
