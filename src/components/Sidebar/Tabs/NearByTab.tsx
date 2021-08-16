@@ -15,8 +15,12 @@ const nearbyTabCss = css`
   overflow: scroll;
   height: 100%;
 
-  button:hover {
-    border: 10px solid ${theme.color.primary.light};
+  button {
+    background-color: transparent;
+    border: 10px solid transparent;
+    &:hover {
+      border: 10px solid ${theme.color.primary.light};
+    }
   }
 
   .vega-embed {
@@ -56,8 +60,8 @@ export default function NearbyTab() {
             delete (gs['data'] as any).url;
             gs['data']['name'] = 'data';
             gs['transform'] = [];
-            gs.width = 150;
-            gs.height = 150;
+            gs.width = 120;
+            gs.height = 120;
           })
         );
         setNearbyCharts(recommendedSpecs as GraphSpec[]);
@@ -106,10 +110,7 @@ export default function NearbyTab() {
         </div>
       ) : nearByCharts ? (
         nearByCharts.map((spec: GraphSpec, i: number) => (
-          <button
-            style={{ backgroundColor: 'transparent' }}
-            onClick={() => handleClickOnNearByChart(i)}
-          >
+          <button onClick={() => handleClickOnNearByChart(i)}>
             <VegaLite spec={spec} data={graphData} actions={false} />
           </button>
         ))
