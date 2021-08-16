@@ -4,7 +4,6 @@ import { jsx, css } from '@emotion/react';
 import React, { useState, useRef } from 'react';
 import SearchBar from '../ui-widgets/SearchBar';
 
-import { Query } from 'compassql/build/src/query/query';
 import { Lock, X } from 'react-feather';
 import { useEffect } from 'react';
 import { EncodingQuery } from 'compassql/build/src/query/encoding';
@@ -162,38 +161,11 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
       } as EncodingQuery;
     });
 
-    const preRecommendedSpecs: Query[] = [];
-    if (selectedEncodings.length > 3) {
-      const fixedEncoding = selectedEncodings.filter(
-        (encoding) => encoding.channel !== '?'
-      );
-      const nonFixedEncoding = selectedEncodings.filter(
-        (encoding) => encoding.channel === '?'
-      );
-
-      for (let i = 0; i < nonFixedEncoding.length - 1; i++) {
-        const encodings = [
-          ...fixedEncoding,
-          ...nonFixedEncoding.slice(i, i + 2),
-        ];
-        preRecommendedSpecs.push({
-          spec: { ...spec.spec, encodings: encodings },
-        });
-      }
-    } else {
-      preRecommendedSpecs.push({
-        spec: { ...spec.spec, encodings: selectedEncodings },
-      });
-    }
-
-    const queryAsps = preRecommendedSpecs.map((spec) => {
-      return cql2asp(spec.spec);
-    });
+    const queryAsp = cql2asp({ ...spec.spec, encodings: selectedEncodings });
 
     const draco = new Draco();
 
     draco.init().then(() => {
-      const queryAsp = queryAsps[0];
       const program = 'data("data").\n' + dataAsp.concat(queryAsp).join('\n');
       const solution = draco.solve(program, { models: 5 });
 
