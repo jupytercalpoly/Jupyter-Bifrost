@@ -72,7 +72,7 @@ class BifrostWidget(DOMWidget):
         **kwargs
     ):
         super().__init__(**kwargs)
-        self.df_history.append(df)
+        self.df_history = [df]
         data = self.get_data(df, self.graph_data_config["maxRows"])
         column_types = self.get_column_types(df)
         graph_info = self.create_graph_data(

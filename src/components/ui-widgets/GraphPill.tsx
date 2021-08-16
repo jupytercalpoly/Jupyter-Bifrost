@@ -21,7 +21,6 @@ const filterIconMap: Record<string, any> = {
 
 interface GraphPillProps extends React.LiHTMLAttributes<HTMLLIElement> {
   onClose: () => void;
-  onAggregationSelected: () => void;
   onFilterSelected: () => void;
   onEncodingSelected: () => void;
   onFieldSelected: () => void;
@@ -44,7 +43,6 @@ export default function GraphPill(props: GraphPillProps) {
     filters,
     aggregation,
     scale,
-    onAggregationSelected,
     onFilterSelected,
     onEncodingSelected,
     onFieldSelected,
@@ -188,10 +186,7 @@ export default function GraphPill(props: GraphPillProps) {
 
           {scale && (
             <Fragment>
-              <button
-                className="wrapper icon"
-                onClick={props.onAggregationSelected}
-              >
+              <button className="wrapper icon" onClick={props.onFilterSelected}>
                 <Maximize2 size={12} />
               </button>
               <div style={{ padding: '0 5px' }}>{scale}</div>
