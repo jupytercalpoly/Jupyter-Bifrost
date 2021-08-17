@@ -423,7 +423,7 @@ export default function EditTab({
     });
     setGraphSpec(newSpec);
     setGraphMark(mark);
-    saveSpecToHistory(newSpec);
+    saveSpecToHistory(newSpec, `Updated mark to ${mark}`);
   }
 
   function handleClickOnChevron(section: string) {
