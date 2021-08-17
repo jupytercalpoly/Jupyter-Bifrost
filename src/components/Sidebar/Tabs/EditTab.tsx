@@ -273,6 +273,7 @@ export default function EditTab({
       updateClickedAxis('');
     }
     setActiveOptions({ menu: '', encoding: '' });
+    saveSpecToHistory(newSpec);
   }
 
   function openFilters(encoding: VegaEncoding) {
@@ -407,11 +408,15 @@ export default function EditTab({
   );
 
   function handleClickOnMark(mark: string) {
+    if (mark === graphMark) {
+      return;
+    }
     const newSpec = produce(graphSpec, (gs) => {
       gs.mark = mark;
     });
     setGraphSpec(newSpec);
     setGraphMark(mark);
+    saveSpecToHistory(newSpec);
   }
 
   function handleClickOnChevron(section: string) {
