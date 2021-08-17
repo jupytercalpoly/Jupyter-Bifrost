@@ -7,7 +7,7 @@ import { useModelState, BifrostModelContext } from '../hooks/bifrost-model';
 import theme from '../theme';
 import OnboardingWidget from './Onboarding/OnboardingWidget';
 import VisualizationScreen from './VisualizationScreen';
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 
 const globalStyles = (theme: any) => css`
   // Global styles for the widget
@@ -102,18 +102,17 @@ function BifrostReactWidgetDisplay() {
     Boolean(plotArgs['x'] && plotArgs['y'])
   );
 
-  const displayWidth = useMemo(
-    () => document.getElementById('filebrowser')?.clientWidth ?? 0,
-    [document.getElementById('filebrowser')?.clientWidth]
-  );
+  useEffect(() => {
+    const jupyterWidgets = document.getElementsByClassName('jupyter-widgets');
+    Array.from(jupyterWidgets).forEach((jupyterWidget) => {
+      if (jupyterWidget.children[0].classList.contains('bifrost-widget')) {
+        (jupyterWidget as HTMLElement).style.overflow = 'hidden';
+      }
+    });
+  }, []);
 
   return (
-    <div
-      className="bifrost-widget-display"
-      style={{
-        width: `calc(100vw - 3 * var(--jp-cell-prompt-width) - ${displayWidth}px)`,
-      }}
-    >
+    <div className="bifrost-widget-display">
       {onboarded ? (
         <VisualizationScreen onPrevious={() => setOnboarded(false)} />
       ) : (
