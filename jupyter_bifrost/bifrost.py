@@ -39,6 +39,7 @@ class BifrostWidget(DOMWidget):
     _view_module = Unicode(module_name).tag(sync=True)
     _view_module_version = Unicode(module_version).tag(sync=True)
 
+    df_history = list()
     spec_history = List([]).tag(sync=True)
     current_dataframe_index = Int(0).tag(sync=True)
     query_spec = Dict({}).tag(sync=True)

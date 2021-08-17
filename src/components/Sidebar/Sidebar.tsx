@@ -1,9 +1,8 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react';
 import React, { useState } from 'react';
-import VariablesTab from './Tabs/DataTab';
+import EditTab from './Tabs/EditTab';
 import HistoryTab from './Tabs/HistoryTab';
-import MarkTab from './Tabs/MarkTab';
 import NearbyTab from './Tabs/NearbyTab';
 import { useModelState } from '../../hooks/bifrost-model';
 import { VegaEncoding } from '../../modules/VegaEncodings';
@@ -62,8 +61,7 @@ const tabMapping: {
     updateClickedAxis: (encoding: VegaEncoding | '') => void;
   }) => jsx.JSX.Element;
 } = {
-  Data: VariablesTab,
-  Mark: MarkTab,
+  Edit: EditTab,
   History: HistoryTab,
   Nearby: NearbyTab,
 };
@@ -73,7 +71,7 @@ export default function Sidebar(props: {
   clickedAxis: VegaEncoding | '';
   updateClickedAxis: (encoding: VegaEncoding | '') => void;
 }) {
-  const tabs = ['Data', 'Mark', 'History', 'Nearby'];
+  const tabs = ['Edit', 'History', 'Nearby'];
   const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
   const TabContents = tabMapping[selectedTab];
   return (

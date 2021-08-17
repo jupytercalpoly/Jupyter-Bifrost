@@ -62,6 +62,9 @@ export default function NearbyTab() {
             gs['transform'] = [];
             gs.width = 120;
             gs.height = 120;
+            if (['circle', 'square'].includes(gs.mark as string)) {
+              gs.mark = 'point';
+            }
           })
         );
         setNearbyCharts(recommendedSpecs as GraphSpec[]);

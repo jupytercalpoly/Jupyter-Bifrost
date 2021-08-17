@@ -1,8 +1,8 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
-import { useEffect, useMemo } from 'react';
-import { ArrowLeft, X, Sliders } from 'react-feather';
+import { useEffect, useMemo, useState } from 'react';
+import { X, Sliders } from 'react-feather';
 import { useModelState } from '../../../hooks/bifrost-model';
 import { BifrostTheme } from '../../../theme';
 import {
@@ -31,17 +31,20 @@ const screenCss = (theme: BifrostTheme) => css`
     padding-bottom: 5px;
   }
 
-  h1 {
+  /* h1 {
     .encoding {
       color: ${theme.color.primary.dark};
     }
-  }
+  } */
 
   h2 {
     font-size: 22px;
     font-weight: 700;
     margin-bottom: 10px;
     margin-top: 20px;
+    .encoding {
+      color: ${theme.color.primary.dark};
+    }
   }
 
   .close-slider {
@@ -67,9 +70,33 @@ const screenCss = (theme: BifrostTheme) => css`
     margin-bottom: 2px;
   }
 
-  .filters {
+  .quantitative-filters {
     overflow: auto;
     height: 300px;
+  }
+
+  .transformation-section {
+    display: flex;
+    align-items: center;
+
+    article {
+      margin: 0 10px;
+
+      select {
+        padding: 5px;
+      }
+    }
+  }
+
+  .binning-button {
+    background-color: ${theme.color.primary.standard};
+    color: white;
+    padding: 5px;
+    font-size: initial;
+
+    &.clicked {
+      background-color: ${theme.color.primary.dark};
+    }
   }
 `;
 
@@ -99,14 +126,15 @@ export default function FilterScreen(props: FilterScreenProps) {
     <article css={screenCss}>
       <nav>
         <button className="wrapper" onClick={props.onBack}>
-          <ArrowLeft />
+          <X />
         </button>
       </nav>
       <div className="filter-contents">
-        <h1>
-          <span className="encoding">{props.encoding}</span>{' '}
+        <h2>
+          <span className="encoding">{props.encoding}</span>
+          {': '}
           <span className="column">{columnInfo.field}</span>
-        </h1>
+        </h2>
         <Filters encoding={props.encoding} />
       </div>
     </article>
@@ -116,6 +144,9 @@ export default function FilterScreen(props: FilterScreenProps) {
 function QuantitativeFilters(props: FilterGroupProps) {
   const [graphData] = useModelState('graph_data');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+  const [binned, setBinned] = useState<boolean>(
+    graphSpec.encoding[props.encoding].bin ?? false
+  );
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const currentScale =
@@ -201,19 +232,49 @@ function QuantitativeFilters(props: FilterGroupProps) {
     );
   }
 
-  function updateBin(e: React.ChangeEvent<HTMLInputElement>) {
-    setGraphSpec(
-      produce(graphSpec, (gs) => {
-        gs.encoding[props.encoding].bin = e.target.checked;
-      })
-    );
+  function updateBin() {
+    setBinned((binned) => {
+      setGraphSpec(
+        produce(graphSpec, (gs) => {
+          gs.encoding[props.encoding].bin = !binned;
+        })
+      );
+      return !binned;
+    });
   }
 
   return (
-    <div className="filters">
-      <div>
-        <label className="field-wrapper">
-          <span className="field-label">Aggregate</span>
+    <section className="quantitative-filters">
+      <article className={'range-article'}>
+        <h3>Range</h3>
+        <section>
+          {ranges.map((r, i) => (
+            <div style={{ display: 'flex' }}>
+              <RangeSlider
+                width={300}
+                domain={bounds}
+                values={r}
+                onUpdate={(update) => updateRange(update, i)}
+              />
+              <button
+                className="close-slider wrapper"
+                onClick={() => deleteRange(i)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+          ))}
+          <button
+            className="wrapper block add-range"
+            onClick={() => updateRange(bounds, ranges.length)}
+          >
+            + <Sliders />
+          </button>
+        </section>
+      </article>
+      <section className={'transformation-section'}>
+        <article className={'aggregation-article'}>
+          <h3>Transformation</h3>
           <select
             value={currentAggregation}
             onChange={(e) => updateAggregation(e.target.value)}
@@ -222,9 +283,10 @@ function QuantitativeFilters(props: FilterGroupProps) {
               <option value={aggregation}>{aggregation}</option>
             ))}
           </select>
-        </label>
-        <label className="field-wrapper">
-          <span className="field-label">Scale</span>
+        </article>
+        <article className={'scaling-article'}>
+          <h3>Scale</h3>
+
           <select
             value={currentScale}
             onChange={(e) => updateScale(e.target.value)}
@@ -233,48 +295,23 @@ function QuantitativeFilters(props: FilterGroupProps) {
               <option value={scale}>{scale}</option>
             ))}
           </select>
-        </label>
-        <label className="field-wrapper">
-          <input
+        </article>
+        <article className={'binning-article'}>
+          <h3>Bin</h3>
+          <button
+            className={binned ? 'binning-button clicked' : 'binning-button'}
+            onClick={updateBin}
+          >
+            {binned ? 'Binned' : 'Bin'}
+          </button>
+          {/* <input
             type="checkbox"
             onChange={updateBin}
             style={{ display: 'inline-block' }}
-          />
-
-          <span
-            className="field-label"
-            style={{ display: 'inline-block', marginLeft: 5 }}
-          >
-            Bin
-          </span>
-        </label>
-
-        <h2>Filter</h2>
-      </div>
-
-      {ranges.map((r, i) => (
-        <div style={{ display: 'flex' }}>
-          <RangeSlider
-            width={300}
-            domain={bounds}
-            values={r}
-            onUpdate={(update) => updateRange(update, i)}
-          />
-          <button
-            className="close-slider wrapper"
-            onClick={() => deleteRange(i)}
-          >
-            <X size={20} />
-          </button>
-        </div>
-      ))}
-      <button
-        className="wrapper block add-range"
-        onClick={() => updateRange(bounds, ranges.length)}
-      >
-        + <Sliders />
-      </button>
-    </div>
+          /> */}
+        </article>
+      </section>
+    </section>
   );
 }
 
@@ -323,7 +360,8 @@ function CategoricalFilters(props: FilterGroupProps) {
 
   return (
     <div>
-      <h2>Categories</h2>
+      <h3>Category</h3>
+
       <ul style={{ listStyle: 'none' }}>
         {categories.map((category) => (
           <li key={category}>

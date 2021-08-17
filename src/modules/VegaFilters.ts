@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { GraphData, GraphSpec } from '../hooks/bifrost-model';
+import { GraphData, GraphSpec, EncodingInfo } from '../hooks/bifrost-model';
 import { isFunction } from './utils';
 import { VegaParamPredicate, vegaParamPredicatesList } from './VegaEncodings';
 
@@ -189,6 +189,25 @@ export function getCategories(graphData: GraphData, field: string): string[] {
   }, new Set<string>());
 
   return Array.from(categorySet);
+}
+
+/**
+ * Add default filter in a pill when it's first created
+ * @param spec
+ * @param data
+ * @param columnTypes
+ * @param field
+ * @returns
+ */
+export function addDefaultFilter(
+  spec: GraphSpec,
+  data: GraphData,
+  columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>,
+  field: string
+) {
+  return ['ordinal', 'nominal'].includes(columnTypes[field])
+    ? updateSpecFilter(spec, field, 'oneOf', getCategories(data, field))
+    : updateSpecFilter(spec, field, 'range', getBounds(data, field));
 }
 
 /** Creates a flat array of all filters in a spec.

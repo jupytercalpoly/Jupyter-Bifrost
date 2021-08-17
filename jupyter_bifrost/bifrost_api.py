@@ -43,13 +43,13 @@ class Chart:
         self.mark = "point"
         return self
 
-    def mark_circle(self) -> "Chart":
-        self.mark = "circle"
-        return self
+    # def mark_circle(self) -> "Chart":
+    #     self.mark = "circle"
+    #     return self
 
-    def mark_square(self) -> "Chart":
-        self.mark = "square"
-        return self
+    # def mark_square(self) -> "Chart":
+    #     self.mark = "square"
+    #     return self
 
     def mark_bar(self) -> "Chart":
         self.mark = "bar"
