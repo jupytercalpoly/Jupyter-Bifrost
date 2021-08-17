@@ -26,8 +26,11 @@ export const addVariable = `
 ## Add a Variable
 - Open the side menu.
 - Click the plus icon.
-- Select a variable. Select back arrow to change it.
+- Select a variable. 
+    - Click one of the pills to set the variable
 - Select a datafield to encode.
+    - To go back to change the encoding, simply click the encoding.
+- Click X button to cancel. 
 `;
 
 export const changeEncoding = `
