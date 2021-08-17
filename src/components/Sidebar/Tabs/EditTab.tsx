@@ -198,7 +198,7 @@ export default function EditTab({
     }
     saveSpecToHistory(
       newSpec,
-      `Assigned the '${field}' field to ${activeEncoding}`
+      `Assigned the '${field}' field to ${activeOptions.encoding}`
     );
     setPillsInfo(newPillsInfo);
     setActiveOptions((opt) => ({ ...opt, menu: '' }));
