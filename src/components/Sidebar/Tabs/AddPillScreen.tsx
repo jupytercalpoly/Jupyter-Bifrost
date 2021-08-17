@@ -59,11 +59,10 @@ interface AddPillScreenProps {
 }
 
 export default function AddPillScreen(props: AddPillScreenProps) {
-  const [selectedEncoding, setSelectedEncoding] = useState<
-    VegaEncoding | 'var'
-  >('var');
-  const [selectedDataField, setSelectedDataField] =
-    useState<string>('datafield');
+  const [selectedEncoding, setSelectedEncoding] = useState<VegaEncoding | ''>(
+    ''
+  );
+  const [selectedDataField, setSelectedDataField] = useState<string>('');
   const [columnTypes] = useModelState('column_types');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const [data] = useModelState('graph_data');
@@ -71,9 +70,7 @@ export default function AddPillScreen(props: AddPillScreenProps) {
   const [currentScreen, setCurrentScreen] = useState<string>('var');
 
   useEffect(() => {
-    selectedEncoding !== 'var' &&
-      selectedDataField !== 'datafield' &&
-      addNewPill();
+    selectedEncoding !== '' && selectedDataField !== '' && addNewPill();
   }, [selectedEncoding, selectedDataField]);
 
   function switchScreen(screen: string) {
@@ -93,7 +90,7 @@ export default function AddPillScreen(props: AddPillScreenProps) {
 
     // change the encoded field.
     let newSpec = produce(graphSpec, (gs) => {
-      if (selectedEncoding !== 'var') {
+      if (selectedEncoding !== '') {
         (gs.encoding[selectedEncoding] as EncodingInfo) = {
           field: selectedDataField,
           type: dtype,
@@ -143,7 +140,7 @@ export default function AddPillScreen(props: AddPillScreenProps) {
           }
           onClick={() => switchScreen('var')}
         >
-          {selectedEncoding}
+          {selectedEncoding === '' ? 'var' : `encoding: ${selectedEncoding}`}
         </button>
         <button
           className={
@@ -153,7 +150,9 @@ export default function AddPillScreen(props: AddPillScreenProps) {
           }
           onClick={() => switchScreen('datafield')}
         >
-          {selectedDataField}
+          {selectedDataField === ''
+            ? 'datafield'
+            : `datafield: ${selectedDataField}`}
         </button>
       </nav>
       {currentScreen === 'var' ? (
