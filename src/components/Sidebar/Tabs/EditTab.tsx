@@ -196,7 +196,10 @@ export default function EditTab({
     if (clickedAxis) {
       updateClickedAxis('');
     }
-    saveSpecToHistory(newSpec);
+    saveSpecToHistory(
+      newSpec,
+      `Assigned the '${field}' field to ${activeEncoding}`
+    );
     setPillsInfo(newPillsInfo);
     setActiveOptions((opt) => ({ ...opt, menu: '' }));
   };
@@ -268,6 +271,10 @@ export default function EditTab({
     });
     setPillsInfo(newPills);
     setGraphSpec(newSpec);
+    saveSpecToHistory(
+      newSpec,
+      `Removed the ${pillState.field} encoding from the ${newSpec.mark} plot.`
+    );
 
     if (encoding === activeOptions.encoding) {
       updateClickedAxis('');

@@ -351,6 +351,7 @@ function AxisRangeSlider({
     if (!range) {
       updateRange(bounds);
     }
+    setGraphSpec({ ...graphSpec, description: 'test' });
   }, []);
 
   function getRange(): [number, number] | undefined {
@@ -394,7 +395,9 @@ function AxisRangeSlider({
         domain={bounds}
         values={range}
         onUpdate={(update) => updateRange(update)}
-        onSlideEnd={() => save(graphSpec)}
+        onSlideEnd={() =>
+          save(graphSpec, `Updated the filter range for ${field}`)
+        }
         vertical={axis === 'y'}
         reversed={axis === 'y'}
         onAxis={true}

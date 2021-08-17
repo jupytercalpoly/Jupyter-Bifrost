@@ -47,6 +47,7 @@ export type GraphSpec = VisualizationSpec & {
   mark: string | Record<string, any>;
   encoding: Record<VegaEncoding, EncodingInfo>;
   params: any[];
+  description?: string;
   transform: {
     [transformType: string]: any;
   }[];

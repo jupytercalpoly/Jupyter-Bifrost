@@ -120,7 +120,11 @@ export default function FilterScreen(props: FilterScreenProps) {
   const [graphSpec] = useModelState('graph_spec');
   const columnInfo = graphSpec.encoding[props.encoding];
   const Filters = filterMap[columnInfo.type];
-  useSpecHistory({ saveOnDismount: true });
+  const { field } = graphSpec.encoding[props.encoding];
+  useSpecHistory({
+    saveOnDismount: true,
+    description: `Filtered on ${field}`,
+  });
 
   return (
     <article css={screenCss}>
