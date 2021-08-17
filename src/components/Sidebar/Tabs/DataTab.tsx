@@ -72,6 +72,11 @@ const variableTabCss = css`
   }
 `;
 
+interface ActiveOptions {
+  menu: 'encoding' | 'field' | 'filter' | '';
+  encoding: VegaEncoding | '';
+}
+
 export default function DataTab({
   clickedAxis,
   updateClickedAxis,
@@ -89,13 +94,14 @@ export default function DataTab({
   );
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const [data] = useModelState('graph_data');
-  const [activeEncoding, setActiveEncoding] = useState<VegaEncoding | ''>('');
-  const [showEncodings, setShowEncodings] = useState(false);
-  const [filterEncoding, setFilterEncoding] = useState<VegaEncoding | ''>('');
+  const [activeOptions, setActiveOptions] = useState<ActiveOptions>({
+    menu: '',
+    encoding: '',
+  });
   const isInitialMount = useRef<boolean>(true);
 
   useEffect(() => {
-    setActiveEncoding(clickedAxis);
+    setActiveOptions((opt) => ({ ...opt, encoding: clickedAxis }));
   }, [clickedAxis]);
   const saveSpecToHistory = useSpecHistory();
   // A list of GraphPill Props. Defined separately from spec to prevent reordering during user edits.
@@ -112,20 +118,18 @@ export default function DataTab({
   useEffect(updatePillFilters, [graphSpec]);
 
   const updateField = (field: string) => {
-    if (activeEncoding === '') {
+    if (!activeOptions.encoding) {
       return;
     }
     const dtype = columnTypes[field];
 
     // change the encoded field.
     let newSpec = produce(graphSpec, (gs) => {
-      (gs.encoding[activeEncoding] as EncodingInfo) = {
+      (gs.encoding[activeOptions.encoding as VegaEncoding] as EncodingInfo) = {
         field: field,
         type: dtype,
       };
     });
-
-    console.log(hasDuplicateField(newSpec, field));
 
     newSpec =
       // check if the filter is being used in another pill
@@ -136,7 +140,9 @@ export default function DataTab({
           addDefaultFilter(newSpec, data, columnTypes, field);
 
     const newPillsInfo = produce(pillsInfo, (info) => {
-      const pill = info.find((pill) => pill.encoding === activeEncoding);
+      const pill = info.find(
+        (pill) => pill.encoding === activeOptions.encoding
+      );
       if (!pill) {
         return;
       }
@@ -151,7 +157,7 @@ export default function DataTab({
     }
     saveSpecToHistory(newSpec);
     setPillsInfo(newPillsInfo);
-    setActiveEncoding('');
+    setActiveOptions((opt) => ({ ...opt, menu: '' }));
   };
 
   function updatePillFilters() {
@@ -229,13 +235,13 @@ export default function DataTab({
     setPillsInfo(newPills);
     setGraphSpec(newSpec);
 
-    if (encoding === activeEncoding) {
+    if (encoding === activeOptions.encoding) {
       updateClickedAxis('');
     }
   }
 
   function openFilters(encoding: VegaEncoding) {
-    setFilterEncoding(encoding);
+    setActiveOptions({ menu: 'filter', encoding });
   }
 
   function addEncoding(encoding: VegaEncoding) {
@@ -243,23 +249,24 @@ export default function DataTab({
       return;
     }
     const newSpec = produce(graphSpec, (gs) => {
-      if (activeEncoding) {
+      if (activeOptions.encoding) {
         (gs.encoding[encoding] as EncodingInfo) =
-          gs.encoding[activeEncoding as VegaEncoding];
-        delete gs.encoding[activeEncoding];
+          gs.encoding[activeOptions.encoding];
+        delete gs.encoding[activeOptions.encoding];
       } else {
         (gs.encoding[encoding] as EncodingInfo) = {
           field: '',
           type: '',
         };
       }
-      setShowEncodings(false);
     });
 
+    setActiveOptions({ menu: '', encoding: '' });
+
     const newPills = produce(pillsInfo, (info) => {
-      if (activeEncoding) {
+      if (activeOptions) {
         const i = pillsInfo.findIndex(
-          (pill) => pill.encoding === activeEncoding
+          (pill) => pill.encoding === activeOptions.encoding
         );
         if (i === -1) {
           return;
@@ -279,7 +286,7 @@ export default function DataTab({
 
     setPillsInfo(newPills);
     setGraphSpec(newSpec);
-    setActiveEncoding('');
+    setActiveOptions((opt) => ({ ...opt, menu: '' }));
   }
 
   function updateFieldType(field: string, oldType: string) {
@@ -318,20 +325,32 @@ export default function DataTab({
   const encodingList = pillsInfo.map((props, i) => (
     <GraphPill
       onClose={() => deletePill(props)}
-      onAggregationSelected={() => openFilters(props.encoding as VegaEncoding)}
       onFilterSelected={() =>
         props.field && openFilters(props.encoding as VegaEncoding)
       }
       onFieldTypeSelected={() => updateFieldType(props.field, props.type)}
       onEncodingSelected={() => {
-        setActiveEncoding(props.encoding as VegaEncoding);
-        setShowEncodings((show) => !show);
+        const toggledOn =
+          activeOptions.encoding !== props.encoding ||
+          activeOptions.menu !== 'encoding';
+        setActiveOptions({
+          menu: toggledOn ? 'encoding' : '',
+          encoding: toggledOn ? (props.encoding as VegaEncoding) : '',
+        });
       }}
       onFieldSelected={() => {
-        setActiveEncoding((encoding) =>
-          encoding === props.encoding ? '' : (props.encoding as VegaEncoding)
-        );
+        setActiveOptions((opt) => {
+          let toggledOn =
+            opt.encoding !== props.encoding || activeOptions.menu !== 'field';
+          return {
+            menu: toggledOn ? 'field' : '',
+            encoding: toggledOn ? (props.encoding as VegaEncoding) : '',
+          };
+        });
       }}
+      selectedField={
+        activeOptions.encoding === props.encoding ? activeOptions.menu : ''
+      }
       position={i}
       key={i}
       {...props}
@@ -343,7 +362,7 @@ export default function DataTab({
       key={'add-new-pill'}
       className="wrapper"
       style={{ margin: '0 10px' }}
-      onClick={() => setShowEncodings(true)}
+      onClick={() => setActiveOptions({ encoding: '', menu: 'encoding' })}
     >
       <PlusCircle />
     </button>
@@ -352,7 +371,7 @@ export default function DataTab({
   return (
     <section className="DataTab" css={variableTabCss}>
       <ul className="encoding-list">{encodingList}</ul>
-      {showEncodings && (
+      {activeOptions.menu === 'encoding' && (
         <ul className="encoding-choices">
           {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]
             .filter((encoding) => !(encoding in graphSpec.encoding))
@@ -366,7 +385,7 @@ export default function DataTab({
             ))}
         </ul>
       )}
-      {activeEncoding && (
+      {activeOptions.menu === 'field' && (
         <div>
           <SearchBar
             choices={columns}
@@ -391,10 +410,10 @@ export default function DataTab({
         </div>
       )}
 
-      {filterEncoding && (
+      {activeOptions.menu === 'filter' && (
         <FilterScreen
-          encoding={filterEncoding}
-          onBack={() => setFilterEncoding('')}
+          encoding={activeOptions.encoding as VegaEncoding}
+          onBack={() => setActiveOptions({ encoding: '', menu: '' })}
         />
       )}
     </section>
