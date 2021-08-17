@@ -106,13 +106,3 @@ export default function HistoryTab() {
     </section>
   );
 }
-
-// function generateDescriptions(hist: GraphSpec[]) {
-//   return hist.map((spec) => {
-//     const fieldString = Object.values(spec.encoding)
-//       .map((info) => info.field)
-//       .join(' vs ');
-//     const mark = spec.mark;
-//     return `${fieldString} ${mark} chart`;
-//   });
-// }

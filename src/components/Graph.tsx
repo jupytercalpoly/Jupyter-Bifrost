@@ -351,7 +351,6 @@ function AxisRangeSlider({
     if (!range) {
       updateRange(bounds);
     }
-    setGraphSpec({ ...graphSpec, description: 'test' });
   }, []);
 
   function getRange(): [number, number] | undefined {
