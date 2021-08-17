@@ -4,9 +4,9 @@ import LineChartIcon from './LineChartIcon';
 // import PieChartIcon from './PieChartIcon';
 import TickChartIcon from './TickChartIcon';
 import BoxPlotChartIcon from './BoxPlotChartIcon';
-import CircleChartIcon from './CircleChartIcon';
+// import CircleChartIcon from './CircleChartIcon';
 import ErrorBandChartIcon from './ErrorBandChartIcon';
-import SquareChartIcon from './SquareChartIcon';
+// import SquareChartIcon from './SquareChartIcon';
 import ErrorBarChartIcon from './ErrorBarChartIcon';
 
 export const chartIcons = [
@@ -16,8 +16,8 @@ export const chartIcons = [
   // { icon: PieChartIcon, mark: 'arc' },
   { icon: TickChartIcon, mark: 'tick' },
   { icon: BoxPlotChartIcon, mark: 'boxplot' },
-  { icon: CircleChartIcon, mark: 'circle' },
+  // { icon: CircleChartIcon, mark: 'circle' },
   { icon: ErrorBandChartIcon, mark: 'errorband' },
   { icon: ErrorBarChartIcon, mark: 'errorbar' },
-  { icon: SquareChartIcon, mark: 'square' },
+  // { icon: SquareChartIcon, mark: 'square' },
 ];
