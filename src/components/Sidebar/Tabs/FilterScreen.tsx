@@ -142,9 +142,11 @@ export default function FilterScreen(props: FilterScreenProps) {
 }
 
 function QuantitativeFilters(props: FilterGroupProps) {
-  const [binned, setBinned] = useState<boolean>(false);
   const [graphData] = useModelState('graph_data');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+  const [binned, setBinned] = useState<boolean>(
+    graphSpec.encoding[props.encoding].bin ?? false
+  );
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const currentScale =

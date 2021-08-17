@@ -183,10 +183,7 @@ export default function GraphPill(props: GraphPillProps) {
 
           {scale && (
             <Fragment>
-              <button
-                className="wrapper icon"
-                onClick={props.onAggregationSelected}
-              >
+              <button className="wrapper icon" onClick={props.onFilterSelected}>
                 <ScaleIcon />
               </button>
               <div style={{ padding: '0 5px' }}>{scale}</div>
