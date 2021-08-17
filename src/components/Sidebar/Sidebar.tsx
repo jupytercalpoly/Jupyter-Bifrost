@@ -8,7 +8,7 @@ import NearbyTab from './Tabs/NearbyTab';
 import { useModelState } from '../../hooks/bifrost-model';
 import { VegaEncoding } from '../../modules/VegaEncodings';
 import { CSSTransitionGroup } from 'react-transition-group';
-import theme from '../../theme';
+import theme, { BifrostTheme } from '../../theme';
 
 const transitionCss = css`
   .side-bar-transition-enter {
@@ -45,15 +45,14 @@ const sidebarCss = css`
   min-height: 400px;
   border-radius: 2.5% 2.5% 0 0;
   box-shadow: ${theme.shadow.handle};
+  margin: 8px;
 
   .sidebar-content {
     position: relative;
-    border: 2px solid #e4e4e4;
-    border-top: none;
-    border-bottom: none;
+    border-top: 2px solid #e4e4e4;
     padding: 10px;
     padding-bottom: 0;
-    height: 440px;
+    height: 430px;
   }
 `;
 const tabMapping: {
@@ -103,29 +102,33 @@ export default function Sidebar(props: {
   );
 }
 
-const tabBarCss = css`
+const tabBarCss = (t: BifrostTheme) => css`
   ul {
     display: flex;
+    justify-content: space-around;
+    align-items: center;
     list-style: none;
     padding: 0;
     margin: 0;
-    justify-content: space-between;
+    padding: 8px 30px;
   }
   li {
-    padding: 15px 30px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    background: #e9e9e9;
+    background: transparent;
     cursor: pointer;
-
-    border: 1px solid #d4d4d4;
     border-bottom: none;
-    width: calc(100% / 3);
-    text-align: center;
+    transform: scale(1);
+    transition: transform 0.5s;
+    padding: 5px 20px;
+    border-radius: 15px;
+
+    &:active {
+      transform: scale(0.95);
+    }
 
     &.selected {
       font-weight: 800;
-      background: whitesmoke;
+      background-color: ${t.color.primary.dark};
+      color: white;
     }
   }
 `;
@@ -157,7 +160,6 @@ const actionBarCss = css`
   ul {
     display: flex;
     justify-content: center;
-    border: 2px solid #e4e4e4;
     border-top: none;
     list-style: none;
     margin: 0;
