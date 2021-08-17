@@ -6,7 +6,7 @@ const pillCss = css`
   list-style: none;
   padding: 5px;
   background: #dedede;
-  border-radius: 15px;
+  border-radius: 7px;
   border: 1px solid transparent;
   transition: border-color 0.5s;
   width: min-content;
