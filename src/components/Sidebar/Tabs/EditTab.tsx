@@ -298,7 +298,7 @@ export default function EditTab({
     setActiveOptions({ menu: '', encoding: '' });
 
     const newPills = produce(pillsInfo, (info) => {
-      if (activeOptions) {
+      if (activeOptions.encoding) {
         const i = pillsInfo.findIndex(
           (pill) => pill.encoding === activeOptions.encoding
         );
@@ -374,7 +374,7 @@ export default function EditTab({
       }}
       onFieldSelected={() => {
         setActiveOptions((opt) => {
-          let toggledOn =
+          const toggledOn =
             opt.encoding !== props.encoding || activeOptions.menu !== 'field';
           return {
             menu: toggledOn ? 'field' : '',
@@ -397,7 +397,7 @@ export default function EditTab({
       className="wrapper"
       style={{ margin: '0 10px' }}
       onClick={() => {
-        setActiveOptions({ encoding: '', menu: 'encoding' });
+        setActiveOptions({ encoding: '', menu: '' });
         setAddNewPill(true);
       }}
     >
