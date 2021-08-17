@@ -178,6 +178,9 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
             gs['transform'] = [];
             gs.width = 400;
             gs.height = 200;
+            if (['circle', 'square'].includes(gs.mark as string)) {
+              gs.mark = 'point';
+            }
           })
         );
         setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
