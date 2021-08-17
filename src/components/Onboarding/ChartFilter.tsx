@@ -5,14 +5,6 @@ import theme from '../../theme';
 import { chartIcons } from '../../assets/icons/chartIcons/ChartIcons';
 import Tooltip from '../Tooltip';
 
-const chartFilters = [
-  { icon: BarChartIcon, mark: 'bar' },
-  { icon: ScatterChartIcon, mark: 'point' },
-  { icon: LineChartIcon, mark: 'line' },
-  { icon: PieChartIcon, mark: 'arc' },
-  { icon: TickChartIcon, mark: 'tick' },
-];
-
 const chartFilterCss = (theme: BifrostTheme) => css`
   margin: 5px;
 
@@ -54,7 +46,7 @@ export default function ChartFilter({
     <div className="ChartFilter" css={chartFilterCss}>
       <h3>Filter</h3>
       <ul>
-        {chartFilters
+        {chartIcons
           .filter(({ mark }) => availableMarks.has(mark))
           .map(({ mark, icon: Icon }) => (
             <li key={mark}>
