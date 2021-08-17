@@ -111,7 +111,7 @@ export default function AddPillScreen(props: AddPillScreenProps) {
         field: selectedDataField,
         encoding: selectedEncoding,
         aggregation: '',
-        type: '',
+        type: dtype,
         scale: '',
         filters: [],
       });

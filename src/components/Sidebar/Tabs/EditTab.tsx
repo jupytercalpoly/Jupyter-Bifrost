@@ -272,6 +272,7 @@ export default function EditTab({
     if (encoding === activeOptions.encoding) {
       updateClickedAxis('');
     }
+    setActiveOptions({ menu: '', encoding: '' });
   }
 
   function openFilters(encoding: VegaEncoding) {
