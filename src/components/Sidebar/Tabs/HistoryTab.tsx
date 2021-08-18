@@ -3,13 +3,12 @@ import { jsx, css } from '@emotion/react';
 import produce from 'immer';
 import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
-import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
+import { useModelState } from '../../../hooks/bifrost-model';
 import SearchBar from '../../ui-widgets/SearchBar';
 
 const historyCss = (theme: any) => css`
   height: 100%;
   .history-list {
-    list-style: none;
     padding: 0;
     max-height: 370px;
     overflow-y: scroll;
@@ -44,7 +43,13 @@ export default function HistoryTab() {
     [specHistory]
   );
   const histDescriptions = useMemo(
-    () => generateDescriptions(reverseHistory),
+    () =>
+      reverseHistory.map(
+        (spec, i) =>
+          `${reverseHistory.length - i}.   ${
+            spec.description || 'Graph Changed'
+          }`
+      ),
     [reverseHistory]
   );
 
@@ -77,7 +82,7 @@ export default function HistoryTab() {
         onChange={setSearchQuery}
         onResultsChange={setResults}
       />
-      <ul className="history-list">
+      <ol className="history-list">
         {searchResults.map(({ choice, index }, elIndex) => {
           const classes = [
             ['history-el', true],
@@ -97,17 +102,7 @@ export default function HistoryTab() {
             </li>
           );
         })}
-      </ul>
+      </ol>
     </section>
   );
-}
-
-function generateDescriptions(hist: GraphSpec[]) {
-  return hist.map((spec) => {
-    const fieldString = Object.values(spec.encoding)
-      .map((info) => info.field)
-      .join(' vs ');
-    const mark = spec.mark;
-    return `${fieldString} ${mark} chart`;
-  });
 }

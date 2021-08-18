@@ -118,7 +118,10 @@ export default function AddPillScreen(props: AddPillScreenProps) {
     });
 
     props.updatePillState(newPills);
-    saveSpecToHistory(newSpec);
+    saveSpecToHistory(
+      newSpec,
+      `Applied the ${selectedDataField} field to ${selectedEncoding}`
+    );
     setGraphSpec(newSpec);
     props.onPrevious();
   }

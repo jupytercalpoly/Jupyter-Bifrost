@@ -11,6 +11,7 @@ import {
   GraphSpec,
   useModelState,
 } from '../../hooks/bifrost-model';
+import { VegaEncoding } from '../../modules/VegaEncodings';
 // import { VegaEncoding } from '../../modules/VegaEncodings';
 import { BifrostTheme } from '../../theme';
 import HelpScreen from '../HelpScreen/HelpScreen';
@@ -130,6 +131,10 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
         mark: { tooltip: true },
       };
       gs.params = [{ name: 'brush', select: 'interval' }];
+      let graphDescriptor = Object.values(gs.encoding)
+        .map((info) => (info as GraphSpec['encoding'][VegaEncoding]).field)
+        .join(' vs. ');
+      gs.description = `Chose the ${graphDescriptor} ${gs.mark} plot`;
     });
     setGraphSpec(spec);
     setOpHistory([spec]);

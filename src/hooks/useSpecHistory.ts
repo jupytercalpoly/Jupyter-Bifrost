@@ -5,6 +5,7 @@ import { GraphSpec, useModelState } from './bifrost-model';
 
 interface SpecHistoryOptions {
   saveOnDismount?: boolean;
+  description?: string;
 }
 
 /**
@@ -13,7 +14,7 @@ interface SpecHistoryOptions {
  * @returns a function that can manually save a graph spec to history
  */
 export default function useSpecHistory(
-  options: SpecHistoryOptions = { saveOnDismount: false }
+  options: SpecHistoryOptions = { saveOnDismount: false, description: '' }
 ) {
   const [opHistory, setOpHistory] = useModelState('spec_history');
   const graphSpec = useModelState('graph_spec')[0];
@@ -39,19 +40,26 @@ export default function useSpecHistory(
   /**
    * Saves graph spec to the current history branch
    * @param spec Graph Spec to save
+   * @param description Description of the edit which will appear in history
    */
-  function save(spec: GraphSpec = graphSpec) {
+  function save(
+    spec: GraphSpec = graphSpec,
+    description: string = options.description || 'Graph Changed'
+  ) {
     const hasChanged = originalSpec !== spec;
-    const hasNoEncoding = !Object.keys(spec.encoding).length;
-    if (!hasChanged || hasNoEncoding) {
+    const hasEncoding = Object.keys(spec.encoding).length;
+    if (!hasChanged || !hasEncoding) {
       return;
     }
     const newHist = opHistory.slice(0, index + 1);
-    newHist.push(spec);
+    const explainedSpec = produce(spec, (gs) => {
+      gs.description = description;
+    });
+    newHist.push(explainedSpec);
     setOpHistory(newHist);
     setIndex(newHist.length - 1);
-    setOriginalSpec(spec);
-    setDfCode(updateDfCode(spec, inputVar, outputVar, columnMap));
+    setOriginalSpec(explainedSpec);
+    setDfCode(updateDfCode(explainedSpec, inputVar, outputVar, columnMap));
   }
 
   saveRef.current = save;
