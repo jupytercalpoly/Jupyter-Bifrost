@@ -38,6 +38,10 @@ export interface EncodingInfo {
   aggregate?: string;
   axis?: {
     title?: string;
+    titleColor?: string;
+  };
+  legend?: {
+    titleColor?: string;
   };
 }
 

@@ -9,11 +9,22 @@ import produce from 'immer';
 import { useState, useEffect } from 'react';
 import { VegaLite } from 'react-vega';
 import theme from '../../../theme';
+import { VegaEncoding } from '../../../modules/VegaEncodings';
 
 const nearbyTabCss = css`
   width: 100%;
-  overflow: scroll;
   height: 100%;
+
+  .chart-list {
+    overflow: scroll;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: 340px;
+    .chart-element {
+      padding: 0;
+    }
+  }
 
   button {
     background-color: transparent;
@@ -56,29 +67,24 @@ export default function NearbyTab() {
     draco.init().then(() => {
       const program = 'data("data").\n' + dataAsp.concat(queryAsp).join('\n');
       const solution = draco.solve(program, { models: 5 });
+      const excludeFacet = (spec: any) =>
+        !(
+          'facet' in (spec as GraphSpec).encoding ||
+          'row' in (spec as GraphSpec).encoding
+        );
 
       if (solution) {
         const recommendedSpecs = solution.specs
-          .filter(
-            (spec) =>
-              !(
-                'facet' in (spec as GraphSpec).encoding ||
-                'row' in (spec as GraphSpec).encoding
-              )
-          )
-          .map((spec) =>
-            produce(spec, (gs) => {
-              delete gs['$schema'];
-              delete (gs['data'] as any).url;
-              gs['data']['name'] = 'data';
-              gs['transform'] = [];
-              gs.width = 120;
-              gs.height = 120;
-              if (['circle', 'square'].includes(gs.mark as string)) {
-                gs.mark = 'point';
-              }
-            })
-          );
+          .slice(1) // The first graph is identical to the current one, so we exclude it.
+          .filter(excludeFacet)
+          .map(preprocessRecommendation)
+          .map((recommendedSpec) => {
+            const differingEncodings = diffSpecEncodings(spec, recommendedSpec);
+            return differingEncodings.reduce(
+              setEncodingHighlight,
+              recommendedSpec
+            );
+          });
         setNearbyCharts(recommendedSpecs as GraphSpec[]);
       }
       setLoading(false);
@@ -98,7 +104,7 @@ export default function NearbyTab() {
   }
 
   function handleClickOnNearByChart(idx: number) {
-    const newSpec = produce(nearByCharts[idx], (gs) => {
+    const newSpec = produce(nearByCharts[idx], (gs: GraphSpec) => {
       gs['width'] = spec.width;
       gs['height'] = spec.height;
       gs.config = {
@@ -106,32 +112,115 @@ export default function NearbyTab() {
       };
       gs.params = [{ name: 'brush', select: 'interval' }];
       gs.transform = spec.transform;
+      removeEncodingHighlights(gs);
     });
     setSpec(newSpec);
   }
 
   return (
     <section css={nearbyTabCss}>
-      {loading ? (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <Loader />
-        </div>
-      ) : nearByCharts.length !== 0 ? (
-        nearByCharts.map((spec: GraphSpec, i: number) => (
-          <button onClick={() => handleClickOnNearByChart(i)}>
-            <VegaLite spec={spec} data={graphData} actions={false} />
-          </button>
-        ))
-      ) : (
-        <div>Can't find the nearby charts!</div>
-      )}
+      <h2>Find a Similar Chart</h2>
+      <ul className="chart-list">
+        {loading ? (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Loader />
+          </div>
+        ) : nearByCharts.length !== 0 ? (
+          nearByCharts.map((spec: GraphSpec, i: number) => (
+            <li className="chart-element">
+              <button onClick={() => handleClickOnNearByChart(i)}>
+                <VegaLite spec={spec} data={graphData} actions={false} />
+              </button>
+            </li>
+          ))
+        ) : (
+          <div>No similar charts found</div>
+        )}
+      </ul>
     </section>
   );
+}
+
+/**
+ *
+ * @param specA First GraphSpec
+ * @param specB Second GraphSpec
+ * @returns A list of encodings that differ between the two
+ */
+function diffSpecEncodings(specA: GraphSpec, specB: GraphSpec): VegaEncoding[] {
+  const encodingSet = new Set(Object.keys(specA.encoding) as VegaEncoding[]);
+  const encodingList = Object.keys(specB.encoding) as VegaEncoding[];
+  const differingEncodings = encodingList.filter((encoding) => {
+    let unique = true;
+    const hasSharedEncoding = encodingSet.delete(encoding);
+    if (hasSharedEncoding) {
+      const hasDiffAgg =
+        specA.encoding[encoding].aggregate !==
+        specB.encoding[encoding].aggregate;
+      const hasDiffBin =
+        specA.encoding[encoding].bin !== specB.encoding[encoding].bin;
+      unique = hasDiffAgg || hasDiffBin;
+    }
+    return unique;
+  });
+  differingEncodings.push(...encodingSet);
+  return differingEncodings;
+}
+
+/**
+ * Adds a highlight to the encoding to indicate a difference between the primary and recommended spec.
+ * @param spec GraphSpec to modify
+ * @param encoding encoding to receive the highlight
+ */
+function setEncodingHighlight(spec: GraphSpec, encoding: VegaEncoding) {
+  const titleColor = 'red';
+  switch (encoding) {
+    case 'x':
+    case 'y':
+      spec.encoding[encoding].axis = { titleColor };
+      break;
+    case 'color':
+    case 'size':
+    case 'shape':
+      spec.encoding[encoding].legend = { titleColor };
+    default:
+      break;
+  }
+  return spec;
+}
+
+/**
+ * Removes colored encoding highlights from the nearby graph.
+ */
+function removeEncodingHighlights(spec: GraphSpec) {
+  for (let key in spec.encoding) {
+    if (spec.encoding[key as VegaEncoding].axis)
+      delete spec.encoding[key as VegaEncoding].axis;
+    else if (spec.encoding[key as VegaEncoding].legend)
+      delete spec.encoding[key as VegaEncoding].legend;
+  }
+  return spec;
+}
+
+/**
+ * Converts recommendation to an appropriately formatted nearby GraphSpec
+ */
+function preprocessRecommendation(recommendation: any): GraphSpec {
+  delete recommendation['$schema'];
+  delete (recommendation['data'] as any).url;
+  recommendation['data']['name'] = 'data';
+  recommendation['transform'] = [];
+  recommendation.width = 120;
+  recommendation.height = 120;
+  if (['circle', 'square'].includes(recommendation.mark as string)) {
+    recommendation.mark = 'point';
+  }
+  return recommendation;
 }
