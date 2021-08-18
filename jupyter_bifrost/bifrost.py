@@ -59,7 +59,7 @@ class BifrostWidget(DOMWidget):
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
-    graph_data_config = Dict({"maxRows": 100, "sample": False}).tag(sync=True)
+    graph_data_config = Dict({"sampleSize": 100, "datasetLength": 0}).tag(sync=True)
 
 
     def __init__(
@@ -74,7 +74,8 @@ class BifrostWidget(DOMWidget):
     ):
         super().__init__(**kwargs)
         self.df_history = [df]
-        data = self.get_data(df, self.graph_data_config["maxRows"])
+
+        data = self.get_data(df, self.graph_data_config["sampleSize"])
         column_types = self.get_column_types(df)
         graph_info = self.create_graph_data(
             df, data, column_types, kind=kind, x=x, y=y, color=color
@@ -89,6 +90,7 @@ class BifrostWidget(DOMWidget):
         self.set_trait("plot_function_args", graph_info["args"])
         self.set_trait("column_types", column_types)
         self.set_trait("column_name_map", column_name_map)
+        self.set_trait("graph_data_config", {"sampleSize": 100, "datasetLength": len(df)})
         if df_watcher.plot_output:
             self.set_trait("output_variable", df_watcher.plot_output)
         if df_watcher.bifrost_input:
@@ -109,12 +111,11 @@ class BifrostWidget(DOMWidget):
     @observe("graph_data_config")
     def update_dataset(self, changes):
         config = changes["new"]
-        if changes["old"]["sample"] == config["sample"] or config["maxRows"] >= len(self.df_history[-1]):
+        df_len = len(self.df_history[-1])
+        if changes["old"]["sampleSize"] >= df_len and config["sampleSize"] >= df_len:
             return
-        if config["sample"]:
-            self.set_trait("graph_data", self.get_data(self.df_history[-1], config["maxRows"]))
-        else:
-            self.set_trait("graph_data", self.get_data(self.df_history[-1]))
+        self.set_trait("graph_data", self.get_data(self.df_history[-1]))
+            
 
 
     def get_data(self, df: pd.DataFrame, sampleLimit:int=None):

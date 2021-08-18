@@ -126,6 +126,8 @@ export default function EditTab({
   );
   const [graphMark, setGraphMark] = useState<string>('');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+  const [graphDataConfig, setGraphDataConfig] =
+    useModelState('graph_data_config');
   const [data] = useModelState('graph_data');
   const [activeOptions, setActiveOptions] = useState<ActiveOptions>({
     menu: '',
@@ -435,6 +437,12 @@ export default function EditTab({
     }
   }
 
+  function setSamplingThreshold(val: number) {
+    console.log(val);
+    console.log(graphDataConfig);
+    setGraphDataConfig({ ...graphDataConfig, sampleSize: Math.floor(val) });
+  }
+
   return (
     <section className="DataTab" css={variableTabCss}>
       {addNewPill ? (
@@ -537,7 +545,20 @@ export default function EditTab({
                 <ChevronUp size={12} />
               </div>
             </h3>
-            {samplingSectionOpen ? <article></article> : <article></article>}
+            {samplingSectionOpen ? (
+              <article>
+                <input
+                  type="range"
+                  min="1"
+                  max={graphDataConfig.datasetLength}
+                  step="1"
+                  value={graphDataConfig.sampleSize}
+                  onChange={(e) => setSamplingThreshold(e.target.valueAsNumber)}
+                />
+              </article>
+            ) : (
+              <div></div>
+            )}
           </section>
         </article>
       )}
