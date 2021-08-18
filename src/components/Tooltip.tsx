@@ -19,8 +19,13 @@ const tooltipCss = (t: BifrostTheme) => css`
     position: absolute;
     padding: 3px;
     border: 1px solid #e4d2e4;
+    border-radius: 3px;
     background: white;
     font-size: 12px;
+    pointer-events: none;
+    width: max-content;
+    max-width: 140px;
+    z-index: 200;
     &.top {
       bottom: 100%;
       left: 0;
