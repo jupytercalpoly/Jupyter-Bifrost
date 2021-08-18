@@ -1,7 +1,7 @@
 /**@jsx jsx */
 
 import { jsx, css } from '@emotion/react';
-import { ArrowLeft, HelpCircle } from 'react-feather';
+import { ArrowLeft, Code, HelpCircle } from 'react-feather';
 
 const graphNavCss = css`
   ul {
@@ -20,6 +20,7 @@ const graphNavCss = css`
 interface NavBarProps {
   onBack?(): void;
   onHelpRequested?(): void;
+  onExportCodeRequested?(): void;
 }
 
 export default function NavBar(props: NavBarProps) {
@@ -29,6 +30,11 @@ export default function NavBar(props: NavBarProps) {
         <li>
           <button className="wrapper" onClick={props.onBack}>
             <ArrowLeft />
+          </button>
+        </li>
+        <li>
+          <button className="wrapper" onClick={props.onExportCodeRequested}>
+            <Code />
           </button>
         </li>
         <li>

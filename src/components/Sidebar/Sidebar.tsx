@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import EditTab from './Tabs/EditTab';
 import HistoryTab from './Tabs/HistoryTab';
 import NearbyTab from './Tabs/NearbyTab';
-import { useModelState } from '../../hooks/bifrost-model';
 import { VegaEncoding } from '../../modules/VegaEncodings';
 import { CSSTransitionGroup } from 'react-transition-group';
 import theme, { BifrostTheme } from '../../theme';
@@ -39,8 +38,8 @@ const sidebarCss = css`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 500px;
-  height: 100%;
+  max-width: 330px;
+  height: 97%;
   min-height: 400px;
   border-radius: 2.5% 2.5% 0 0;
   box-shadow: ${theme.shadow.handle};
@@ -94,7 +93,6 @@ export default function Sidebar(props: {
             updateClickedAxis={props.updateClickedAxis}
           />
         </div>
-        <ActionBar />
       </aside>
     </CSSTransitionGroup>
   );
@@ -149,39 +147,6 @@ function TabBar(props: TabBarProps) {
             {tab}
           </li>
         ))}
-      </ul>
-    </nav>
-  );
-}
-
-const actionBarCss = css`
-  ul {
-    display: flex;
-    justify-content: center;
-    border-top: none;
-    list-style: none;
-    margin: 0;
-    padding: 12px;
-    box-shadow: 0 0 20px #00000017;
-  }
-  li {
-    margin: 0 10px;
-  }
-`;
-
-function ActionBar() {
-  const dfCode = useModelState('df_code')[0];
-
-  function exportCode() {
-    navigator.clipboard.writeText(dfCode);
-  }
-
-  return (
-    <nav className="action-bar" css={actionBarCss}>
-      <ul>
-        <li>
-          <button onClick={exportCode}>Export Code</button>
-        </li>
       </ul>
     </nav>
   );
