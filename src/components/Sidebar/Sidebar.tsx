@@ -50,7 +50,10 @@ const sidebarCss = css`
     border-top: 2px solid #e4e4e4;
     padding: 10px;
     padding-bottom: 0;
-    height: 430px;
+    height: 100%;
+    display: flex;
+    justify-content: column;
+    overflow: hidden;
   }
 `;
 const tabMapping: {
