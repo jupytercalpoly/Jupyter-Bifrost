@@ -14,17 +14,20 @@ import theme from '../theme';
 import { VegaEncoding } from '../modules/VegaEncodings';
 import RangeSlider from './ui-widgets/RangeSlider';
 import useSpecHistory from '../hooks/useSpecHistory';
+// import { useResizeDetector } from 'react-resize-detector';
+// import produce from 'immer';
 
 const graphCss = css`
   padding-left: 34px;
   overflow-x: auto;
-  /* .vega-embed.has-actions {
+
+  .vega-embed.has-actions {
     details {
       position: absolute;
-      top: -28px;
-      left: 75px;
+      top: 10px;
+      right: 10px;
     }
-  } */
+  }
 
   g.mark-text.role-axis-title {
     text.hovered {
@@ -55,6 +58,18 @@ export default function Graph(props: GraphProps) {
     activeAxis: props.clickedAxis,
   });
   const data = useModelState('graph_data')[0];
+
+  // const { width, height, ref } = useResizeDetector();
+
+  // useEffect(() => {
+  //   console.log('graph');
+  //   console.log(width, height);
+  //   const newSpec = produce(spec, (gs) => {
+  //     gs.height = height ?? 'container';
+  //     gs.width = width ?? 'container';
+  //   });
+  //   setSpec(newSpec);
+  // }, [width, height]);
 
   useEffect(() => {
     if (['x', 'y'].includes(props.clickedAxis)) {
@@ -228,7 +243,7 @@ export default function Graph(props: GraphProps) {
         }px;
         position: absolute;
         left: ${xAxisBoundingBox.left - parentBoundingBox.left}px;
-        bottom: ${parentBoundingBox.bottom - xAxisBoundingBox.bottom}px;
+        top: ${xAxisBoundingBox.top - parentBoundingBox.top + 40}px;
         `
       );
     }
@@ -241,7 +256,7 @@ export default function Graph(props: GraphProps) {
         }px;
         position: absolute;
         left: ${yAxisBoundingBox.left - parentBoundingBox.left}px;
-        bottom: ${parentBoundingBox.bottom - yAxisBoundingBox.bottom}px;`
+        top: ${yAxisBoundingBox.top - parentBoundingBox.top + 40}px;`
       );
     }
   }
@@ -289,8 +304,10 @@ export default function Graph(props: GraphProps) {
   return (
     <div css={graphCss} onDoubleClick={resetBrushView}>
       <div
+        // style={{ width: '100%', height: '100%' }}
         onMouseUp={updateGraphBounds}
         onMouseLeave={() => setSelectedData(['brush', {}])}
+        // ref={ref}
       >
         <BifrostVega
           spec={spec}

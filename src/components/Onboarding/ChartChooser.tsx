@@ -36,17 +36,22 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
   .chart-col {
     position: relative;
     max-height: 100%;
+    width: 100%;
     align-self: flex-start;
+    overflow: hidden;
   }
 
   .suggested-charts {
-    height: 300px;
+    height: 315px;
     margin-left: 10px;
     scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: x mandatory;
     scroll-snap-align: center;
-
-    overflow: scroll;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
 
     @media screen and (max-width: 1200px) {
       max-height: 500px;
@@ -63,6 +68,7 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
     transition: border-color 0.5s;
     border: 10px solid transparent;
     transition: border-color 0.4s;
+    flex: 0 0 auto;
 
     &:active {
       transform: scale(1);
@@ -120,7 +126,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
 
     const spec = produce(suggestedGraphs[selectedIndex] as GraphSpec, (gs) => {
       // Resize the spec to fit a single graph view
-      gs.height = 405;
+      gs.height = 420;
       gs.width = 550;
       gs.config = {
         mark: { tooltip: true },

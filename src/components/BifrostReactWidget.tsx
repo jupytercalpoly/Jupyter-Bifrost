@@ -7,12 +7,12 @@ import { useModelState, BifrostModelContext } from '../hooks/bifrost-model';
 import theme from '../theme';
 import OnboardingWidget from './Onboarding/OnboardingWidget';
 import VisualizationScreen from './VisualizationScreen';
+import { useEffect } from 'react';
 
 const globalStyles = (theme: any) => css`
   // Global styles for the widget
   //===========================================================
   .bifrost-widget {
-    width: 100%;
     height: 100%;
     max-height: fit-content;
 
@@ -101,6 +101,16 @@ function BifrostReactWidgetDisplay() {
   const [onboarded, setOnboarded] = useState(
     Boolean(plotArgs['x'] && plotArgs['y'])
   );
+
+  useEffect(() => {
+    const jupyterWidgets = document.getElementsByClassName('jupyter-widgets');
+    Array.from(jupyterWidgets).forEach((jupyterWidget) => {
+      if (jupyterWidget.children[0].classList.contains('bifrost-widget')) {
+        (jupyterWidget as HTMLElement).style.overflow = 'hidden';
+      }
+    });
+  }, []);
+
   return (
     <div className="bifrost-widget-display">
       {onboarded ? (

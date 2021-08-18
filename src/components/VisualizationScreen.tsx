@@ -14,8 +14,8 @@ const bifrostWidgetCss = css`
   // Element-based styles
   //===========================================================
   display: grid;
-  grid-template-columns: 720px minmax(450px, 600px);
-  grid-template-rows: 40px 500px;
+  grid-template-columns: minmax(720px, min-content) minmax(max-content, auto);
+  grid-template-rows: 40px auto;
   grid-template-areas: 'nav sidebar' 'graph sidebar';
   height: 100%;
 
@@ -24,7 +24,7 @@ const bifrostWidgetCss = css`
   }
 
   .side-bar-collapsible-button {
-    transition: transform 0.4s ease-in-out;
+    transition: transform 0.6s ease-in-out;
     transform-origin: 40% 35%;
     cursor: pointer;
 

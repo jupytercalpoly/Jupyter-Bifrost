@@ -21,7 +21,8 @@ import Draco from 'draco-vis';
 import produce from 'immer';
 
 const columnSelectorCss = (theme: BifrostTheme) => css`
-  width: 320px;
+  /* width: 320px; */
+  flex: 0 0 320px;
   margin-right: 30px;
   padding-right: 30px;
   border-right: 1px solid #cecece;

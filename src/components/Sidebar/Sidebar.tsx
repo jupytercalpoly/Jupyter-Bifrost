@@ -39,7 +39,7 @@ const sidebarCss = css`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   height: 100%;
   min-height: 400px;
   border-radius: 2.5% 2.5% 0 0;
