@@ -33,6 +33,7 @@ import { useRef } from 'react';
 import { chartIcons } from '../../../assets/icons/chartIcons/ChartIcons';
 import theme from '../../../theme';
 import AddPillScreen from './AddPillScreen';
+import Slider from '../../ui-widgets/Slider';
 
 //TODO: have only scatter
 const variableTabCss = css`
@@ -547,13 +548,11 @@ export default function EditTab({
             </h3>
             {samplingSectionOpen ? (
               <article>
-                <input
-                  type="range"
-                  min="1"
-                  max={graphDataConfig.datasetLength}
-                  step="1"
+                <Slider
                   value={graphDataConfig.sampleSize}
-                  onChange={(e) => setSamplingThreshold(e.target.valueAsNumber)}
+                  domain={[1, graphDataConfig.datasetLength]}
+                  onSlideEnd={setSamplingThreshold}
+                  step={1}
                 />
               </article>
             ) : (

@@ -114,7 +114,7 @@ class BifrostWidget(DOMWidget):
         df_len = len(self.df_history[-1])
         if changes["old"]["sampleSize"] >= df_len and config["sampleSize"] >= df_len:
             return
-        self.set_trait("graph_data", self.get_data(self.df_history[-1]))
+        self.set_trait("graph_data", self.get_data(self.df_history[-1], config["sampleSize"]))
             
 
 

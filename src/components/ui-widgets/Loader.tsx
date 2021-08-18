@@ -1,6 +1,6 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { BifrostTheme } from '../theme';
+import { BifrostTheme } from '../../theme';
 
 const loaderCss = (t: BifrostTheme) => css`
   width: 50px;

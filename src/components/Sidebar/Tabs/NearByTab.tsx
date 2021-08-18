@@ -2,7 +2,7 @@
 import { jsx, css } from '@emotion/react';
 import { data2schema, schema2asp, cql2asp } from 'draco-core';
 import Draco from 'draco-vis';
-import Loader from '../../Loader';
+import Loader from '../../ui-widgets/Loader';
 
 import { GraphSpec, useModelState } from '../../../hooks/bifrost-model';
 import produce from 'immer';
