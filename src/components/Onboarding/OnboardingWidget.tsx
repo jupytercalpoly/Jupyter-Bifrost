@@ -49,14 +49,15 @@ export default function OnboardingWidget(props: OnboardingWidgetProps) {
       })
     );
     return () => {
-      console.log('user defined?', userDefinedSample);
-      setGraphConfig(
-        produce(graphConfig, (gc) => {
-          gc.sampleSize = userDefinedSample
-            ? gc.sampleSize
-            : defaultSingleGraphThreshold;
-        })
-      );
+      setTimeout(() => {
+        setGraphConfig(
+          produce(graphConfig, (gc) => {
+            gc.sampleSize = userDefinedSample
+              ? gc.sampleSize
+              : defaultSingleGraphThreshold;
+          })
+        );
+      }, 100);
     };
   }, []);
 

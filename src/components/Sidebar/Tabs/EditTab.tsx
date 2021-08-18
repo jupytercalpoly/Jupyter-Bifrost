@@ -44,7 +44,7 @@ const variableTabCss = css`
     .data-section,
     .sampling-section {
       cursor: pointer;
-      transition: transform 0.5s ease-in-out;
+      transition: transform 0.2s ease-in-out;
       &.open,
       &.open {
         transform: rotate(180deg);
@@ -102,6 +102,11 @@ const variableTabCss = css`
         background-color: whitesmoke;
       }
     }
+  }
+
+  .dataset-percentage {
+    margin-left: 13px;
+    margin-bottom: 5px;
   }
 `;
 
@@ -330,7 +335,6 @@ export default function EditTab({
       }
     });
 
-    console.log('data', newSpec);
     setPillsInfo(newPills);
     setGraphSpec(newSpec);
     setActiveOptions((opt) => ({ ...opt, menu: '' }));
@@ -439,8 +443,6 @@ export default function EditTab({
   }
 
   function setSamplingThreshold(val: number) {
-    console.log(val);
-    console.log(graphDataConfig);
     setGraphDataConfig({ ...graphDataConfig, sampleSize: Math.floor(val) });
   }
 
@@ -548,6 +550,14 @@ export default function EditTab({
             </h3>
             {samplingSectionOpen ? (
               <article>
+                <p className="dataset-percentage">
+                  {Math.round(
+                    (graphDataConfig.sampleSize /
+                      graphDataConfig.datasetLength) *
+                      100
+                  )}
+                  % of dataset
+                </p>
                 <Slider
                   value={graphDataConfig.sampleSize}
                   domain={[1, graphDataConfig.datasetLength]}
