@@ -47,12 +47,13 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
   }
 
   .suggested-charts {
-    height: 300px;
+    height: 315px;
     margin-left: 10px;
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     scroll-snap-align: center;
     overflow-x: scroll;
+    overflow-y: hidden;
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
