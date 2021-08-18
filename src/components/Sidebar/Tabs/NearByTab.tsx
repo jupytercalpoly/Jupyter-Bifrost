@@ -59,7 +59,13 @@ export default function NearbyTab() {
 
       if (solution) {
         const recommendedSpecs = solution.specs
-          .filter((spec) => !('facet' in (spec as GraphSpec).encoding))
+          .filter(
+            (spec) =>
+              !(
+                'facet' in (spec as GraphSpec).encoding ||
+                'row' in (spec as GraphSpec).encoding
+              )
+          )
           .map((spec) =>
             produce(spec, (gs) => {
               delete gs['$schema'];
