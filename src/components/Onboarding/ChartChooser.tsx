@@ -6,13 +6,8 @@ import { useMemo } from 'react';
 import { useState } from 'react';
 import { HelpCircle } from 'react-feather';
 import { VegaLite, VisualizationSpec } from 'react-vega';
-import {
-  // EncodingInfo,
-  GraphSpec,
-  useModelState,
-} from '../../hooks/bifrost-model';
+import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 import { VegaEncoding } from '../../modules/VegaEncodings';
-// import { VegaEncoding } from '../../modules/VegaEncodings';
 import { BifrostTheme } from '../../theme';
 import HelpScreen from '../HelpScreen/HelpScreen';
 import ChartFilter from './ChartFilter';
