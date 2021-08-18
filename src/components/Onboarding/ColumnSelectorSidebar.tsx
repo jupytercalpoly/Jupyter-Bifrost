@@ -207,7 +207,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   function handleDelete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     const updatedSet = new Set(selectedColumns);
     const selectedTag = (e.currentTarget as HTMLButtonElement).className.split(
-      '_'
+      /_(.+)/
     )[1];
 
     updatedSet.delete(selectedTag);
