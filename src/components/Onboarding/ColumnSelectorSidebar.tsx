@@ -75,6 +75,7 @@ const columnSelectorCss = (theme: BifrostTheme) => css`
 
   form {
     margin-top: 12px;
+    border-bottom: 1px solid #cecece;
   }
 
   fieldset {
@@ -222,25 +223,6 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
     <aside className="ColumnSelectorSidebar" css={columnSelectorCss}>
       <h2>Columns</h2>
       <h3 className="subtitle">Select up to 3 columns</h3>
-      <ul className="column-tags">
-        {Array.from(selectedColumns).map((column: string, i) => {
-          return (
-            <Pill key={column} style={{ margin: 4, padding: 4 }}>
-              <div className="tag-content-wrapper">
-                <span style={{ padding: '0px 5px', fontSize: 12 }}>
-                  {column}
-                </span>
-                <button
-                  className={`tagButton_${column}`}
-                  onClick={handleDelete}
-                >
-                  <X size={10} />
-                </button>
-              </div>
-            </Pill>
-          );
-        })}
-      </ul>
       <SearchBar
         data-immediate-focus
         data-focusable="search"
@@ -276,6 +258,25 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
           })}
         </fieldset>
       </form>
+      <ul className="column-tags">
+        {Array.from(selectedColumns).map((column: string, i) => {
+          return (
+            <Pill key={column} style={{ margin: 4, padding: 4 }}>
+              <div className="tag-content-wrapper">
+                <span style={{ padding: '0px 5px', fontSize: 12 }}>
+                  {column}
+                </span>
+                <button
+                  className={`tagButton_${column}`}
+                  onClick={handleDelete}
+                >
+                  <X size={10} />
+                </button>
+              </div>
+            </Pill>
+          );
+        })}
+      </ul>
     </aside>
   );
 }
