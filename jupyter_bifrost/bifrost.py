@@ -59,8 +59,8 @@ class BifrostWidget(DOMWidget):
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
-    graph_data_config = Dict({"sampleSize": 100, "datasetLength": 0}).tag(sync=True)
-
+    graph_data_config = Dict({"maxRows": 100, "sample": False}).tag(sync=True)
+    input_url = Unicode("").tag(sync=True)
 
     def __init__(
         self,
@@ -90,11 +90,15 @@ class BifrostWidget(DOMWidget):
         self.set_trait("plot_function_args", graph_info["args"])
         self.set_trait("column_types", column_types)
         self.set_trait("column_name_map", column_name_map)
-        self.set_trait("graph_data_config", {"sampleSize": 100, "datasetLength": len(df)})
+        self.set_trait(
+            "graph_data_config", {"sampleSize": 100, "datasetLength": len(df)}
+        )
         if df_watcher.plot_output:
             self.set_trait("output_variable", df_watcher.plot_output)
         if df_watcher.bifrost_input:
             self.set_trait("df_variable_name", df_watcher.bifrost_input)
+        elif df_watcher.bifrost_input_url:
+            self.set_trait("input_url", df_watcher.bifrost_input_url)
 
     @observe("graph_spec")
     def update_graph_from_cols(self, changes):
@@ -107,18 +111,17 @@ class BifrostWidget(DOMWidget):
         if self.output_variable != "":
             get_ipython().run_cell(code).result
 
-
     @observe("graph_data_config")
     def update_dataset(self, changes):
         config = changes["new"]
         df_len = len(self.df_history[-1])
         if changes["old"]["sampleSize"] >= df_len and config["sampleSize"] >= df_len:
             return
-        self.set_trait("graph_data", self.get_data(self.df_history[-1], config["sampleSize"]))
-            
+        self.set_trait(
+            "graph_data", self.get_data(self.df_history[-1], config["sampleSize"])
+        )
 
-
-    def get_data(self, df: pd.DataFrame, sampleLimit:int=None):
+    def get_data(self, df: pd.DataFrame, sampleLimit: int = None):
         if sampleLimit:
             df = df.sample(n=sampleLimit)
         return json.loads(df.to_json(orient="records"))

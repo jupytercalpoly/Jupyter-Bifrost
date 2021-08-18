@@ -126,16 +126,34 @@ export default class VegaPandasTranslator {
    * @param outputDf Name of the DataFrame which is assigned to the output of bifrost.plot()
    * @returns Pandas code that applies the spec changes to the inputDf.
    */
-  convertSpecToCode(spec: GraphSpec, inputDf = '', outputDf = '') {
+  convertSpecToCode(
+    spec: GraphSpec,
+    inputDf = '',
+    inputUrl = '',
+    outputDf = ''
+  ) {
+    const inputDataFrame = inputDf ? inputDf : 'temp';
+    const inputDataFrameDef = inputDf
+      ? ''
+      : `temp = pd.read_csv('${inputUrl}')`;
+
     // Filters
-    const filterQuery = this.getFilterFromTransform(spec.transform, inputDf);
+    const filterQuery = this.getFilterFromTransform(
+      spec.transform,
+      inputDataFrame
+    );
     const filteredDs = filterQuery.length
-      ? `${outputDf} = ${inputDf}[${filterQuery}]`
+      ? outputDf
+        ? `${outputDf} = ${inputDataFrame}[${filterQuery}]`
+        : `${inputDataFrame}[${filterQuery}]`
       : '';
+
     // Aggregators
     const aggregations = this.getAggregations(spec.encoding, outputDf);
 
-    const code = [filteredDs, aggregations].join('\n');
+    const code = inputDataFrameDef
+      ? [inputDataFrameDef, filteredDs, aggregations].join('\n')
+      : [filteredDs, aggregations].join('\n');
     const isAlphaNum = /\w/;
 
     return isAlphaNum.test(code) ? code : inputDf;
