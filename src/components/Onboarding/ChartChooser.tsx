@@ -6,13 +6,8 @@ import { useMemo } from 'react';
 import { useState } from 'react';
 import { HelpCircle } from 'react-feather';
 import { VegaLite, VisualizationSpec } from 'react-vega';
-import {
-  // EncodingInfo,
-  GraphSpec,
-  useModelState,
-} from '../../hooks/bifrost-model';
+import { GraphSpec, useModelState } from '../../hooks/bifrost-model';
 import { VegaEncoding } from '../../modules/VegaEncodings';
-// import { VegaEncoding } from '../../modules/VegaEncodings';
 import { BifrostTheme } from '../../theme';
 import HelpScreen from '../HelpScreen/HelpScreen';
 import ChartFilter from './ChartFilter';
@@ -80,10 +75,8 @@ const suggestedChartCss = (theme: BifrostTheme) => css`
   }
 `;
 
-const defaultMarks = new Set(['point', 'bar', 'arc', 'line', 'tick']);
-
 export default function ChartChooser(props: { onOnboarded: () => void }) {
-  const [activeMarks, setActiveMarks] = useState(defaultMarks);
+  const [filteredMark, setFilteredMark] = useState('');
   const suggestedGraphs = useModelState('suggested_graphs')[0];
   const selectedColumns = useModelState('selected_columns')[0];
   const [showHelp, setShowHelp] = useState(false);
@@ -91,10 +84,12 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
   const helpRef = useRef<HTMLButtonElement>(null);
   const filteredGraphs = useMemo(
     () =>
-      suggestedGraphs.filter((spec) =>
-        activeMarks.has((spec as GraphSpec).mark as string)
-      ),
-    [activeMarks, suggestedGraphs]
+      filteredMark
+        ? suggestedGraphs.filter(
+            (spec) => filteredMark === ((spec as GraphSpec).mark as string)
+          )
+        : suggestedGraphs,
+    [filteredMark, suggestedGraphs]
   );
 
   const availableMarks = useMemo(
@@ -160,9 +155,9 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
           <HelpCircle />
         </button>
         <ChartFilter
-          activeMarks={activeMarks}
+          filteredMark={filteredMark}
           availableMarks={availableMarks}
-          onChange={setActiveMarks}
+          onChange={setFilteredMark}
         />
       </div>
 
@@ -170,7 +165,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
         {!!filteredGraphs.length && (
           <div style={{ paddingBottom: 10 }}>
             <h2 className="title">Recommended Charts</h2>
-            <h3 className="subtitle">Select a chart</h3>
+            <h3 className="subtitle">Select a chart to explore the dataset</h3>
           </div>
         )}
         <div className="suggested-charts">

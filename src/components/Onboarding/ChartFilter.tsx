@@ -3,56 +3,67 @@ import { jsx, css } from '@emotion/react';
 import { BifrostTheme } from '../../theme';
 import theme from '../../theme';
 import { chartIcons } from '../../assets/icons/chartIcons/ChartIcons';
+import Tooltip from '../Tooltip';
 
 const chartFilterCss = (theme: BifrostTheme) => css`
-  list-style: none;
   margin: 5px;
-  padding: 15px;
-  border-radius: 50px;
-  background-color: white;
-  box-shadow: ${theme.shadow.handle};
-  li {
-    padding: 0;
-    margin: 10px 0;
+
+  h3 {
+    margin: 0;
+    text-align: center;
+  }
+
+  ul {
+    list-style: none;
+    padding: 15px;
+    border-radius: 15px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    margin: 7px 0;
+    li {
+      padding: 0;
+      margin: 10px 0;
+    }
   }
 `;
 
 interface ChartFilterProps {
-  activeMarks: Set<string>;
+  filteredMark: string;
   availableMarks: Set<string>;
-  onChange: (marks: Set<string>) => void;
+  onChange: (mark: string) => void;
 }
 
 export default function ChartFilter({
   onChange,
-  activeMarks,
+  filteredMark,
   availableMarks,
 }: ChartFilterProps) {
   function toggleMark(mark: string) {
-    const markSet = new Set(activeMarks);
-    if (markSet.has(mark)) {
-      markSet.delete(mark);
-    } else {
-      markSet.add(mark as string);
-    }
-    onChange(markSet);
+    onChange(mark === filteredMark ? '' : mark);
   }
 
   return (
-    <ul css={chartFilterCss}>
-      {chartIcons
-        .filter(({ mark }) => availableMarks.has(mark))
-        .map(({ mark, icon: Icon }) => (
-          <li key={mark}>
-            <button className="wrapper" onClick={() => toggleMark(mark)}>
-              <Icon
-                color={
-                  activeMarks.has(mark) ? theme.color.primary.dark : '#bbbbbb'
-                }
-              />
-            </button>
-          </li>
-        ))}
-    </ul>
+    <div className="ChartFilter" css={chartFilterCss}>
+      <h3>Filter</h3>
+      <ul>
+        {chartIcons
+          .filter(({ mark }) => availableMarks.has(mark))
+          .map(({ mark, icon: Icon }) => (
+            <li key={mark}>
+              <Tooltip message={mark} position="right">
+                <button className="wrapper" onClick={() => toggleMark(mark)}>
+                  <Icon
+                    color={
+                      mark === filteredMark
+                        ? theme.color.primary.dark
+                        : '#bbbbbb'
+                    }
+                  />
+                </button>
+              </Tooltip>
+            </li>
+          ))}
+      </ul>
+    </div>
   );
 }
