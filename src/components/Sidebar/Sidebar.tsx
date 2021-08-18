@@ -119,7 +119,7 @@ const tabBarCss = (t: BifrostTheme) => css`
     transform: scale(1);
     transition: transform 0.5s;
     padding: 5px 20px;
-    border-radius: 15px;
+    border-radius: 7px;
 
     &:active {
       transform: scale(0.95);
