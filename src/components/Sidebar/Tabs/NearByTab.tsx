@@ -40,6 +40,10 @@ export default function NearbyTab() {
   }, [spec]);
 
   function recommendCharts() {
+    if ('facet' in spec.encoding) {
+      setLoading(false);
+      return;
+    }
     const dataSchema = data2schema(data);
     const dataAsp = schema2asp(dataSchema);
 
@@ -51,22 +55,30 @@ export default function NearbyTab() {
 
     draco.init().then(() => {
       const program = 'data("data").\n' + dataAsp.concat(queryAsp).join('\n');
-      const solution = draco.solve(program, { models: 3 });
+      const solution = draco.solve(program, { models: 5 });
 
       if (solution) {
-        const recommendedSpecs = solution.specs.map((spec) =>
-          produce(spec, (gs) => {
-            delete gs['$schema'];
-            delete (gs['data'] as any).url;
-            gs['data']['name'] = 'data';
-            gs['transform'] = [];
-            gs.width = 120;
-            gs.height = 120;
-            if (['circle', 'square'].includes(gs.mark as string)) {
-              gs.mark = 'point';
-            }
-          })
-        );
+        const recommendedSpecs = solution.specs
+          .filter(
+            (spec) =>
+              !(
+                'facet' in (spec as GraphSpec).encoding ||
+                'row' in (spec as GraphSpec).encoding
+              )
+          )
+          .map((spec) =>
+            produce(spec, (gs) => {
+              delete gs['$schema'];
+              delete (gs['data'] as any).url;
+              gs['data']['name'] = 'data';
+              gs['transform'] = [];
+              gs.width = 120;
+              gs.height = 120;
+              if (['circle', 'square'].includes(gs.mark as string)) {
+                gs.mark = 'point';
+              }
+            })
+          );
         setNearbyCharts(recommendedSpecs as GraphSpec[]);
       }
       setLoading(false);
@@ -111,7 +123,7 @@ export default function NearbyTab() {
         >
           <Loader />
         </div>
-      ) : nearByCharts ? (
+      ) : nearByCharts.length !== 0 ? (
         nearByCharts.map((spec: GraphSpec, i: number) => (
           <button onClick={() => handleClickOnNearByChart(i)}>
             <VegaLite spec={spec} data={graphData} actions={false} />
