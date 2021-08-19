@@ -13,6 +13,8 @@ import {
   VegaEncoding,
   vegaMarkEncodingMap,
   BifrostVegaMark,
+  VegaMark,
+  VegaColumnType,
 } from '../../../modules/VegaEncodings';
 import useSpecHistory from '../../../hooks/useSpecHistory';
 import Pill from '../../ui-widgets/Pill';
@@ -31,12 +33,13 @@ import { hasDuplicateField } from '../../../modules/utils';
 import GraphPill from '../../ui-widgets/GraphPill';
 import { useRef } from 'react';
 import { chartIcons } from '../../../assets/icons/chartIcons/ChartIcons';
-import theme from '../../../theme';
 import AddPillScreen from './AddPillScreen';
 import Slider from '../../ui-widgets/Slider';
+import { BifrostTheme } from '../../../theme';
+import Tooltip from '../../Tooltip';
 
 //TODO: have only scatter
-const variableTabCss = css`
+const variableTabCss = (t: BifrostTheme) => css`
   position: relative;
   width: 100%;
   overflow: scroll;
@@ -60,10 +63,19 @@ const variableTabCss = css`
     justify-content: space-between;
     padding: 0;
 
-    li {
+    button {
       padding: 5px;
-      border-radius: 25%;
-      cursor: pointer;
+      padding-top: 7px;
+      border-radius: 5px;
+      background: transparent;
+
+      &:disabled {
+        opacity: 0.4;
+      }
+
+      &.active {
+        background: ${t.color.primary.dark};
+      }
     }
   }
 
@@ -475,21 +487,23 @@ export default function EditTab({
           {dataSectionOpen ? (
             <section>
               <ul className="mark-list">
-                {chartIcons.map(({ icon: Icon, mark }) => (
-                  <li
-                    key={mark}
-                    onClick={() => handleClickOnMark(mark)}
-                    style={
-                      mark === graphMark
-                        ? {
-                            backgroundColor: `${theme.color.primary.dark}`,
-                          }
-                        : {}
-                    }
-                  >
-                    {mark === graphMark ? <Icon color={'white'} /> : <Icon />}
-                  </li>
-                ))}
+                {chartIcons.map(({ icon: Icon, mark }) => {
+                  return (
+                    <li key={mark}>
+                      <Tooltip message={mark} position="top">
+                        <button
+                          className={mark === graphMark ? 'active' : ''}
+                          onClick={() => handleClickOnMark(mark)}
+                          disabled={!validateMarkChange(mark, graphSpec)}
+                        >
+                          <Icon
+                            color={mark === graphMark ? 'white' : undefined}
+                          />
+                        </button>
+                      </Tooltip>
+                    </li>
+                  );
+                })}
               </ul>
               <ul className="encoding-list">{encodingList}</ul>
               {activeOptions.menu === 'encoding' && (
@@ -658,4 +672,58 @@ function extractPillProps(spec: GraphSpec) {
     }
   });
   return Object.values(pillsByField).flat();
+}
+
+/**
+ * Determines whether a given mark is applicable to a GraphSpec.
+ * @param mark The new mark option to be validated.
+ * @param spec Spec receiving the new mark
+ * @returns true if the mark is valid.
+ */
+function validateMarkChange(mark: VegaMark, spec: GraphSpec): boolean {
+  const xAxisType = spec.encoding['x']?.type;
+  const yAxisType = spec.encoding['y']?.type;
+
+  const isAxisCombination = (types: (VegaColumnType | undefined)[]) => {
+    if (types.length > 1) {
+      return (
+        (types[0] === xAxisType && types[1] === yAxisType) ||
+        (types[1] === xAxisType && types[0] === yAxisType)
+      );
+    } else if (types.length === 1) {
+      return xAxisType === types[0] || yAxisType === types[0];
+    } else return false;
+  };
+
+  const quantComponents: (VegaColumnType | undefined)[][] = [
+    [undefined, 'quantitative'],
+    ['nominal', 'quantitative'],
+    ['quantitative', 'quantitative'],
+  ];
+
+  switch (mark) {
+    case 'bar':
+      return ![
+        [undefined, undefined],
+        ['quantitative', undefined],
+      ].some((c) => isAxisCombination(c as VegaColumnType[]));
+    case 'point':
+      return ![
+        [undefined, undefined],
+        ['nominal', undefined],
+      ].some((c) => isAxisCombination(c as VegaColumnType[]));
+    case 'line':
+      return isAxisCombination(['quantitative', 'quantitative']);
+    case 'tick':
+      return quantComponents.some(isAxisCombination);
+    case 'boxplot':
+      return quantComponents.some(isAxisCombination);
+    case 'errorband':
+      return quantComponents.some(isAxisCombination);
+    case 'errorbar':
+      return quantComponents.some(isAxisCombination);
+
+    default:
+      return true;
+  }
 }

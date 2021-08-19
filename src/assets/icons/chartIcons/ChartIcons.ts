@@ -8,8 +8,9 @@ import BoxPlotChartIcon from './BoxPlotChartIcon';
 import ErrorBandChartIcon from './ErrorBandChartIcon';
 // import SquareChartIcon from './SquareChartIcon';
 import ErrorBarChartIcon from './ErrorBarChartIcon';
+import { VegaMark } from '../../../modules/VegaEncodings';
 
-export const chartIcons = [
+export const chartIcons: { icon: typeof BarChartIcon; mark: VegaMark }[] = [
   { icon: BarChartIcon, mark: 'bar' },
   { icon: ScatterChartIcon, mark: 'point' },
   { icon: LineChartIcon, mark: 'line' },
