@@ -12,6 +12,7 @@ import {
   useModelState,
   SuggestedGraphs,
   Args,
+  GraphSpec,
 } from '../../hooks/bifrost-model';
 import Pill from '../ui-widgets/Pill';
 import { useMemo } from 'react';
@@ -146,6 +147,22 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   // Create charts whenever the column selection changes
   useEffect(recommendCharts, [selectedColumns]);
 
+  /**
+   * This function will move aggregate to transform to add groupby operation
+   * @param spec current graph spec
+   */
+  function handleAggregate(spec: GraphSpec): GraphSpec {
+    return produce(spec, (gs) => {
+      if ('aggregate' in gs.encoding.x && !('field' in gs.encoding.x)) {
+        (gs.encoding.x as any).type = 'nominal';
+        (gs.encoding.x as any).field = (gs.encoding?.y as any).field;
+      } else if ('aggregate' in gs.encoding.y && !('field' in gs.encoding.y)) {
+        (gs.encoding.y as any).type = 'nominal';
+        (gs.encoding.y as any).field = (gs.encoding.x as any).field;
+      }
+    });
+  }
+
   function recommendCharts() {
     const dataSchema = data2schema(data);
     const dataAsp = schema2asp(dataSchema);
@@ -172,8 +189,8 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
       const solution = draco.solve(program, { models: 5 });
 
       if (solution) {
-        const recommendedSpecs = solution.specs.map((spec) =>
-          produce(spec, (gs) => {
+        const recommendedSpecs = solution.specs.map((spec) => {
+          const newSpec = produce(spec, (gs) => {
             delete gs['$schema'];
             delete (gs['data'] as any).url;
             gs['data']['name'] = 'data';
@@ -183,8 +200,10 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
             if (['circle', 'square'].includes(gs.mark as string)) {
               gs.mark = 'point';
             }
-          })
-        );
+          });
+          return handleAggregate(newSpec as GraphSpec);
+        });
+        console.log(recommendedSpecs);
         setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
       }
     });

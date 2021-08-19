@@ -125,6 +125,7 @@ export default function FilterScreen(props: FilterScreenProps) {
     saveOnDismount: true,
     description: `Filtered on ${field}`,
   });
+  console.log(graphSpec);
 
   return (
     <article css={screenCss}>
@@ -325,6 +326,15 @@ function CategoricalFilters(props: FilterGroupProps) {
   const { field } = graphSpec.encoding[props.encoding];
   const categories = useMemo(() => getCategories(graphData, field), []);
   const selectedCategories = useMemo(getSelectedCategories, [graphSpec]);
+  const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
+
+  function updateAggregation(aggregation: string) {
+    const newSpec = produce(graphSpec, (gs) => {
+      gs.encoding[props.encoding].aggregate =
+        aggregation === 'none' ? '' : aggregation;
+    });
+    setGraphSpec(newSpec);
+  }
 
   function getSelectedCategories() {
     const type = 'oneOf';
@@ -381,6 +391,17 @@ function CategoricalFilters(props: FilterGroupProps) {
           </li>
         ))}
       </ul>
+      <article className={'aggregation-article'}>
+        <h3>Transformation</h3>
+        <select
+          value={currentAggregation}
+          onChange={(e) => updateAggregation(e.target.value)}
+        >
+          {['none', 'count'].map((aggregation) => (
+            <option value={aggregation}>{aggregation}</option>
+          ))}
+        </select>
+      </article>
     </div>
   );
 }

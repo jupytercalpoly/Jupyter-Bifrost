@@ -293,6 +293,7 @@ export default function EditTab({
   }
 
   function openFilters(encoding: VegaEncoding) {
+    console.log(graphSpec);
     setActiveOptions({ menu: 'filter', encoding });
   }
 
