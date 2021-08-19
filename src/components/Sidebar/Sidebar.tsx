@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/react';
 import React, { useState } from 'react';
 import EditTab from './Tabs/EditTab';
 import HistoryTab from './Tabs/HistoryTab';
-import NearbyTab from './Tabs/NearbyTab';
+import NearbyTab from './Tabs/NearByTab';
 import { VegaEncoding } from '../../modules/VegaEncodings';
 import { CSSTransitionGroup } from 'react-transition-group';
 import theme, { BifrostTheme } from '../../theme';
