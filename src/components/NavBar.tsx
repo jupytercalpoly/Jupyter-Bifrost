@@ -1,11 +1,14 @@
 /**@jsx jsx */
 
 import { jsx, css } from '@emotion/react';
-import { ArrowLeft, Code, HelpCircle } from 'react-feather';
-import Tooltip from './Tooltip';
+import { ArrowLeft, MoreHorizontal, HelpCircle } from 'react-feather';
+import { useState } from 'react';
+import HelpScreen from './HelpScreen/HelpScreen';
+import MoreMenu from './ui-widgets/MoreMenu';
+import { View } from 'vega';
 
 const graphNavCss = css`
-  ul {
+  .menu-list {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -13,7 +16,7 @@ const graphNavCss = css`
     margin: 0;
     padding: 0;
   }
-  li {
+  .menu-option {
     margin: 0 10px;
   }
 `;
@@ -21,31 +24,38 @@ const graphNavCss = css`
 interface NavBarProps {
   onBack?(): void;
   onHelpRequested?(): void;
-  onExportCodeRequested?(): void;
+  onMoreClicked?(): void;
+  vegaView?: View;
 }
 
 export default function NavBar(props: NavBarProps) {
+  const [showHelpScreen, setShowHelpScreen] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   return (
     <nav className="graph-nav-bar" css={graphNavCss}>
-      <ul>
-        <li>
+      <ul className="menu-list">
+        <li className="menu-option">
           <button className="wrapper" onClick={props.onBack}>
             <ArrowLeft />
           </button>
         </li>
-        <li>
-          <Tooltip message={'Export Code'} position="right">
-            <button className="wrapper" onClick={props.onExportCodeRequested}>
-              <Code />
-            </button>
-          </Tooltip>
-        </li>
-        <li>
-          <button className="wrapper" onClick={props.onHelpRequested}>
+        <li className="menu-option">
+          <button className="wrapper" onClick={() => setShowHelpScreen(true)}>
             <HelpCircle />
           </button>
         </li>
+        <li className="menu-option">
+          <button className="wrapper" onClick={() => setShowMoreMenu(true)}>
+            <MoreHorizontal />
+          </button>
+        </li>
       </ul>
+      {showHelpScreen && (
+        <HelpScreen onDismiss={() => setShowHelpScreen(false)} />
+      )}
+      {showMoreMenu && (
+        <MoreMenu view={props.vegaView} onBack={() => setShowMoreMenu(false)} />
+      )}
     </nav>
   );
 }

@@ -47,6 +47,7 @@ interface GraphProps {
   updateClickedAxis: (encoding: VegaEncoding | '') => void;
   sideBarOpen: boolean;
   clickSidebarButton: () => void;
+  onViewCreated(vegaView: View): void;
 }
 
 export default function Graph(props: GraphProps) {
@@ -263,6 +264,7 @@ export default function Graph(props: GraphProps) {
 
   function onNewView(view: View) {
     setTimeout(() => placeAxisWrappers(), 100);
+    props.onViewCreated(view);
   }
 
   function handleMouseEnter(channel: VegaEncoding) {
