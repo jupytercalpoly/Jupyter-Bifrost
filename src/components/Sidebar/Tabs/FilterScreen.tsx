@@ -125,7 +125,6 @@ export default function FilterScreen(props: FilterScreenProps) {
     saveOnDismount: true,
     description: `Filtered on ${field}`,
   });
-  console.log(graphSpec);
 
   return (
     <article css={screenCss}>

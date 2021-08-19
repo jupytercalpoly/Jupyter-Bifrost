@@ -203,7 +203,6 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
           });
           return handleAggregate(newSpec as GraphSpec);
         });
-        console.log(recommendedSpecs);
         setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
       }
     });
