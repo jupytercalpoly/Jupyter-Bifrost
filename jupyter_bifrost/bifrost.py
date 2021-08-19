@@ -59,7 +59,7 @@ class BifrostWidget(DOMWidget):
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
-    graph_data_config = Dict({"maxRows": 100, "sample": False}).tag(sync=True)
+    graph_data_config = Dict({"sampleSize": 100, "datasetLength": 0}).tag(sync=True)
     input_url = Unicode("").tag(sync=True)
 
     def __init__(
