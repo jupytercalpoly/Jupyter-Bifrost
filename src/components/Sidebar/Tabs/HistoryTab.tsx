@@ -5,8 +5,9 @@ import { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import { useModelState } from '../../../hooks/bifrost-model';
 import SearchBar from '../../ui-widgets/SearchBar';
+import { BifrostTheme } from '../../../theme';
 
-const historyCss = (theme: any) => css`
+const historyCss = (theme: BifrostTheme) => css`
   height: 100%;
   .history-list {
     padding: 0;
@@ -17,12 +18,14 @@ const historyCss = (theme: any) => css`
       padding: 10px;
       transition: background-color 0.5s;
       background-color: white;
+      border-left: 5px solid ${theme.color.primary.standard};
       &:hover {
         background-color: whitesmoke;
       }
 
       &.active {
-        border-left: 3px solid ${theme.color.primary[1]};
+        border: 3px solid ${theme.color.primary.dark};
+        border-left: 5px solid ${theme.color.primary.dark};
         font-weight: 700;
       }
     }
