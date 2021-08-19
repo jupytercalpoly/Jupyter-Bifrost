@@ -328,7 +328,6 @@ export default function EditTab({
       }
     });
 
-    console.log('data', newSpec);
     setPillsInfo(newPills);
     setGraphSpec(newSpec);
     setActiveOptions((opt) => ({ ...opt, menu: '' }));

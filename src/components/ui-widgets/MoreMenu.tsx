@@ -5,7 +5,6 @@ import { View } from 'vega';
 import { useModelState } from '../../hooks/bifrost-model';
 import Modal from './Modal';
 
-// TODO: style the list elements
 const moreMenuCss = css`
   list-style: none;
   margin: 0;
@@ -34,7 +33,6 @@ export default function MoreMenu({
   const dfCode = useModelState('df_code')[0];
 
   function exportCode() {
-    console.log('df code', dfCode);
     navigator.clipboard.writeText(dfCode);
   }
   function exportImage(type: 'svg' | 'png') {
