@@ -33,6 +33,7 @@ import { useRef } from 'react';
 import { chartIcons } from '../../../assets/icons/chartIcons/ChartIcons';
 import theme from '../../../theme';
 import AddPillScreen from './AddPillScreen';
+import Slider from '../../ui-widgets/Slider';
 
 //TODO: have only scatter
 const variableTabCss = css`
@@ -44,7 +45,7 @@ const variableTabCss = css`
     .data-section,
     .sampling-section {
       cursor: pointer;
-      transition: transform 0.5s ease-in-out;
+      transition: transform 0.2s ease-in-out;
       &.open,
       &.open {
         transform: rotate(180deg);
@@ -103,6 +104,11 @@ const variableTabCss = css`
       }
     }
   }
+
+  .dataset-percentage {
+    margin-left: 13px;
+    margin-bottom: 5px;
+  }
 `;
 
 interface ActiveOptions {
@@ -127,6 +133,8 @@ export default function EditTab({
   );
   const [graphMark, setGraphMark] = useState<string>('');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+  const [graphDataConfig, setGraphDataConfig] =
+    useModelState('graph_data_config');
   const [data] = useModelState('graph_data');
   const [activeOptions, setActiveOptions] = useState<ActiveOptions>({
     menu: '',
@@ -328,7 +336,6 @@ export default function EditTab({
       }
     });
 
-    console.log('data', newSpec);
     setPillsInfo(newPills);
     setGraphSpec(newSpec);
     setActiveOptions((opt) => ({ ...opt, menu: '' }));
@@ -436,6 +443,10 @@ export default function EditTab({
     }
   }
 
+  function setSamplingThreshold(val: number) {
+    setGraphDataConfig({ ...graphDataConfig, sampleSize: Math.floor(val) });
+  }
+
   return (
     <section className="DataTab" css={variableTabCss}>
       {addNewPill ? (
@@ -538,7 +549,26 @@ export default function EditTab({
                 <ChevronUp size={12} />
               </div>
             </h3>
-            {samplingSectionOpen ? <article></article> : <article></article>}
+            {samplingSectionOpen ? (
+              <article>
+                <p className="dataset-percentage">
+                  {Math.round(
+                    (graphDataConfig.sampleSize /
+                      graphDataConfig.datasetLength) *
+                      100
+                  )}
+                  % of dataset
+                </p>
+                <Slider
+                  value={graphDataConfig.sampleSize}
+                  domain={[1, graphDataConfig.datasetLength]}
+                  onSlideEnd={setSamplingThreshold}
+                  step={1}
+                />
+              </article>
+            ) : (
+              <div></div>
+            )}
           </section>
         </article>
       )}

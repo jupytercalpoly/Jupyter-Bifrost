@@ -59,18 +59,6 @@ export default function Graph(props: GraphProps) {
   });
   const data = useModelState('graph_data')[0];
 
-  // const { width, height, ref } = useResizeDetector();
-
-  // useEffect(() => {
-  //   console.log('graph');
-  //   console.log(width, height);
-  //   const newSpec = produce(spec, (gs) => {
-  //     gs.height = height ?? 'container';
-  //     gs.width = width ?? 'container';
-  //   });
-  //   setSpec(newSpec);
-  // }, [width, height]);
-
   useEffect(() => {
     if (['x', 'y'].includes(props.clickedAxis)) {
       setAxisState({ activeAxis: props.clickedAxis });

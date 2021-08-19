@@ -44,7 +44,7 @@ const bifrostModelPropDefaults = {
   plot_function_args: {} as Args,
   column_types: {} as Record<EncodingInfo['field'], EncodingInfo['type']>,
   column_name_map: {} as Record<string, string>,
-  graph_data_config: { maxRows: 100, sample: false } as GraphDataConfig,
+  graph_data_config: { sampleSize: 100, datasetLength: 1 } as GraphDataConfig,
   df_code: '$df',
 };
 

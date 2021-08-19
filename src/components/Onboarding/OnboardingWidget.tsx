@@ -7,6 +7,7 @@ import ColumnSelectorSidebar from './ColumnSelectorSidebar';
 import { Args, useModelState } from '../../hooks/bifrost-model';
 import { useKeyboardNavigation } from './KeyboardNav';
 import { useEffect } from 'react';
+import produce from 'immer';
 
 interface OnboardingWidgetProps {
   onOnboarded: () => void;
@@ -36,9 +37,27 @@ export default function OnboardingWidget(props: OnboardingWidgetProps) {
 
   // Handle downsampling with multiple charts
   useEffect(() => {
-    setGraphConfig({ ...graphConfig, sample: true });
+    const sampleThreshold = graphConfig.sampleSize;
+    const userDefinedSample = sampleThreshold !== 100;
+    const defaultSingleGraphThreshold = Math.min(
+      5000,
+      graphConfig.datasetLength
+    );
+    setGraphConfig(
+      produce(graphConfig, (gc) => {
+        gc.sampleSize = 100;
+      })
+    );
     return () => {
-      setGraphConfig({ ...graphConfig, sample: false });
+      setTimeout(() => {
+        setGraphConfig(
+          produce(graphConfig, (gc) => {
+            gc.sampleSize = userDefinedSample
+              ? gc.sampleSize
+              : defaultSingleGraphThreshold;
+          })
+        );
+      }, 100);
     };
   }, []);
 

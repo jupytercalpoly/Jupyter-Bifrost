@@ -71,8 +71,8 @@ export type SelectionData = [
 ];
 
 export type GraphDataConfig = {
-  maxRows: number;
-  sample: boolean;
+  sampleSize: number;
+  datasetLength: number;
 };
 
 // HOOKS
