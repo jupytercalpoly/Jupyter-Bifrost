@@ -695,23 +695,33 @@ function validateMarkChange(mark: VegaMark, spec: GraphSpec): boolean {
     } else return false;
   };
 
+  const quantComponents: (VegaColumnType | undefined)[][] = [
+    [undefined, 'quantitative'],
+    ['nominal', 'quantitative'],
+    ['quantitative', 'quantitative'],
+  ];
+
   switch (mark) {
+    case 'bar':
+      return ![
+        [undefined, undefined],
+        ['quantitative', undefined],
+      ].some((c) => isAxisCombination(c as VegaColumnType[]));
+    case 'point':
+      return ![
+        [undefined, undefined],
+        ['nominal', undefined],
+      ].some((c) => isAxisCombination(c as VegaColumnType[]));
     case 'line':
       return isAxisCombination(['quantitative', 'quantitative']);
-    case 'errorband':
-      return isAxisCombination(['ordinal', 'quantitative']);
-    case 'errorbar':
-      return isAxisCombination(['quantitative', 'nominal']);
     case 'tick':
-      return (
-        isAxisCombination([undefined, 'quantitative']) ||
-        isAxisCombination(['nominal', 'quantitative'])
-      );
+      return quantComponents.some(isAxisCombination);
     case 'boxplot':
-      return (
-        isAxisCombination(['quantitative', undefined]) ||
-        isAxisCombination(['quantitative', 'nominal'])
-      );
+      return quantComponents.some(isAxisCombination);
+    case 'errorband':
+      return quantComponents.some(isAxisCombination);
+    case 'errorbar':
+      return quantComponents.some(isAxisCombination);
 
     default:
       return true;
