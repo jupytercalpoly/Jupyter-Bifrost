@@ -133,7 +133,7 @@ export default function GraphPill(props: GraphPillProps) {
   `;
 
   return (
-    <li css={graphPillCss} {...rest}>
+    <li className="graph-pill" css={graphPillCss} {...rest}>
       <div className="pill-header">
         <button className="wrapper" onClick={props.onFieldTypeSelected}>
           <TypeIcon />
