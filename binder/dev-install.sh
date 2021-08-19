@@ -41,4 +41,4 @@ pip install -e .
 
 echo "Cleaning up some files"
 shopt -s extglob 
-rm -rf !(examples|bifrost|jupyter-bifrost-tracing|test)
+rm -rf !(examples|jupyter_bifrost|jupyter-bifrost-tracing|test)
