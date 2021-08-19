@@ -37,7 +37,7 @@ export default function MoreMenu({
   }
   function exportImage(type: 'svg' | 'png') {
     view?.toImageURL(type).then(function (url) {
-      var link = document.createElement('a');
+      const link = document.createElement('a');
       link.setAttribute('href', url);
       link.setAttribute('target', '_blank');
       link.setAttribute('download', `bifrost_chart.${type}`);
