@@ -23,6 +23,7 @@ export default function useSpecHistory(
   const [columnMap] = useModelState('column_name_map');
   const [outputVar] = useModelState('output_variable');
   const [inputVar] = useModelState('df_variable_name');
+  const [inputUrl] = useModelState('input_url');
   const [originalSpec, setOriginalSpec] = useState(graphSpec);
   const saveRef = useRef<(spec?: GraphSpec) => void>(save);
 
@@ -59,7 +60,9 @@ export default function useSpecHistory(
     setOpHistory(newHist);
     setIndex(newHist.length - 1);
     setOriginalSpec(explainedSpec);
-    setDfCode(updateDfCode(explainedSpec, inputVar, outputVar, columnMap));
+    setDfCode(
+      updateDfCode(explainedSpec, inputVar, inputUrl, outputVar, columnMap)
+    );
   }
 
   saveRef.current = save;
@@ -70,6 +73,7 @@ export default function useSpecHistory(
 function updateDfCode(
   spec: GraphSpec,
   inputDfName: string,
+  inputUrl: string,
   outputDfName: string,
   columnNameMap: Record<string, string>
 ): string {
@@ -90,5 +94,10 @@ function updateDfCode(
   });
 
   const translator = new VegaPandasTranslator();
-  return translator.convertSpecToCode(revertedSpec, inputDfName, outputDfName);
+  return translator.convertSpecToCode(
+    revertedSpec,
+    inputDfName,
+    inputUrl,
+    outputDfName
+  );
 }

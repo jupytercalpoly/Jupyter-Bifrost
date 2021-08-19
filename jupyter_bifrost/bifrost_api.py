@@ -114,4 +114,4 @@ class Chart:
             formatted_color,
         )
         display(w)
-        return w.df_history[-1]
+        return self._dataFrame if w.output_variable else None
