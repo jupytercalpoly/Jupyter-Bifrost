@@ -38,6 +38,7 @@ import AddPillScreen from './AddPillScreen';
 const variableTabCss = css`
   position: relative;
   width: 100%;
+  overflow: scroll;
 
   h3 {
     .data-section,

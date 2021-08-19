@@ -9,12 +9,13 @@ import { VegaEncoding } from '../modules/VegaEncodings';
 import SideBarCollapsibleButtonIcon from '../assets/icons/SideBarCollapsibleButtonIcon';
 import theme from '../theme';
 import HelpScreen from './HelpScreen/HelpScreen';
+import { useModelState } from '../hooks/bifrost-model';
 
 const bifrostWidgetCss = css`
   // Element-based styles
   //===========================================================
   display: grid;
-  grid-template-columns: minmax(720px, min-content) minmax(max-content, auto);
+  grid-template-columns: minmax(600px, min-content) minmax(max-content, auto);
   grid-template-rows: 40px auto;
   grid-template-areas: 'nav sidebar' 'graph sidebar';
   height: 100%;
@@ -51,6 +52,7 @@ export default function VisualizationScreen({
   const [clickedAxis, setClickedAxis] = useState<VegaEncoding | ''>('');
   const [sideBarOpen, setSideBarOpen] = useState<boolean>(true);
   const [showHelpScreen, setShowHelpScreen] = useState(false);
+  const [dfCode] = useModelState('df_code');
 
   function updateClickedAxis(encoding: VegaEncoding | ''): void {
     setClickedAxis(encoding);
@@ -58,6 +60,10 @@ export default function VisualizationScreen({
 
   function onClickCollapsibleButton() {
     setSideBarOpen(!sideBarOpen);
+  }
+
+  function onExportCodeRequested() {
+    navigator.clipboard.writeText(dfCode);
   }
 
   return (
@@ -68,6 +74,7 @@ export default function VisualizationScreen({
             <NavBar
               onBack={onPrevious}
               onHelpRequested={() => setShowHelpScreen(true)}
+              onExportCodeRequested={onExportCodeRequested}
             />
             <div
               className={`side-bar-collapsible-button${
