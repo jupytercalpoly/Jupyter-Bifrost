@@ -22,99 +22,101 @@ from jupyter_packaging import (
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
-
-
 # The name of the project
-name = 'jupyter_bifrost'
+name = "jupyter_bifrost"
 
 # Get the version
-version = get_version(pjoin(name, '_version.py'))
+version = get_version(pjoin(name, "_version.py"))
 
 
 # Representative files that should exist after a successful build
 jstargets = [
-    pjoin(HERE, name, 'nbextension', 'index.js'),
-    pjoin(HERE, 'lib', 'plugin.js'),
+    # pjoin(HERE, name, "nbextension", "index.js"),
+    pjoin(HERE, "lib", "plugin.js"),
 ]
 
 
 package_data_spec = {
     name: [
-        'nbextension/**js*',
-        'labextension/**'
+        # 'nbextension/**js*',
+        "labextension/**"
     ]
 }
 
 
 data_files_spec = [
     # ('share/jupyter/nbextensions/jupyter_bifrost', 'jupyter_bifrost/nbextension', '**'),
-    ('share/jupyter/labextensions/jupyter_bifrost', 'jupyter_bifrost/labextension', '**'),
-    ('share/jupyter/labextensions/jupyter_bifrost', '.', 'install.json'),
-    ('etc/jupyter/nbconfig/notebook.d', '.', 'jupyter_bifrost.json'),
+    (
+        "share/jupyter/labextensions/jupyter_bifrost",
+        "jupyter_bifrost/labextension",
+        "**",
+    ),
+    ("share/jupyter/labextensions/jupyter_bifrost", ".", "install.json"),
+    ("etc/jupyter/nbconfig/notebook.d", ".", "jupyter_bifrost.json"),
 ]
 
 
-cmdclass = create_cmdclass('jsdeps', package_data_spec=package_data_spec,
-    data_files_spec=data_files_spec)
-cmdclass['jsdeps'] = combine_commands(
-    install_npm(HERE, build_cmd='build:prod'),
+cmdclass = create_cmdclass(
+    "jsdeps", package_data_spec=package_data_spec, data_files_spec=data_files_spec
+)
+cmdclass["jsdeps"] = combine_commands(
+    install_npm(HERE, build_cmd="build:prod"),
     ensure_targets(jstargets),
 )
 
 
 setup_args = dict(
-    name            = name,
-    description     = 'A Jupyter Widget for Interactive Data Visualization',
-    version         = version,
-    scripts         = glob(pjoin('scripts', '*')),
-    cmdclass        = cmdclass,
-    packages        = find_packages(),
-    author          = 'John Waidhofer(waidhoferj), Jay Ahn(jahn96)',
-    author_email    = 'waidhoferj@gmail.com, aju960219@gmail.com',
-    url             = 'https://github.com//jupyter_bifrost',
-    license         = 'BSD',
-    platforms       = "Linux, Mac OS X, Windows",
-    keywords        = ['Jupyter', 'Widgets', 'IPython'],
-    classifiers     = [
-        'Intended Audience :: Developers',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Framework :: Jupyter',
+    name=name,
+    description="A Jupyter Widget for Interactive Data Visualization",
+    version=version,
+    scripts=glob(pjoin("scripts", "*")),
+    cmdclass=cmdclass,
+    packages=find_packages(),
+    author="John Waidhofer(waidhoferj), Jay Ahn(jahn96)",
+    author_email="waidhoferj@gmail.com, aju960219@gmail.com",
+    url="https://github.com//jupyter_bifrost",
+    license="BSD",
+    platforms="Linux, Mac OS X, Windows",
+    keywords=["Jupyter", "Widgets", "IPython"],
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Framework :: Jupyter",
     ],
-    include_package_data = True,
+    include_package_data=True,
     python_requires=">=3.6",
-    install_requires = [
-        'ipywidgets>=7.0.0',
+    install_requires=[
+        "ipywidgets>=7.0.0",
     ],
-    extras_require = {
-        'test': [
-            'pytest>=4.6',
-            'pytest-cov',
-            'nbval',
+    extras_require={
+        "test": [
+            "pytest>=4.6",
+            "pytest-cov",
+            "nbval",
         ],
-        'examples': [
+        "examples": [
             # Any requirements for the examples to run
         ],
-        'docs': [
-            'jupyter_sphinx',
-            'nbsphinx',
-            'nbsphinx-link',
-            'pytest_check_links',
-            'pypandoc',
-            'recommonmark',
-            'sphinx>=1.5',
-            'sphinx_rtd_theme',
+        "docs": [
+            "jupyter_sphinx",
+            "nbsphinx",
+            "nbsphinx-link",
+            "pytest_check_links",
+            "pypandoc",
+            "recommonmark",
+            "sphinx>=1.5",
+            "sphinx_rtd_theme",
         ],
     },
-    entry_points = {
-    },
+    entry_points={},
 )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     setup(**setup_args)
