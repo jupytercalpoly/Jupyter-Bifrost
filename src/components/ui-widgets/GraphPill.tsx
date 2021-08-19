@@ -53,6 +53,7 @@ export default function GraphPill(props: GraphPillProps) {
     width: min-content;
     margin: 5px;
     box-shadow: ${theme.shadow.handle};
+    color: ${color.active};
 
     .pill-header {
       display: flex;
@@ -86,11 +87,14 @@ export default function GraphPill(props: GraphPillProps) {
 
     .options {
       display: flex;
-      align-items: start;
+      align-items: center;
       .slider-button {
-        border-radius: 0 15px 15px 0;
-        background-color: ${theme.color.primary.dark};
+        border-radius: 50%;
+        background-color: ${color.active};
         padding: 5px;
+        margin-left: 3px;
+        height: 25px;
+        width: 25px;
       }
     }
 
@@ -98,7 +102,7 @@ export default function GraphPill(props: GraphPillProps) {
       display: grid;
       grid-template-columns: auto 1fr;
       justify-content: start;
-      align-items: start;
+      align-items: center;
 
       padding: 8px;
 
@@ -136,7 +140,7 @@ export default function GraphPill(props: GraphPillProps) {
     <li css={graphPillCss} {...rest}>
       <div className="pill-header">
         <button className="wrapper" onClick={props.onFieldTypeSelected}>
-          <TypeIcon />
+          <TypeIcon color={color.active} />
         </button>
         <span
           onClick={onEncodingSelected}
@@ -148,10 +152,10 @@ export default function GraphPill(props: GraphPillProps) {
           onClick={onFieldSelected}
           className={selectedField === 'field' ? 'selected' : undefined}
         >
-          <b>{field}</b>
+          {field}
         </span>
         <button className="wrapper icon" onClick={onClose}>
-          <X size={15} />
+          <X size={15} color={color.active} />
         </button>
       </div>
       <div className="options">
@@ -162,7 +166,7 @@ export default function GraphPill(props: GraphPillProps) {
           {!!filters.length && (
             <Fragment>
               <button className="wrapper icon" onClick={onFilterSelected}>
-                <FilterIcon size={12} />
+                <FilterIcon size={12} color={color.active} />
               </button>
               <ul className="filter-list">
                 {filters.map((filter, i) => (
@@ -175,7 +179,7 @@ export default function GraphPill(props: GraphPillProps) {
           {aggregation && (
             <Fragment>
               <button className="wrapper icon" onClick={props.onFilterSelected}>
-                <AggregateIcon />
+                <AggregateIcon color={color.active} />
               </button>
               <div style={{ padding: '0 5px' }}>{aggregation}</div>
             </Fragment>
@@ -184,7 +188,7 @@ export default function GraphPill(props: GraphPillProps) {
           {scale && (
             <Fragment>
               <button className="wrapper icon" onClick={props.onFilterSelected}>
-                <ScaleIcon />
+                <ScaleIcon color={color.active} />
               </button>
               <div style={{ padding: '0 5px' }}>{scale}</div>
             </Fragment>
