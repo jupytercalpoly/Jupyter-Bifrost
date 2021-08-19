@@ -17,7 +17,7 @@ export default function FilterSliderIcon({
     >
       <path
         d="M0.999998 3.33398L6.44444 3.33398"
-        stroke="black"
+        stroke={color}
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -25,7 +25,7 @@ export default function FilterSliderIcon({
       />
       <path
         d="M9.55566 3.33398L15.0001 3.33398"
-        stroke="black"
+        stroke={color}
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -33,7 +33,7 @@ export default function FilterSliderIcon({
       />
       <path
         d="M6.44444 1L6.44444 5.66667"
-        stroke="black"
+        stroke={color}
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"

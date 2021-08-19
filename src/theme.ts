@@ -8,11 +8,11 @@ const theme = {
       light: '#E4D2E4',
     },
     pill: [
-      { standard: '#F3E5DA', active: '#A84822' },
-      { standard: '#E0EEF3', active: '#1A5B71' },
-      { standard: '#E7EFE3', active: '#517242' },
-      { standard: '#E5E4F0', active: '#4B3E98' },
-      { standard: '#F4E6E7', active: '#9E1C3C' },
+      { standard: '#F3E5DA', active: '#A84822', dark: '#A84822' },
+      { standard: '#E0EEF3', active: '#1A5B71', dark: '#1A5B71' },
+      { standard: '#E7EFE3', active: '#517242', dark: '#517242' },
+      { standard: '#E5E4F0', active: '#4B3E98', dark: '#4B3E98' },
+      { standard: '#F4E6E7', active: '#9E1C3C', dark: '#9E1C3C' },
     ],
   },
   shadow: {

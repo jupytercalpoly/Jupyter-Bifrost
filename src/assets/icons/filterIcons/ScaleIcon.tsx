@@ -17,7 +17,7 @@ export default function ScaleIcon({
     >
       <path
         d="M7.35254 1H9.99957V3.64703"
-        stroke="black"
+        stroke={color}
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -25,7 +25,7 @@ export default function ScaleIcon({
       />
       <path
         d="M1 9.99991L9.99991 1"
-        stroke="black"
+        stroke={color}
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -33,7 +33,7 @@ export default function ScaleIcon({
       />
       <path
         d="M9.99957 7.88086V10.5279H7.35254"
-        stroke="black"
+        stroke={color}
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -41,7 +41,7 @@ export default function ScaleIcon({
       />
       <path
         d="M6.82324 7.35352L9.99968 10.53"
-        stroke="black"
+        stroke={color}
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -49,7 +49,7 @@ export default function ScaleIcon({
       />
       <path
         d="M1 1.5293L3.64703 4.17633"
-        stroke="black"
+        stroke={color}
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"

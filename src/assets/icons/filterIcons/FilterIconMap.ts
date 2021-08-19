@@ -1,7 +1,7 @@
 import FilterSliderIcon from './FilterSliderIcon';
-import { CheckSquare } from 'react-feather';
+import { CheckSquare, Icon } from 'react-feather';
 
-export const filterIconMap: Record<string, any> = {
+export const filterIconMap: Record<string, typeof FilterSliderIcon | Icon> = {
   quantitative: FilterSliderIcon,
   nominal: CheckSquare,
 };
