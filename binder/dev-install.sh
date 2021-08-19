@@ -36,7 +36,7 @@ set -e
 echo "Setting NODE_OPTIONS env varible"
 export NODE_OPTIONS="--max-old-space-size=4096"
 
-echo "Pip installing bifrost extension"
+echo "Pip installing jupyter bifrost"
 pip install -e .
 
 echo "Cleaning up some files"
