@@ -74,7 +74,7 @@ const variableTabCss = (t: BifrostTheme) => css`
       }
 
       &.active {
-        background: ${t.color.primary.standard};
+        background: ${t.color.primary.dark};
       }
     }
   }
