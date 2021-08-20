@@ -102,6 +102,7 @@ const screenCss = (theme: BifrostTheme) => css`
 
 interface FilterGroupProps {
   encoding: VegaEncoding;
+  updateAggregation: (aggregation: string) => void;
 }
 
 export const filterMap: {
@@ -117,7 +118,7 @@ interface FilterScreenProps {
 }
 
 export default function FilterScreen(props: FilterScreenProps) {
-  const [graphSpec] = useModelState('graph_spec');
+  const [graphSpec, setGraphSpec] = useModelState('graph_spec');
   const columnInfo = graphSpec.encoding[props.encoding];
   const Filters = filterMap[columnInfo.type];
   const { field } = graphSpec.encoding[props.encoding];
@@ -125,6 +126,14 @@ export default function FilterScreen(props: FilterScreenProps) {
     saveOnDismount: true,
     description: `Filtered on ${field}`,
   });
+
+  function updateAggregation(aggregation: string) {
+    const newSpec = produce(graphSpec, (gs) => {
+      gs.encoding[props.encoding].aggregate =
+        aggregation === 'none' ? '' : aggregation;
+    });
+    setGraphSpec(newSpec);
+  }
 
   return (
     <article css={screenCss}>
@@ -139,7 +148,10 @@ export default function FilterScreen(props: FilterScreenProps) {
           {': '}
           <span className="column">{columnInfo.field}</span>
         </h2>
-        <Filters encoding={props.encoding} />
+        <Filters
+          encoding={props.encoding}
+          updateAggregation={updateAggregation}
+        />
       </div>
     </article>
   );
@@ -204,14 +216,6 @@ function QuantitativeFilters(props: FilterGroupProps) {
       }
     });
 
-    setGraphSpec(newSpec);
-  }
-
-  function updateAggregation(aggregation: string) {
-    const newSpec = produce(graphSpec, (gs) => {
-      gs.encoding[props.encoding].aggregate =
-        aggregation === 'none' ? '' : aggregation;
-    });
     setGraphSpec(newSpec);
   }
 
@@ -281,7 +285,7 @@ function QuantitativeFilters(props: FilterGroupProps) {
           <h3>Transformation</h3>
           <select
             value={currentAggregation}
-            onChange={(e) => updateAggregation(e.target.value)}
+            onChange={(e) => props.updateAggregation(e.target.value)}
           >
             {['none', ...vegaAggregationList].map((aggregation) => (
               <option value={aggregation}>{aggregation}</option>
@@ -326,14 +330,6 @@ function CategoricalFilters(props: FilterGroupProps) {
   const categories = useMemo(() => getCategories(graphData, field), []);
   const selectedCategories = useMemo(getSelectedCategories, [graphSpec]);
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
-
-  function updateAggregation(aggregation: string) {
-    const newSpec = produce(graphSpec, (gs) => {
-      gs.encoding[props.encoding].aggregate =
-        aggregation === 'none' ? '' : aggregation;
-    });
-    setGraphSpec(newSpec);
-  }
 
   function getSelectedCategories() {
     const type = 'oneOf';
@@ -394,7 +390,7 @@ function CategoricalFilters(props: FilterGroupProps) {
         <h3>Transformation</h3>
         <select
           value={currentAggregation}
-          onChange={(e) => updateAggregation(e.target.value)}
+          onChange={(e) => props.updateAggregation(e.target.value)}
         >
           {['none', 'count'].map((aggregation) => (
             <option value={aggregation}>{aggregation}</option>
