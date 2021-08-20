@@ -48,9 +48,30 @@ export default function MoreMenu({
   return (
     <Modal position={position} onBack={onBack}>
       <ul css={moreMenuCss}>
-        <li onClick={() => exportImage('png')}>Export PNG</li>
-        <li onClick={() => exportImage('svg')}>Export SVG</li>
-        <li onClick={exportCode}>Copy Code to Clipboard</li>
+        <li
+          onClick={() => {
+            exportImage('png');
+            onBack();
+          }}
+        >
+          Export PNG
+        </li>
+        <li
+          onClick={() => {
+            exportImage('svg');
+            onBack();
+          }}
+        >
+          Export SVG
+        </li>
+        <li
+          onClick={() => {
+            exportCode();
+            onBack();
+          }}
+        >
+          Copy Code to Clipboard
+        </li>
       </ul>
     </Modal>
   );
