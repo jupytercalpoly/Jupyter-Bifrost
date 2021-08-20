@@ -387,7 +387,7 @@ function CategoricalFilters(props: FilterGroupProps) {
         ))}
       </ul>
       <article className={'aggregation-article'}>
-        <h3>Transformation</h3>
+        <h3>Aggregation</h3>
         <select
           value={currentAggregation}
           onChange={(e) => props.updateAggregation(e.target.value)}
