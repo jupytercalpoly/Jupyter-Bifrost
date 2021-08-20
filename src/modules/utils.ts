@@ -10,5 +10,5 @@ export function hasDuplicateField(
   const countFieldUsage = Object.values(graphSpec.encoding).filter(
     (encodingInfo: EncodingInfo) => encodingInfo.field === field
   ).length;
-  return countFieldUsage !== 1;
+  return countFieldUsage > 1;
 }

@@ -184,22 +184,28 @@ export default function EditTab({
       return;
     }
     const dtype = columnTypes[field];
-
+    const oldFieldInfo = graphSpec.encoding[activeOptions.encoding];
+    if (oldFieldInfo.field === field)
+      return setActiveOptions((opt) => ({ ...opt, menu: '' }));
+    let newSpec = graphSpec;
+    if (!hasDuplicateField(newSpec, field))
+      newSpec = deleteSpecFilter(
+        newSpec,
+        oldFieldInfo.field,
+        oldFieldInfo.type === 'quantitative' ? 'range' : 'oneOf',
+        { deleteCompound: true }
+      );
     // change the encoded field.
-    let newSpec = produce(graphSpec, (gs) => {
+    newSpec = produce(newSpec, (gs) => {
       (gs.encoding[activeOptions.encoding as VegaEncoding] as EncodingInfo) = {
         field: field,
         type: dtype,
       };
     });
 
-    newSpec =
-      // check if the filter is being used in another pill
-      hasDuplicateField(newSpec, field)
-        ? // keep the same filter
-          newSpec
-        : // add default filter
-          addDefaultFilter(newSpec, data, columnTypes, field);
+    // check if the filter is being used in another pill
+    if (!hasDuplicateField(newSpec, field))
+      newSpec = addDefaultFilter(newSpec, data, columnTypes, field);
 
     const newPillsInfo = produce(pillsInfo, (info) => {
       const pill = info.find(
@@ -257,11 +263,10 @@ export default function EditTab({
   function deletePill(pillState: PillState) {
     const encoding = pillState.encoding as VegaEncoding;
     const isFilter = pillState.type === 'filter';
-
     let newSpec =
       // check if the filter is being used in another pill
       hasDuplicateField(graphSpec, pillState.field)
-        ? (Object.assign(graphSpec) as GraphSpec)
+        ? graphSpec
         : // Remove all filters associated with the pill
           deleteSpecFilter(
             graphSpec,
