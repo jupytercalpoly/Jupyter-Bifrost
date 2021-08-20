@@ -12,6 +12,7 @@ import {
   useModelState,
   SuggestedGraphs,
   Args,
+  GraphSpec,
 } from '../../hooks/bifrost-model';
 import Pill from '../ui-widgets/Pill';
 import { useMemo } from 'react';
@@ -140,20 +141,28 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
       const program = 'data("data").\n' + dataAsp.concat(queryAsp).join('\n');
       const solution = draco.solve(program, { models: 5 });
 
-      if (solution) {
-        const recommendedSpecs = solution.specs.map((spec) =>
-          produce(spec, (gs) => {
-            delete gs['$schema'];
-            delete (gs['data'] as any).url;
-            gs['data']['name'] = 'data';
-            gs['transform'] = [];
-            gs.width = 400;
-            gs.height = 200;
-            if (['circle', 'square'].includes(gs.mark as string)) {
-              gs.mark = 'point';
-            }
-          })
+      const excludeFacet = (spec: any) =>
+        !(
+          'facet' in (spec as GraphSpec).encoding ||
+          'row' in (spec as GraphSpec).encoding
         );
+
+      if (solution) {
+        const recommendedSpecs = solution.specs
+          .filter(excludeFacet)
+          .map((spec) =>
+            produce(spec, (gs) => {
+              delete gs['$schema'];
+              delete (gs['data'] as any).url;
+              gs['data']['name'] = 'data';
+              gs['transform'] = [];
+              gs.width = 400;
+              gs.height = 200;
+              if (['circle', 'square'].includes(gs.mark as string)) {
+                gs.mark = 'point';
+              }
+            })
+          );
         setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
       }
     });

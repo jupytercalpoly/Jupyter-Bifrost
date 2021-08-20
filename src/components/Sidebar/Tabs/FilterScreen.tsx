@@ -2,7 +2,7 @@
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
 import { useEffect, useMemo } from 'react';
-import { X, Sliders } from 'react-feather';
+import { X, Sliders, XCircle } from 'react-feather';
 import { useModelState } from '../../../hooks/bifrost-model';
 import { BifrostTheme } from '../../../theme';
 import {
@@ -24,18 +24,22 @@ const screenCss = (theme: BifrostTheme) => css`
   background-color: ${theme.color.background[0]};
   width: 100%;
   height: 100%;
+  padding: 15px;
 
-  .filter-contents {
+  .filter-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
   }
   nav {
     padding-bottom: 5px;
   }
 
   h2 {
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 700;
-    margin-bottom: 10px;
-    margin-top: 20px;
+    margin: 0;
     .encoding {
       color: ${theme.color.primary.dark};
     }
@@ -66,11 +70,6 @@ const screenCss = (theme: BifrostTheme) => css`
     font-size: 17px;
     font-weight: 500;
     margin-bottom: 2px;
-  }
-
-  .quantitative-filters {
-    overflow: auto;
-    height: 300px;
   }
 
   .RangeSlider {
@@ -134,17 +133,17 @@ export default function FilterScreen(props: FilterScreenProps) {
 
   return (
     <article css={screenCss}>
-      <nav>
-        <button className="wrapper" onClick={props.onBack}>
-          <X />
-        </button>
-      </nav>
-      <div className="filter-contents">
+      <nav className="filter-nav">
         <h2>
           <span className="encoding">{props.encoding}</span>
           {': '}
           <span className="column">{columnInfo.field}</span>
         </h2>
+        <button className="wrapper" onClick={props.onBack}>
+          <XCircle />
+        </button>
+      </nav>
+      <div className="filter-contents">
         <Filters encoding={props.encoding} />
       </div>
     </article>

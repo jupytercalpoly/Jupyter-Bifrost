@@ -23,9 +23,7 @@ const graphCss = css`
 
   .vega-embed.has-actions {
     details {
-      position: absolute;
-      top: 10px;
-      right: 10px;
+      display: none;
     }
   }
 
