@@ -4,7 +4,7 @@ import { jsx, css } from '@emotion/react';
 import React, { useState, useRef } from 'react';
 import SearchBar from '../ui-widgets/SearchBar';
 
-import { Lock, X } from 'react-feather';
+import { HelpCircle, Lock, X } from 'react-feather';
 import { useEffect } from 'react';
 import { EncodingQuery } from 'compassql/build/src/query/encoding';
 
@@ -20,9 +20,9 @@ import { BifrostTheme } from '../../theme';
 import { data2schema, schema2asp, cql2asp } from 'draco-core';
 import Draco from 'draco-vis';
 import produce from 'immer';
+import HelpScreen from '../HelpScreen/HelpScreen';
 
 const columnSelectorCss = (theme: BifrostTheme) => css`
-  /* width: 320px; */
   flex: 0 0 320px;
   margin-right: 30px;
   padding-right: 30px;
@@ -30,6 +30,12 @@ const columnSelectorCss = (theme: BifrostTheme) => css`
   h2,
   h3 {
     margin: 0;
+  }
+  .title-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .choice {
@@ -87,6 +93,7 @@ const columnSelectorCss = (theme: BifrostTheme) => css`
 `;
 export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   const [query, setQuery] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
   const columnChoices = useModelState('df_columns')[0];
   const [selectedColumns, setSelectedColumns] =
     useModelState('selected_columns');
@@ -191,7 +198,18 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
 
   return (
     <aside className="ColumnSelectorSidebar" css={columnSelectorCss}>
-      <h2>Columns</h2>
+      <div className="title-wrapper">
+        <h2>Columns</h2>
+        <button className="wrapper" onClick={() => setShowHelp(true)}>
+          <HelpCircle />
+        </button>
+        {showHelp && (
+          <HelpScreen
+            onDismiss={() => setShowHelp(false)}
+            position={['100%', 0]}
+          />
+        )}
+      </div>
       <h3 className="subtitle">Select up to 3 columns</h3>
       <SearchBar
         data-immediate-focus
