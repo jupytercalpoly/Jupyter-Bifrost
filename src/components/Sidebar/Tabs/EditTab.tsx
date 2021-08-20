@@ -2,7 +2,7 @@
 import { css, jsx } from '@emotion/react';
 import produce from 'immer';
 import { useEffect, useState } from 'react';
-import { ChevronUp, PlusCircle } from 'react-feather';
+import { ChevronUp, Plus } from 'react-feather';
 import {
   EncodingInfo,
   GraphData,
@@ -424,14 +424,13 @@ export default function EditTab({
   encodingList.push(
     <button
       key={'add-new-pill'}
-      className="wrapper"
       style={{ margin: '0 10px' }}
       onClick={() => {
         setActiveOptions({ encoding: '', menu: '' });
         setAddNewPill(true);
       }}
     >
-      <PlusCircle />
+      <Plus color="white" />
     </button>
   );
 

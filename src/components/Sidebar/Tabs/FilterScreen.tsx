@@ -1,7 +1,7 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { X, Sliders } from 'react-feather';
 import { useModelState } from '../../../hooks/bifrost-model';
 import { BifrostTheme } from '../../../theme';
@@ -31,12 +31,6 @@ const screenCss = (theme: BifrostTheme) => css`
     padding-bottom: 5px;
   }
 
-  /* h1 {
-    .encoding {
-      color: ${theme.color.primary.dark};
-    }
-  } */
-
   h2 {
     font-size: 22px;
     font-weight: 700;
@@ -45,6 +39,10 @@ const screenCss = (theme: BifrostTheme) => css`
     .encoding {
       color: ${theme.color.primary.dark};
     }
+  }
+
+  h3 {
+    margin: 6px 0;
   }
 
   .close-slider {
@@ -75,15 +73,23 @@ const screenCss = (theme: BifrostTheme) => css`
     height: 300px;
   }
 
+  .RangeSlider {
+    padding-left: 0px;
+  }
+
   .transformation-section {
     display: flex;
     align-items: center;
 
     article {
-      margin: 0 10px;
+      margin-right: 10px;
 
       select {
         padding: 5px;
+      }
+
+      .bin-checkbox {
+        margin: 5px 0;
       }
     }
   }
@@ -148,9 +154,6 @@ export default function FilterScreen(props: FilterScreenProps) {
 function QuantitativeFilters(props: FilterGroupProps) {
   const [graphData] = useModelState('graph_data');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
-  const [binned, setBinned] = useState<boolean>(
-    graphSpec.encoding[props.encoding].bin ?? false
-  );
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const currentScale =
@@ -236,15 +239,12 @@ function QuantitativeFilters(props: FilterGroupProps) {
     );
   }
 
-  function updateBin() {
-    setBinned((binned) => {
-      setGraphSpec(
-        produce(graphSpec, (gs) => {
-          gs.encoding[props.encoding].bin = !binned;
-        })
-      );
-      return !binned;
-    });
+  function updateBin(e: React.ChangeEvent<HTMLInputElement>) {
+    setGraphSpec(
+      produce(graphSpec, (gs) => {
+        gs.encoding[props.encoding].bin = e.target.checked;
+      })
+    );
   }
 
   return (
@@ -278,7 +278,7 @@ function QuantitativeFilters(props: FilterGroupProps) {
       </article>
       <section className={'transformation-section'}>
         <article className={'aggregation-article'}>
-          <h3>Transformation</h3>
+          <h3>Aggregation</h3>
           <select
             value={currentAggregation}
             onChange={(e) => updateAggregation(e.target.value)}
@@ -302,17 +302,11 @@ function QuantitativeFilters(props: FilterGroupProps) {
         </article>
         <article className={'binning-article'}>
           <h3>Bin</h3>
-          <button
-            className={binned ? 'binning-button clicked' : 'binning-button'}
-            onClick={updateBin}
-          >
-            {binned ? 'Binned' : 'Bin'}
-          </button>
-          {/* <input
+          <input
+            className="bin-checkbox"
             type="checkbox"
             onChange={updateBin}
-            style={{ display: 'inline-block' }}
-          /> */}
+          />
         </article>
       </section>
     </section>
