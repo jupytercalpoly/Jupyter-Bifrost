@@ -53,23 +53,10 @@ export default function Graph(props: GraphProps) {
   const [selectedData, setSelectedData] = useModelState('selected_data');
   const [spec, setSpec] = useModelState('graph_spec');
   const [graphBounds, setGraphBounds] = useModelState('graph_bounds');
-  // const [columnTypes] = useModelState('column_types');
   const [axisState, setAxisState] = useState<Record<string, string>>({
     activeAxis: props.clickedAxis,
   });
   const data = useModelState('graph_data')[0];
-
-  // const { width, height, ref } = useResizeDetector();
-
-  // useEffect(() => {
-  //   console.log('graph');
-  //   console.log(width, height);
-  //   const newSpec = produce(spec, (gs) => {
-  //     gs.height = height ?? 'container';
-  //     gs.width = width ?? 'container';
-  //   });
-  //   setSpec(newSpec);
-  // }, [width, height]);
 
   useEffect(() => {
     if (['x', 'y'].includes(props.clickedAxis)) {
@@ -192,7 +179,6 @@ export default function Graph(props: GraphProps) {
       const pills = encodingList.getElementsByClassName('graph-pill');
       if (pills) {
         Array.from(pills).forEach((pill) => {
-          console.log(pill.querySelectorAll('.pill-header span'));
           if (
             pill
               .querySelectorAll('.pill-header span')[1]
