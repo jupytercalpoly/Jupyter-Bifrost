@@ -62,7 +62,6 @@ export type Args = {
   x: string;
   y: string;
   color: string;
-  kind: string;
 };
 
 export type SelectionData = [

@@ -96,10 +96,10 @@ export default function BifrostReactWidget(props: BifrostReactWidgetProps) {
 }
 
 function BifrostReactWidgetDisplay() {
-  const plotArgs = useModelState('plot_function_args')[0];
-  // TODO: Might need to check the mark as well
+  const plotArgs = useModelState('passed_encodings')[0];
+  const kind = useModelState('passed_kind')[0];
   const [onboarded, setOnboarded] = useState(
-    Boolean(plotArgs['x'] && plotArgs['y'])
+    Boolean(plotArgs['x'] && plotArgs['y'] && kind)
   );
 
   useEffect(() => {

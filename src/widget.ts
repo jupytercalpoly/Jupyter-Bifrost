@@ -24,6 +24,7 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 
 // Import the CSS
 import '../css/widget.css';
+import { VegaMark } from './modules/VegaEncodings';
 
 const bifrostModelPropDefaults = {
   spec_history: [] as GraphSpec[],
@@ -36,12 +37,12 @@ const bifrostModelPropDefaults = {
   df_columns: [] as string[],
   selected_data: ['', {}] as SelectionData,
   selected_columns: [] as string[],
-  selected_mark: '',
+  passed_kind: '' as VegaMark | '',
   graph_data: {} as GraphData,
   graph_bounds: {} as SelectionData[1],
   suggested_graphs: [] as SuggestedGraphs,
   flags: {},
-  plot_function_args: {} as Args,
+  passed_encodings: {} as Args,
   column_types: {} as Record<EncodingInfo['field'], EncodingInfo['type']>,
   column_name_map: {} as Record<string, string>,
   graph_data_config: { sampleSize: 100, datasetLength: 1 } as GraphDataConfig,
