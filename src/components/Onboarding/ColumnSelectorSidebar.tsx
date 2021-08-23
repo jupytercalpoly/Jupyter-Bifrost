@@ -139,7 +139,6 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
     draco.init().then(() => {
       const program = 'data("data").\n' + dataAsp.concat(queryAsp).join('\n');
       const solution = draco.solve(program, { models: 5 });
-
       const excludeFacet = (spec: any) =>
         !(
           'facet' in (spec as GraphSpec).encoding ||
