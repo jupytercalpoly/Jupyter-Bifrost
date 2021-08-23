@@ -72,6 +72,7 @@ export default function GraphPill(props: GraphPillProps) {
         white-space: nowrap;
         cursor: pointer;
         width: 100%;
+        margin: auto 4px;
         text-align: center;
 
         &:hover {
@@ -82,6 +83,7 @@ export default function GraphPill(props: GraphPillProps) {
       button {
         width: 100%;
         text-align: center;
+        margin: auto 4px;
       }
     }
 
