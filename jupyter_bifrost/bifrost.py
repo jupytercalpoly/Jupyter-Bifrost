@@ -130,7 +130,7 @@ class BifrostWidget(DOMWidget):
         )
 
     def get_data(self, df: pd.DataFrame, sampleLimit: int = None):
-        if sampleLimit:
+        if sampleLimit and sampleLimit < len(df):
             df = df.sample(n=sampleLimit)
         return json.loads(df.to_json(orient="records"))
 
