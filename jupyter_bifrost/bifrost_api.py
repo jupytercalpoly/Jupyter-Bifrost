@@ -2,7 +2,6 @@ import os, sys
 import typing
 import pandas as pd
 from .bifrost import BifrostWidget
-import IPython
 from IPython.core.display import display
 
 
@@ -81,6 +80,7 @@ class Chart:
         except AttributeError as e:
             print(e)
             sys.exit(1)
+
         self.encoding["x"] = x
         self.encoding["y"] = y
         self.encoding["color"] = color
@@ -91,7 +91,6 @@ class Chart:
             return None
         return s.replace(" ", "_").replace("(", "").replace(")", "")
 
-    # TODO: reequire plot call
     def plot(self) -> pd.DataFrame:
         formatted_x, formatted_y, formatted_color = [
             self.format_string(self.encoding[key]) for key in self.encoding
@@ -114,4 +113,7 @@ class Chart:
             formatted_color,
         )
         display(w)
+        # reset
+        self.mark = None
+        self.encoding = {"x": None, "y": None, "color": None}
         return self._dataFrame if w.output_variable else None

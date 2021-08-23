@@ -119,22 +119,22 @@ export const vegaParamPredicatesList = [
 
 export const vegaChartList = [
   // 'arc',
-  'area',
+  // 'area',
   'bar',
   'boxplot',
-  'circle',
+  // 'circle',
   'errorband',
   'errorbar',
   // 'geoshape',
   // 'image',
   'line',
   'point',
-  'rect',
+  // 'rect',
   // 'rule',
-  'square',
+  // 'square',
   // 'text',
   'tick',
-  'trail',
+  // 'trail',
 ] as const;
 
 export const vegaCategoricalChartList = [

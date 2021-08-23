@@ -112,14 +112,6 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
     [props.plotArgs]
   );
 
-  // Ensure that pre-selected columns are included on initial render.
-  useEffect(() => {
-    if (selectedColumns.length) {
-      return;
-    }
-    setSelectedColumns(Array.from(preSelectedColumns));
-  }, []);
-
   // Create charts whenever the column selection changes
   useEffect(recommendCharts, [selectedColumns]);
 
@@ -127,7 +119,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
     const dataSchema = data2schema(data);
     const dataAsp = schema2asp(dataSchema);
 
-    const selectedEncodings = Array.from(selectedColumns).map((column) => {
+    const selectedEncodings = selectedColumns.map((column) => {
       if (preSelectedColumns.has(column)) {
         return spec.spec.encodings.filter(
           (encoding: any) => encoding['field'] === column
@@ -247,7 +239,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
         </fieldset>
       </form>
       <ul className="column-tags">
-        {Array.from(selectedColumns).map((column: string, i) => {
+        {selectedColumns.map((column: string, i) => {
           return (
             <Pill key={column} style={{ margin: 4, padding: 4 }}>
               <div className="tag-content-wrapper">

@@ -21,7 +21,7 @@ from IPython import get_ipython
 TODO: Add module docstring
 """
 from ipywidgets import DOMWidget, register
-from traitlets import Unicode, List, Int, Dict
+from traitlets import Unicode, List, Int, Dict, Set
 from ._frontend import module_name, module_version
 import json
 
@@ -44,7 +44,8 @@ class BifrostWidget(DOMWidget):
     current_dataframe_index = Int(0).tag(sync=True)
     query_spec = Dict({}).tag(sync=True)
     graph_spec = Dict({}).tag(sync=True)
-    plot_function_args = Dict({}).tag(sync=True)
+    passed_encodings = Dict({}).tag(sync=True)
+    passed_kind = Unicode("").tag(sync=True)
     graph_data = List([]).tag(sync=True)
     graph_bounds = Dict({}).tag(sync=True)
     graph_encodings = Dict({}).tag(sync=True)
@@ -54,7 +55,6 @@ class BifrostWidget(DOMWidget):
     df_code = Unicode("").tag(sync=True)
     df_columns = List([]).tag(sync=True)
     selected_columns = List([]).tag(sync=True)
-    selected_mark = Unicode("").tag(sync=True)
     selected_data = List([]).tag(sync=True)
     suggested_graphs = List([]).tag(sync=True)
     column_types = Dict({}).tag(sync=True)
@@ -81,13 +81,21 @@ class BifrostWidget(DOMWidget):
             df, data, column_types, kind=kind, x=x, y=y, color=color
         )
         df.columns = column_name_map.values()
-
         self.set_trait("df_columns", sorted(list(df.columns)))
         self.set_trait("selected_data", [])
         self.set_trait("query_spec", graph_info["query_spec"])
         self.set_trait("graph_data", graph_info["data"])
         self.set_trait("graph_spec", graph_info["graph_spec"])
-        self.set_trait("plot_function_args", graph_info["args"])
+        self.set_trait("passed_encodings", graph_info["selected_encodings"])
+        self.set_trait(
+            "selected_columns",
+            [
+                encoding
+                for encoding in graph_info["selected_encodings"].values()
+                if encoding
+            ],
+        ),
+        self.set_trait("passed_kind", graph_info["passed_kind"])
         self.set_trait("column_types", column_types)
         self.set_trait("column_name_map", column_name_map)
         self.set_trait(
@@ -201,5 +209,6 @@ class BifrostWidget(DOMWidget):
             "data": data,
             "query_spec": {"spec": query_spec},
             "graph_spec": graph_spec,
-            "args": {"x": x, "y": y, "color": color, "kind": kind},
+            "selected_encodings": {"x": x, "y": y, "color": color},
+            "passed_kind": kind if kind else "",
         }
