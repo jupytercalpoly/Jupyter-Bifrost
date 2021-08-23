@@ -24,7 +24,6 @@ const historyCss = (theme: BifrostTheme) => css`
       }
 
       &.active {
-        border: 3px solid ${theme.color.primary.dark};
         border-left: 5px solid ${theme.color.primary.dark};
         font-weight: 700;
       }

@@ -21,14 +21,6 @@ const graphCss = css`
   padding-left: 34px;
   overflow-x: auto;
 
-  .vega-embed.has-actions {
-    details {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-  }
-
   g.mark-text.role-axis-title {
     text.hovered {
       fill: ${theme.color.primary.dark};
@@ -47,13 +39,13 @@ interface GraphProps {
   updateClickedAxis: (encoding: VegaEncoding | '') => void;
   sideBarOpen: boolean;
   clickSidebarButton: () => void;
+  onViewCreated(vegaView: View): void;
 }
 
 export default function Graph(props: GraphProps) {
   const [selectedData, setSelectedData] = useModelState('selected_data');
   const [spec, setSpec] = useModelState('graph_spec');
   const [graphBounds, setGraphBounds] = useModelState('graph_bounds');
-  const [columnTypes] = useModelState('column_types');
   const [axisState, setAxisState] = useState<Record<string, string>>({
     activeAxis: props.clickedAxis,
   });
@@ -168,35 +160,26 @@ export default function Graph(props: GraphProps) {
     }
     const field = spec.encoding[channel].field;
 
-    const variableTab = props.sideBarRef.current?.querySelectorAll(
-      '.TabBar li'
-    )[0] as HTMLElement;
-
-    // TODO: use ref to open instead ??
-    variableTab.click();
-
     const encodingList =
       props.sideBarRef.current?.getElementsByClassName('encoding-list')[0];
 
     let newChannel: VegaEncoding | '' =
       axisState['activeAxis'] === channel ? '' : channel;
+
     if (!encodingList) {
       newChannel = '';
     } else {
-      const pills = encodingList.getElementsByTagName('li');
-
+      const pills = encodingList.getElementsByClassName('graph-pill');
       if (pills) {
         Array.from(pills).forEach((pill) => {
           if (
-            pill.querySelector('.encoding-wrapper span')?.textContent === field
+            pill
+              .querySelectorAll('.pill-header span')[1]
+              .getElementsByTagName('b')[0]?.textContent === field
           ) {
-            if (axisState['activeAxis'] === channel) {
-              // fold
-            } else {
-              if (['nominal', 'ordinal'].includes(columnTypes[field])) {
-                pill.querySelectorAll('button')[1]?.click();
-              }
-            }
+            (
+              pill.querySelectorAll('.pill-header span')[1] as HTMLElement
+            ).click();
           }
         });
       }
@@ -251,6 +234,7 @@ export default function Graph(props: GraphProps) {
 
   function onNewView(view: View) {
     setTimeout(() => placeAxisWrappers(), 100);
+    props.onViewCreated(view);
   }
 
   function handleMouseEnter(channel: VegaEncoding) {
@@ -302,6 +286,7 @@ export default function Graph(props: GraphProps) {
           data={graphData}
           signalListeners={signalListeners}
           renderer={'svg'}
+          actions={false}
           onNewView={onNewView}
         />
       </div>

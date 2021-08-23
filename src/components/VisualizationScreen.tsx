@@ -8,8 +8,7 @@ import Graph from './Graph';
 import { VegaEncoding } from '../modules/VegaEncodings';
 import SideBarCollapsibleButtonIcon from '../assets/icons/SideBarCollapsibleButtonIcon';
 import theme from '../theme';
-import HelpScreen from './HelpScreen/HelpScreen';
-import { useModelState } from '../hooks/bifrost-model';
+import { View } from 'vega';
 
 const bifrostWidgetCss = css`
   // Element-based styles
@@ -51,8 +50,7 @@ export default function VisualizationScreen({
   const graphRef = React.useRef<HTMLDivElement>(null);
   const [clickedAxis, setClickedAxis] = useState<VegaEncoding | ''>('');
   const [sideBarOpen, setSideBarOpen] = useState<boolean>(true);
-  const [showHelpScreen, setShowHelpScreen] = useState(false);
-  const [dfCode] = useModelState('df_code');
+  const [vegaView, setVegaView] = useState<View>();
 
   function updateClickedAxis(encoding: VegaEncoding | ''): void {
     setClickedAxis(encoding);
@@ -62,20 +60,12 @@ export default function VisualizationScreen({
     setSideBarOpen(!sideBarOpen);
   }
 
-  function onExportCodeRequested() {
-    navigator.clipboard.writeText(dfCode);
-  }
-
   return (
     <article className="BifrostWidget" css={bifrostWidgetCss}>
       {onPrevious ? (
         <GridArea area="nav">
           <div className={'nav-wrapper'}>
-            <NavBar
-              onBack={onPrevious}
-              onHelpRequested={() => setShowHelpScreen(true)}
-              onExportCodeRequested={onExportCodeRequested}
-            />
+            <NavBar onBack={onPrevious} vegaView={vegaView} />
             <div
               className={`side-bar-collapsible-button${
                 sideBarOpen ? ' open' : ''
@@ -101,11 +91,10 @@ export default function VisualizationScreen({
           updateClickedAxis={updateClickedAxis}
           sideBarOpen={sideBarOpen}
           clickSidebarButton={onClickCollapsibleButton}
+          onViewCreated={setVegaView}
         />
       </GridArea>
-      {showHelpScreen && (
-        <HelpScreen onDismiss={() => setShowHelpScreen(false)} />
-      )}
+
       {sideBarOpen ? (
         <GridArea area="sidebar" ref={sidebarRef}>
           <Sidebar

@@ -1,9 +1,10 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { ArrowLeft } from 'react-feather';
 import Md from 'react-markdown';
 import { BifrostTheme } from '../../theme';
+import Modal from '../ui-widgets/Modal';
 import {
   chartRecs,
   editChart,
@@ -38,14 +39,6 @@ const links: { title: string; screen: ScreenName }[] = [
 ];
 
 const helpScreenCss = (t: BifrostTheme) => css`
-  width: 400px;
-  height: 100%;
-  border: 2px solid ${t.color.primary.light};
-  border-radius: 5px;
-  padding: 25px;
-  background: white;
-  z-index: 100;
-
   nav {
     ul {
       display: flex;
@@ -57,21 +50,6 @@ const helpScreenCss = (t: BifrostTheme) => css`
     }
     li {
       margin: 0;
-    }
-  }
-
-  .HelpLinks {
-    h2 {
-      margin-bottom: 10px;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      line-height: 25px;
-      a:hover {
-        text-decoration: underline;
-      }
     }
   }
 
@@ -101,17 +79,7 @@ const helpScreenCss = (t: BifrostTheme) => css`
     }
   }
 `;
-
-const backdropCss = css`
-  background: white;
-  opacity: 0.5;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-`;
-type Position = [number, number];
+type Position = [number | string, number | string];
 interface HelpScreenProps {
   position?: Position;
   onDismiss(): void;
@@ -122,39 +90,50 @@ export default function HelpScreen({
   onDismiss,
 }: HelpScreenProps) {
   const [screen, setScreen] = useState<ScreenName>('');
-  const posStyle = css`
-    position: absolute;
-    left: ${position[0]}px;
-    top: ${position[1]}px;
-  `;
   return (
-    <Fragment>
-      <div className="backdrop" css={backdropCss} onClick={onDismiss}></div>
-      <aside className="HelpScreen" css={[helpScreenCss, posStyle]}>
-        {screen ? (
-          <section>
-            <nav className="graph-nav-bar">
-              <ul>
-                <li>
-                  <button className="wrapper" onClick={() => setScreen('')}>
-                    <ArrowLeft />
-                  </button>
-                </li>
-              </ul>
-            </nav>
-            <div className="help-content">{screenMap[screen]()}</div>
-          </section>
-        ) : (
-          <HelpLinks onLinkClick={setScreen} />
-        )}
-      </aside>
-    </Fragment>
+    <Modal
+      position={position}
+      onBack={onDismiss}
+      style={{ width: 330, maxHeight: 400, overflow: 'auto' }}
+    >
+      {screen ? (
+        <section className="HelpScreen" css={helpScreenCss}>
+          <nav className="graph-nav-bar">
+            <ul>
+              <li>
+                <button className="wrapper" onClick={() => setScreen('')}>
+                  <ArrowLeft />
+                </button>
+              </li>
+            </ul>
+          </nav>
+          <div className="help-content">{screenMap[screen]()}</div>
+        </section>
+      ) : (
+        <HelpLinks onLinkClick={setScreen} />
+      )}
+    </Modal>
   );
 }
 
+const helpLinksCss = css`
+  h2 {
+    margin-bottom: 10px;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    line-height: 25px;
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
 function HelpLinks(props: { onLinkClick(name: ScreenName): void }) {
   return (
-    <section className="HelpLinks">
+    <section className="HelpLinks" css={helpLinksCss}>
       <h2>Help</h2>
       <ul>
         {links.map(({ title, screen }) => (

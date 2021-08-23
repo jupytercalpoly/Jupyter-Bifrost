@@ -122,10 +122,15 @@ const rangeInputsCss = css`
   align-items: center;
 
   input {
-    max-width: 50px;
     background-color: transparent;
     border: none;
-    margin: 0 10px;
+    &.start {
+      margin-right: 5px;
+    }
+
+    &.end {
+      margin-left: 15px;
+    }
   }
 
   .content {
@@ -142,6 +147,9 @@ interface RangeInputsProps {
 function RangeInputs(props: RangeInputsProps) {
   const [minInput, setMinInput] = useState(props.values[0]);
   const [maxInput, setMaxInput] = useState(props.values[1]);
+  const inputWidths = [minInput, maxInput].map(
+    (val) => val.toFixed(2).length + 'em'
+  );
 
   useEffect(() => {
     setMinInput(props.values[0]);
@@ -171,21 +179,25 @@ function RangeInputs(props: RangeInputsProps) {
   return (
     <div className="RangeInputs" css={rangeInputsCss}>
       <input
+        className="start"
         value={minInput.toFixed(2)}
         type="number"
         name="min"
         onChange={(e) => setMinInput(e.target.valueAsNumber)}
         onBlur={onSubmit}
         onKeyPress={handleEnter}
+        style={{ width: inputWidths[0] }}
       />
       <div className="content">{props.children}</div>
       <input
+        className="end"
         value={maxInput.toFixed(2)}
         type="number"
         name="max"
         onChange={(e) => setMaxInput(e.target.valueAsNumber)}
         onBlur={onSubmit}
         onKeyPress={handleEnter}
+        style={{ width: inputWidths[1] }}
       />
     </div>
   );

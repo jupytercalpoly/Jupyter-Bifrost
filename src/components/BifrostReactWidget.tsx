@@ -35,6 +35,14 @@ const globalStyles = (theme: any) => css`
         transform: scale(0.95);
       }
 
+      &:active:disabled {
+        transform: scale(1);
+      }
+      &:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
       &.wrapper {
         border: none;
         background: transparent;
@@ -76,6 +84,38 @@ const globalStyles = (theme: any) => css`
       color: gray;
       font-weight: 700;
       margin: 0;
+    }
+
+    input[type='checkbox'] {
+      all: unset;
+      width: 13px;
+      height: 13px;
+      display: inline-block;
+      cursor: pointer;
+      border: 1px solid #aaa;
+      border-radius: 20%;
+      margin-right: 6px;
+      position: relative;
+    }
+
+    input[type='checkbox']:disabled {
+      cursor: default;
+    }
+
+    input[type='checkbox']:checked {
+      background: #771c79;
+    }
+
+    input[type='checkbox']:checked::after {
+      position: absolute;
+      color: white;
+      content: '✓';
+      padding-left: 1px;
+      line-height: 1;
+    }
+
+    input[type='checkbox']:focus-visible {
+      outline: auto;
     }
   }
 `;

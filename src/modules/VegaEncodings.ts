@@ -135,7 +135,7 @@ export const vegaChartList = [
   // 'text',
   'tick',
   'trail',
-];
+] as const;
 
 export const vegaCategoricalChartList = [
   'bar',
