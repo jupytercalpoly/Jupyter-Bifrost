@@ -37,7 +37,6 @@ const screenCss = (theme: BifrostTheme) => css`
   }
 
   h2 {
-    font-size: 28px;
     font-weight: 700;
     margin: 0;
     .encoding {
@@ -143,7 +142,15 @@ export default function FilterScreen(props: FilterScreenProps) {
   return (
     <article css={screenCss}>
       <nav className="filter-nav">
-        <h2>
+        <h2
+          style={{
+            fontSize:
+              Math.max(
+                35 - (props.encoding.length + columnInfo.field.length) * 0.7,
+                15
+              ) + 'px',
+          }}
+        >
           <span className="encoding">{props.encoding}</span>
           {': '}
           <span className="column">{columnInfo.field}</span>
@@ -153,8 +160,8 @@ export default function FilterScreen(props: FilterScreenProps) {
         </button>
       </nav>
       <div className="filter-contents">
-        <Filters 
-          encoding={props.encoding} 
+        <Filters
+          encoding={props.encoding}
           updateAggregation={updateAggregation}
         />
       </div>
