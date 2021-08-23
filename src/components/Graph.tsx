@@ -156,22 +156,20 @@ export default function Graph(props: GraphProps) {
     }
     const field = spec.encoding[channel].field;
 
-    const encodingList =
-      props.sideBarRef.current?.getElementsByClassName('encoding-list')[0];
+    const pillList =
+      props.sideBarRef.current?.getElementsByClassName('pill-list')[0];
 
     let newChannel: VegaEncoding | '' =
       axisState['activeAxis'] === channel ? '' : channel;
 
-    if (!encodingList) {
+    if (!pillList) {
       newChannel = '';
     } else {
-      const pills = encodingList.getElementsByClassName('graph-pill');
+      const pills = pillList.getElementsByClassName('graph-pill');
       if (pills) {
         Array.from(pills).forEach((pill) => {
           if (
-            pill
-              .querySelectorAll('.pill-header span')[1]
-              .getElementsByTagName('b')[0]?.textContent === field
+            pill.querySelectorAll('.pill-header span')[1].textContent === field
           ) {
             (
               pill.querySelectorAll('.pill-header span')[1] as HTMLElement
