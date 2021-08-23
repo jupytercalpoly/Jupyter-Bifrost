@@ -35,6 +35,14 @@ const globalStyles = (theme: any) => css`
         transform: scale(0.95);
       }
 
+      &:active:disabled {
+        transform: scale(1);
+      }
+      &:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
       &.wrapper {
         border: none;
         background: transparent;

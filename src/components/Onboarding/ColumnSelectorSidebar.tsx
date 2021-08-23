@@ -196,18 +196,9 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
     setSelectedColumns(Array.from(updatedSet));
   }
 
-  function handleDelete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function handleDelete(column: string) {
     const updatedSet = new Set(selectedColumns);
-    const selectedTag = (e.currentTarget as HTMLButtonElement).className.split(
-      '_'
-    )[1];
-
-    updatedSet.delete(selectedTag);
-
-    const choice = document.getElementsByClassName(
-      `choice_${selectedTag}`
-    )[0] as HTMLInputElement;
-    choice.checked = false;
+    updatedSet.delete(column);
 
     setSelectedColumns(Array.from(updatedSet));
   }
@@ -261,7 +252,7 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
                 </span>
                 <button
                   className={`tagButton_${column}`}
-                  onClick={handleDelete}
+                  onClick={() => handleDelete(column)}
                 >
                   <X size={10} />
                 </button>

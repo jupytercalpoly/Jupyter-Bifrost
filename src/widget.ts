@@ -47,6 +47,7 @@ const bifrostModelPropDefaults = {
   column_name_map: {} as Record<string, string>,
   graph_data_config: { sampleSize: 100, datasetLength: 1 } as GraphDataConfig,
   df_code: '$df',
+  input_url: '',
 };
 
 export type ModelState = typeof bifrostModelPropDefaults;

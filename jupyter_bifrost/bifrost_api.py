@@ -116,4 +116,4 @@ class Chart:
         # reset
         self.mark = None
         self.encoding = {"x": None, "y": None, "color": None}
-        return w.df_history[-1]
+        return self._dataFrame if w.output_variable else None

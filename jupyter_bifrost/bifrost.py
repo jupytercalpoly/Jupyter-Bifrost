@@ -60,6 +60,7 @@ class BifrostWidget(DOMWidget):
     column_types = Dict({}).tag(sync=True)
     column_name_map = Dict({}).tag(sync=True)
     graph_data_config = Dict({"sampleSize": 100, "datasetLength": 0}).tag(sync=True)
+    input_url = Unicode("").tag(sync=True)
 
     def __init__(
         self,
@@ -104,6 +105,8 @@ class BifrostWidget(DOMWidget):
             self.set_trait("output_variable", df_watcher.plot_output)
         if df_watcher.bifrost_input:
             self.set_trait("df_variable_name", df_watcher.bifrost_input)
+        elif df_watcher.bifrost_input_url:
+            self.set_trait("input_url", df_watcher.bifrost_input_url)
 
     @observe("graph_spec")
     def update_graph_from_cols(self, changes):
