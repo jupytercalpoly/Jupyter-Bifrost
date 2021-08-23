@@ -35,13 +35,12 @@ const transitionCss = css`
 
 const sidebarCss = css`
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr;
   width: 100%;
   max-width: 330px;
-  height: 97%;
   min-height: 400px;
-  border-radius: 2.5% 2.5% 0 0;
+  border-radius: 10px;
   box-shadow: ${theme.shadow.handle};
   margin: 8px;
 

@@ -4,7 +4,7 @@ import { jsx, css } from '@emotion/react';
 import React, { useState, useRef } from 'react';
 import SearchBar from '../ui-widgets/SearchBar';
 
-import { Lock, X } from 'react-feather';
+import { HelpCircle, Lock, X } from 'react-feather';
 import { useEffect } from 'react';
 import { EncodingQuery } from 'compassql/build/src/query/encoding';
 
@@ -12,6 +12,7 @@ import {
   useModelState,
   SuggestedGraphs,
   Args,
+  GraphSpec,
 } from '../../hooks/bifrost-model';
 import Pill from '../ui-widgets/Pill';
 import { useMemo } from 'react';
@@ -19,9 +20,9 @@ import { BifrostTheme } from '../../theme';
 import { data2schema, schema2asp, cql2asp } from 'draco-core';
 import Draco from 'draco-vis';
 import produce from 'immer';
+import HelpScreen from '../HelpScreen/HelpScreen';
 
 const columnSelectorCss = (theme: BifrostTheme) => css`
-  /* width: 320px; */
   flex: 0 0 320px;
   margin-right: 30px;
   padding-right: 30px;
@@ -29,6 +30,12 @@ const columnSelectorCss = (theme: BifrostTheme) => css`
   h2,
   h3 {
     margin: 0;
+  }
+  .title-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .choice {
@@ -41,37 +48,6 @@ const columnSelectorCss = (theme: BifrostTheme) => css`
     &.focused {
       border-left: 2px solid ${theme.color.primary.standard};
     }
-  }
-
-  input[type='checkbox'] {
-    all: unset;
-    width: 13px;
-    height: 13px;
-    display: inline-block;
-    cursor: pointer;
-    border: 1px solid #aaa;
-    border-radius: 20%;
-    margin-right: 6px;
-  }
-
-  input[type='checkbox']:disabled {
-    cursor: default;
-  }
-
-  input[type='checkbox']:checked {
-    background: #771c79;
-  }
-
-  input[type='checkbox']:checked::after {
-    position: absolute;
-    color: white;
-    content: '✓';
-    padding-left: 1px;
-    line-height: 1;
-  }
-
-  input[type='checkbox']:focus-visible {
-    outline: auto;
   }
 
   form {
@@ -117,6 +93,7 @@ const columnSelectorCss = (theme: BifrostTheme) => css`
 `;
 export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   const [query, setQuery] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
   const columnChoices = useModelState('df_columns')[0];
   const [selectedColumns, setSelectedColumns] =
     useModelState('selected_columns');
@@ -171,20 +148,28 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
       const program = 'data("data").\n' + dataAsp.concat(queryAsp).join('\n');
       const solution = draco.solve(program, { models: 5 });
 
-      if (solution) {
-        const recommendedSpecs = solution.specs.map((spec) =>
-          produce(spec, (gs) => {
-            delete gs['$schema'];
-            delete (gs['data'] as any).url;
-            gs['data']['name'] = 'data';
-            gs['transform'] = [];
-            gs.width = 400;
-            gs.height = 200;
-            if (['circle', 'square'].includes(gs.mark as string)) {
-              gs.mark = 'point';
-            }
-          })
+      const excludeFacet = (spec: any) =>
+        !(
+          'facet' in (spec as GraphSpec).encoding ||
+          'row' in (spec as GraphSpec).encoding
         );
+
+      if (solution) {
+        const recommendedSpecs = solution.specs
+          .filter(excludeFacet)
+          .map((spec) =>
+            produce(spec, (gs) => {
+              delete gs['$schema'];
+              delete (gs['data'] as any).url;
+              gs['data']['name'] = 'data';
+              gs['transform'] = [];
+              gs.width = 400;
+              gs.height = 200;
+              if (['circle', 'square'].includes(gs.mark as string)) {
+                gs.mark = 'point';
+              }
+            })
+          );
         setSuggestedGraphs(recommendedSpecs as SuggestedGraphs);
       }
     });
@@ -213,7 +198,18 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
 
   return (
     <aside className="ColumnSelectorSidebar" css={columnSelectorCss}>
-      <h2>Columns</h2>
+      <div className="title-wrapper">
+        <h2>Columns</h2>
+        <button className="wrapper" onClick={() => setShowHelp(true)}>
+          <HelpCircle />
+        </button>
+        {showHelp && (
+          <HelpScreen
+            onDismiss={() => setShowHelp(false)}
+            position={['100%', 0]}
+          />
+        )}
+      </div>
       <h3 className="subtitle">Select up to 3 columns</h3>
       <SearchBar
         data-immediate-focus

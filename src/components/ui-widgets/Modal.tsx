@@ -33,8 +33,10 @@ const modalCss = (t: BifrostTheme) => css`
   }
 `;
 
+type Position = [number | string, number | string];
+
 interface ModalProps {
-  position?: [number, number];
+  position?: Position;
   onBack(): void;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -52,7 +54,7 @@ export default function Modal({
       <aside
         className="Modal"
         css={modalCss}
-        style={{ ...style, top: position[1] + 'px', left: position[0] + 'px' }}
+        style={{ ...style, top: position[1], left: position[0] }}
       >
         {children}
       </aside>

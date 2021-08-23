@@ -2,7 +2,7 @@
 import { css, jsx } from '@emotion/react';
 import produce from 'immer';
 import { useEffect, useState } from 'react';
-import { ChevronUp, PlusCircle } from 'react-feather';
+import { ChevronUp, Plus } from 'react-feather';
 import {
   EncodingInfo,
   GraphData,
@@ -79,7 +79,7 @@ const variableTabCss = (t: BifrostTheme) => css`
     }
   }
 
-  .encoding-list,
+  .pill-list,
   .encoding-choices {
     margin: 0;
     padding: 0;
@@ -92,9 +92,18 @@ const variableTabCss = (t: BifrostTheme) => css`
     }
   }
 
-  .encoding-list {
+  .pill-list {
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
+  }
+
+  .add-pill {
+    margin: 10px;
+    width: min-content;
+    height: min-content;
+    padding: 2px;
+    padding-bottom: 0px;
   }
 
   .encoding-choices {
@@ -428,15 +437,14 @@ export default function EditTab({
 
   encodingList.push(
     <button
-      key={'add-new-pill'}
-      className="wrapper"
-      style={{ margin: '0 10px' }}
+      key="add-pill"
+      className="add-pill"
       onClick={() => {
         setActiveOptions({ encoding: '', menu: '' });
         setAddNewPill(true);
       }}
     >
-      <PlusCircle />
+      <Plus color="white" size={25} />
     </button>
   );
 
@@ -510,7 +518,7 @@ export default function EditTab({
                   );
                 })}
               </ul>
-              <ul className="encoding-list">{encodingList}</ul>
+              <ul className="pill-list">{encodingList}</ul>
               {activeOptions.menu === 'encoding' && (
                 <ul className="encoding-choices">
                   {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]

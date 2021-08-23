@@ -1,8 +1,8 @@
 /**@jsx jsx */
 import { jsx, css } from '@emotion/react';
 import produce from 'immer';
-import { useEffect, useMemo, useState } from 'react';
-import { X, Sliders } from 'react-feather';
+import { useEffect, useMemo } from 'react';
+import { X, Sliders, XCircle } from 'react-feather';
 import { useModelState } from '../../../hooks/bifrost-model';
 import { BifrostTheme } from '../../../theme';
 import {
@@ -24,27 +24,29 @@ const screenCss = (theme: BifrostTheme) => css`
   background-color: ${theme.color.background[0]};
   width: 100%;
   height: 100%;
+  padding: 15px;
 
-  .filter-contents {
+  .filter-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
   }
   nav {
     padding-bottom: 5px;
   }
 
-  /* h1 {
-    .encoding {
-      color: ${theme.color.primary.dark};
-    }
-  } */
-
   h2 {
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 700;
-    margin-bottom: 10px;
-    margin-top: 20px;
+    margin: 0;
     .encoding {
       color: ${theme.color.primary.dark};
     }
+  }
+
+  h3 {
+    margin: 6px 0;
   }
 
   .close-slider {
@@ -70,9 +72,8 @@ const screenCss = (theme: BifrostTheme) => css`
     margin-bottom: 2px;
   }
 
-  .quantitative-filters {
-    overflow: auto;
-    height: 300px;
+  .RangeSlider {
+    padding-left: 0px;
   }
 
   .transformation-section {
@@ -80,10 +81,14 @@ const screenCss = (theme: BifrostTheme) => css`
     align-items: center;
 
     article {
-      margin: 0 10px;
+      margin-right: 10px;
 
       select {
         padding: 5px;
+      }
+
+      .bin-checkbox {
+        margin: 5px 0;
       }
     }
   }
@@ -128,17 +133,17 @@ export default function FilterScreen(props: FilterScreenProps) {
 
   return (
     <article css={screenCss}>
-      <nav>
-        <button className="wrapper" onClick={props.onBack}>
-          <X />
-        </button>
-      </nav>
-      <div className="filter-contents">
+      <nav className="filter-nav">
         <h2>
           <span className="encoding">{props.encoding}</span>
           {': '}
           <span className="column">{columnInfo.field}</span>
         </h2>
+        <button className="wrapper" onClick={props.onBack}>
+          <XCircle />
+        </button>
+      </nav>
+      <div className="filter-contents">
         <Filters encoding={props.encoding} />
       </div>
     </article>
@@ -148,9 +153,6 @@ export default function FilterScreen(props: FilterScreenProps) {
 function QuantitativeFilters(props: FilterGroupProps) {
   const [graphData] = useModelState('graph_data');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
-  const [binned, setBinned] = useState<boolean>(
-    graphSpec.encoding[props.encoding].bin ?? false
-  );
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const currentScale =
@@ -236,15 +238,12 @@ function QuantitativeFilters(props: FilterGroupProps) {
     );
   }
 
-  function updateBin() {
-    setBinned((binned) => {
-      setGraphSpec(
-        produce(graphSpec, (gs) => {
-          gs.encoding[props.encoding].bin = !binned;
-        })
-      );
-      return !binned;
-    });
+  function updateBin(e: React.ChangeEvent<HTMLInputElement>) {
+    setGraphSpec(
+      produce(graphSpec, (gs) => {
+        gs.encoding[props.encoding].bin = e.target.checked;
+      })
+    );
   }
 
   return (
@@ -278,7 +277,7 @@ function QuantitativeFilters(props: FilterGroupProps) {
       </article>
       <section className={'transformation-section'}>
         <article className={'aggregation-article'}>
-          <h3>Transformation</h3>
+          <h3>Aggregation</h3>
           <select
             value={currentAggregation}
             onChange={(e) => updateAggregation(e.target.value)}
@@ -302,17 +301,11 @@ function QuantitativeFilters(props: FilterGroupProps) {
         </article>
         <article className={'binning-article'}>
           <h3>Bin</h3>
-          <button
-            className={binned ? 'binning-button clicked' : 'binning-button'}
-            onClick={updateBin}
-          >
-            {binned ? 'Binned' : 'Bin'}
-          </button>
-          {/* <input
+          <input
+            className="bin-checkbox"
             type="checkbox"
             onChange={updateBin}
-            style={{ display: 'inline-block' }}
-          /> */}
+          />
         </article>
       </section>
     </section>

@@ -21,14 +21,6 @@ const graphCss = css`
   padding-left: 34px;
   overflow-x: auto;
 
-  .vega-embed.has-actions {
-    details {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-  }
-
   g.mark-text.role-axis-title {
     text.hovered {
       fill: ${theme.color.primary.dark};
@@ -294,6 +286,7 @@ export default function Graph(props: GraphProps) {
           data={graphData}
           signalListeners={signalListeners}
           renderer={'svg'}
+          actions={false}
           onNewView={onNewView}
         />
       </div>

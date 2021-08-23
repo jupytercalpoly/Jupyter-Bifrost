@@ -79,7 +79,7 @@ const helpScreenCss = (t: BifrostTheme) => css`
     }
   }
 `;
-type Position = [number, number];
+type Position = [number | string, number | string];
 interface HelpScreenProps {
   position?: Position;
   onDismiss(): void;
@@ -91,7 +91,11 @@ export default function HelpScreen({
 }: HelpScreenProps) {
   const [screen, setScreen] = useState<ScreenName>('');
   return (
-    <Modal position={position} onBack={onDismiss} style={{ maxWidth: 330 }}>
+    <Modal
+      position={position}
+      onBack={onDismiss}
+      style={{ width: 330, maxHeight: 400, overflow: 'auto' }}
+    >
       {screen ? (
         <section className="HelpScreen" css={helpScreenCss}>
           <nav className="graph-nav-bar">
