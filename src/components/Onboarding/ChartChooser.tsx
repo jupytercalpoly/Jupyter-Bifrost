@@ -117,10 +117,7 @@ export default function ChartChooser(props: { onOnboarded: () => void }) {
       gs.config = {
         mark: { tooltip: true },
       };
-      gs.params = [
-        { name: 'brush', select: 'interval' },
-        { name: 'zoom', select: 'interval', bind: 'scales' },
-      ];
+      gs.params = [{ name: 'brush', select: 'interval' }];
       const graphDescriptor = Object.values(gs.encoding)
         .map((info) => (info as GraphSpec['encoding'][VegaEncoding]).field)
         .join(' vs. ');
