@@ -22,7 +22,6 @@ import SearchBar from '../../ui-widgets/SearchBar';
 import FilterScreen from './FilterScreen';
 import {
   deleteSpecFilter,
-  getBounds,
   getCategories,
   getFilterList,
   stringifyFilter,
@@ -146,6 +145,7 @@ export default function EditTab({
 }) {
   const columns = useModelState('df_columns')[0];
   const [columnTypes, setColumnTypes] = useModelState('column_types');
+  const [columnRanges] = useModelState('df_column_ranges');
   const graphData = useModelState('graph_data')[0];
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -175,7 +175,12 @@ export default function EditTab({
 
   // Set initial pills based off of spec.
   useEffect(() => {
-    const newSpec = initializeDefaultFilter(graphSpec, data, columnTypes);
+    const newSpec = initializeDefaultFilter(
+      graphSpec,
+      data,
+      columnTypes,
+      columnRanges
+    );
     setGraphSpec(newSpec);
     setPillsInfo(extractPillProps(newSpec));
     if (typeof newSpec.mark === 'object') {
@@ -616,7 +621,8 @@ type PillMap = Record<string, PillState[]>;
 function initializeDefaultFilter(
   spec: GraphSpec,
   data: GraphData,
-  columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>
+  columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>,
+  columnRanges: Record<string, [number, number]>
 ): GraphSpec {
   const filters = getFilterList(spec);
   let newSpec = Object.assign({}, spec);
@@ -631,7 +637,7 @@ function initializeDefaultFilter(
           getCategories(data, field)
         );
       } else {
-        const range = getBounds(data, field);
+        const range = columnRanges[field];
         if (isFinite(range[0])) {
           newSpec = updateSpecFilter(newSpec, field, 'range', range);
         }
