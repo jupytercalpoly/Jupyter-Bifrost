@@ -150,9 +150,10 @@ export const vegaScaleList = [
   'pow',
   'sqrt',
   'quantile',
-  'quantize',
-  'threshold',
-];
+  // The last two don't work without additional properties.
+  // 'quantize',
+  // 'threshold',
+] as const;
 
 const bifrostVegaMark = [
   'point',
@@ -188,5 +189,7 @@ export type VegaAggregation = typeof vegaAggregationList[number];
 export type VegaParamPredicate = typeof vegaParamPredicatesList[number];
 
 export type VegaMark = typeof vegaChartList[number];
+
+export type VegaAxisScale = typeof vegaScaleList[number];
 
 export type BifrostVegaMark = typeof bifrostVegaMark[number];

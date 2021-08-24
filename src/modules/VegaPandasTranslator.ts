@@ -2,6 +2,7 @@ import {
   vegaParamPredicatesList,
   VegaParamPredicate,
   VegaAggregation,
+  VegaAxisScale,
 } from './VegaEncodings';
 import { GraphSpec, EncodingInfo } from '../hooks/bifrost-model';
 import { isFunction } from './utils';
@@ -36,6 +37,12 @@ const vegaAggToPd: { [vegaAgg: string]: string | AggFunc } = {
 };
 
 export default class VegaPandasTranslator {
+  /**
+   * Extracts a pandas query from the vega-lite filter object.
+   * @param filterConfig Object that describes the filtering action.
+   * @param dfName Variable name of the Python DataFrame.
+   * @returns a Pandas query string.
+   */
   private getQueryFromFilter(filterConfig: any, dfName: string): string {
     return Object.keys(filterConfig)
       .filter((key) => filterTypes.has(key))
@@ -69,6 +76,12 @@ export default class VegaPandasTranslator {
       .join('&');
   }
 
+  /**
+   * Translates vega-lite graph transformations into Pandas queries.
+   * @param transform An array of vega-lite graph transformations.
+   * @param dfName Variable name of the Python DataFrame.
+   * @returns A compound Pandas query string that enact the transform operations.
+   */
   private getFilterFromTransform(
     transform: GraphSpec['transform'],
     dfName: string
@@ -95,6 +108,12 @@ export default class VegaPandasTranslator {
       .join('&');
   }
 
+  /**
+   * Transforms encoding-based vega-lite aggregations into Pandas code
+   * @param encodings Encodings of a vega-lite graph
+   * @param dfName The name of the variable which holds the Python DataFrame.
+   * @returns a Pandas query string.
+   */
   private getAggregations(encodings: GraphSpec['encoding'], dfName: string) {
     const encodingVals = Object.values(encodings);
     return encodingVals
@@ -122,9 +141,57 @@ export default class VegaPandasTranslator {
       .join('\n');
   }
 
+  private getBinning(encodings: GraphSpec['encoding'], dfName: string) {
+    return '';
+  }
+
+  private getAxisScaling(encodings: GraphSpec['encoding'], dfName: string) {
+    const encodingInfo: EncodingInfo[] = Object.values(encodings);
+    const [columnNames, columns] = encodingInfo
+      .filter((info) => 'scale' in info && info.scale!.type !== 'linear')
+      .map((info) => {
+        const field = info.field;
+        const scale: VegaAxisScale = info.scale!.type;
+        const columnName = `${field} (${scale})`;
+        let query: string;
+        switch (scale) {
+          case 'log':
+            query = `np.log(df["${field}"])`;
+            break;
+          case 'pow':
+            query = `np.pow(df["${field}"])`;
+            break;
+          case 'sqrt':
+            query = `np.sqrt(df["${field}"])`;
+            break;
+          case 'quantile':
+            query = `np.quantile(df["${field}"], 0.25)`;
+            break;
+          default:
+            query = '';
+        }
+        return [columnName, query];
+      })
+      .reduce(
+        ([columns, ops], [columnName, query]) => [
+          columns.length ? columns + ', ' + columnName : columnName,
+          ops.length ? ops + ', ' + query : query,
+        ],
+        ['', '']
+      );
+
+    return columns.length
+      ? `
+    _bifrost_original_columns = list(${dfName}.columns)
+    ${dfName} = pd.concat((${dfName}, ${columns}), axis=1)
+    ${dfName}.columns = [*_bifrost_original_columns, ${columnNames}]
+    `
+      : '';
+  }
+
   /**
-   *
-   * @param spec Graph spec to convert to pandas code
+   * Converts a vega-lite graph spec to Pandas Python code.
+   * @param spec Graph spec to convert to Pandas code
    * @param inputDf Name of the DataFrame which is the target of the Bifrost Plot
    * @param outputDf Name of the DataFrame which is assigned to the output of bifrost.plot()
    * @returns Pandas code that applies the spec changes to the inputDf.
@@ -135,10 +202,11 @@ export default class VegaPandasTranslator {
     inputUrl = '',
     outputDf = ''
   ) {
+    const codeBlocks: string[] = [];
     const inputDataFrame = inputDf ? inputDf : 'temp';
-    const inputDataFrameDef = inputDf
-      ? ''
-      : `temp = pd.read_csv('${inputUrl}')`;
+    if (!inputDf) {
+      codeBlocks.push(`temp = pd.read_csv('${inputUrl}')`);
+    }
 
     // Filters
     const filterQuery = this.getFilterFromTransform(
@@ -150,13 +218,20 @@ export default class VegaPandasTranslator {
         ? `${outputDf} = ${inputDataFrame}[${filterQuery}]`
         : `${inputDataFrame}[${filterQuery}]`
       : '';
+    codeBlocks.push(filteredDs);
 
     // Aggregators
     const aggregations = this.getAggregations(spec.encoding, outputDf);
+    aggregations && codeBlocks.push(aggregations);
 
-    const code = inputDataFrameDef
-      ? [inputDataFrameDef, filteredDs, aggregations].join('\n')
-      : [filteredDs, aggregations].join('\n');
+    // Axis scales
+    const scaling = this.getAxisScaling(spec.encoding, outputDf);
+    scaling && codeBlocks.push(scaling);
+
+    // Binning
+    const binning = this.getBinning(spec.encoding, outputDf);
+    binning && codeBlocks.push(binning);
+    const code = codeBlocks.join('\n');
     const isAlphaNum = /\w/;
 
     return isAlphaNum.test(code) ? code : inputDf;
