@@ -167,14 +167,14 @@ const bifrostVegaMark = [
 const minimalEncoding = ['x', 'y', 'color', 'opacity', 'size', 'facet'];
 minimalEncoding.sort();
 
-export const vegaMarkEncodingMap: Record<string, string[]> = {
+export const vegaMarkEncodingMap: { [mark in VegaMark]: string[] } = {
   point: minimalEncoding,
-  circle: minimalEncoding,
-  square: minimalEncoding,
   tick: minimalEncoding,
   line: minimalEncoding,
   bar: minimalEncoding,
-  trail: minimalEncoding,
+  errorband: minimalEncoding,
+  boxplot: minimalEncoding,
+  errorbar: minimalEncoding,
 };
 
 export const vegaTemporalChartList = ['area'];

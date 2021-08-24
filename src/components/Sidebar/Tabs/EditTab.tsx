@@ -12,7 +12,6 @@ import {
 import {
   VegaEncoding,
   vegaMarkEncodingMap,
-  BifrostVegaMark,
   VegaMark,
   VegaColumnType,
 } from '../../../modules/VegaEncodings';
@@ -165,13 +164,13 @@ export default function EditTab({
   const [dataSectionOpen, setDataSectionOpen] = useState<boolean>(true);
   const [samplingSectionOpen, setSamplingSectionOpen] = useState<boolean>(true);
   const [addNewPill, setAddNewPill] = useState<boolean>(false);
+  // A list of GraphPill Props. Defined separately from spec to prevent reordering during user edits.
+  const [pillsInfo, setPillsInfo] = useState<PillState[]>([]);
 
   useEffect(() => {
     setActiveOptions((opt) => ({ ...opt, encoding: clickedAxis }));
   }, [clickedAxis]);
   const saveSpecToHistory = useSpecHistory();
-  // A list of GraphPill Props. Defined separately from spec to prevent reordering during user edits.
-  const [pillsInfo, setPillsInfo] = useState<PillState[]>([]);
 
   // Set initial pills based off of spec.
   useEffect(() => {
@@ -526,7 +525,7 @@ export default function EditTab({
               <ul className="pill-list">{encodingList}</ul>
               {activeOptions.menu === 'encoding' && (
                 <ul className="encoding-choices">
-                  {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]
+                  {vegaMarkEncodingMap[graphSpec.mark as VegaMark]
                     .filter((encoding) => !(encoding in graphSpec.encoding))
                     .map((encoding) => (
                       <Pill
