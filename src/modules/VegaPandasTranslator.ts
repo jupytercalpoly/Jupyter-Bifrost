@@ -142,12 +142,21 @@ export default class VegaPandasTranslator {
   }
 
   private getBinning(encodings: GraphSpec['encoding'], dfName: string) {
-    return '';
+    const encodingInfo: EncodingInfo[] = Object.values(encodings);
+    return encodingInfo
+      .filter((info) => info.bin)
+      .map(({ field }) => {
+        const series = `${dfName}["${field}"]`;
+        return `_bifrost_bins = pd.cut(${series}, bins=pd.interval_range(start=${series}.min(), freq=10, end=${series}.max())).rename("${field} (bins)")
+        ${dfName} = pd.concat((${dfName}, _bifrost_bins), axis=1)
+        `;
+      })
+      .join('\n');
   }
 
   private getAxisScaling(encodings: GraphSpec['encoding'], dfName: string) {
     const encodingInfo: EncodingInfo[] = Object.values(encodings);
-    const [columnNames, columns] = encodingInfo
+    const columns = encodingInfo
       .filter((info) => 'scale' in info && info.scale!.type !== 'linear')
       .map((info) => {
         const field = info.field;
@@ -170,22 +179,12 @@ export default class VegaPandasTranslator {
           default:
             query = '';
         }
-        return [columnName, query];
+        return `${query}.rename("${columnName}")`;
       })
-      .reduce(
-        ([columns, ops], [columnName, query]) => [
-          columns.length ? columns + ', ' + columnName : columnName,
-          ops.length ? ops + ', ' + query : query,
-        ],
-        ['', '']
-      );
+      .join(',');
 
     return columns.length
-      ? `
-    _bifrost_original_columns = list(${dfName}.columns)
-    ${dfName} = pd.concat((${dfName}, ${columns}), axis=1)
-    ${dfName}.columns = [*_bifrost_original_columns, ${columnNames}]
-    `
+      ? `${dfName} = pd.concat((${dfName}, ${columns}), axis=1)`
       : '';
   }
 
