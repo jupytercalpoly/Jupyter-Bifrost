@@ -12,3 +12,13 @@ export function hasDuplicateField(
   ).length;
   return countFieldUsage > 1;
 }
+
+/**
+ *
+ * @param val numerical value to round
+ * @param decimalPlaces number of digits after the decimal
+ */
+export function round(val: number, decimalPlaces: number) {
+  const s = 10 ** decimalPlaces;
+  return Math.floor(s * val) / s;
+}

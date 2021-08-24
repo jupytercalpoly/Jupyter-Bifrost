@@ -13,6 +13,7 @@ import { GetHandleProps } from 'react-compound-slider/dist/types/Handles/types';
 import { GetTrackProps } from 'react-compound-slider/dist/types/Tracks/types';
 import { BifrostTheme } from '../../theme';
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import { round } from '../../modules/utils';
 
 const sliderStyle = {
   position: 'relative',
@@ -124,6 +125,7 @@ const rangeInputsCss = css`
   input {
     background-color: transparent;
     border: none;
+    width: 5em;
     &.start {
       margin-right: 5px;
     }
@@ -147,9 +149,6 @@ interface RangeInputsProps {
 function RangeInputs(props: RangeInputsProps) {
   const [minInput, setMinInput] = useState(props.values[0]);
   const [maxInput, setMaxInput] = useState(props.values[1]);
-  const inputWidths = [minInput, maxInput].map(
-    (val) => val.toFixed(2).length + 'em'
-  );
 
   useEffect(() => {
     setMinInput(props.values[0]);
@@ -180,24 +179,22 @@ function RangeInputs(props: RangeInputsProps) {
     <div className="RangeInputs" css={rangeInputsCss}>
       <input
         className="start"
-        value={minInput.toFixed(2)}
+        value={round(minInput, 2)}
         type="number"
         name="min"
         onChange={(e) => setMinInput(e.target.valueAsNumber)}
         onBlur={onSubmit}
         onKeyPress={handleEnter}
-        style={{ width: inputWidths[0] }}
       />
       <div className="content">{props.children}</div>
       <input
         className="end"
-        value={maxInput.toFixed(2)}
+        value={round(maxInput, 2)}
         type="number"
         name="max"
         onChange={(e) => setMaxInput(e.target.valueAsNumber)}
         onBlur={onSubmit}
         onKeyPress={handleEnter}
-        style={{ width: inputWidths[1] }}
       />
     </div>
   );

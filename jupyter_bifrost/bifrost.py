@@ -6,6 +6,7 @@
 
 import pandas as pd
 import sys
+import numpy as np
 from importlib import import_module
 
 bifrost_tracing = import_module(
@@ -31,7 +32,7 @@ class BifrostWidget(DOMWidget):
     """
     Data representation of the graph visualization platform Bifrost
     """
-
+    # Jupyter Widget config
     _model_name = Unicode("BifrostModel").tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
     _model_module_version = Unicode(module_version).tag(sync=True)
@@ -39,27 +40,47 @@ class BifrostWidget(DOMWidget):
     _view_module = Unicode(module_name).tag(sync=True)
     _view_module_version = Unicode(module_version).tag(sync=True)
 
+    # Dataframe sources for the chart object
     df_history = list()
+    # List of Vega chart specs that are used for populating the history screen
     spec_history = List([]).tag(sync=True)
+    # The selected index on the history screen
     current_dataframe_index = Int(0).tag(sync=True)
+    # The spec used to initialize Draco recommendations
     query_spec = Dict({}).tag(sync=True)
-    graph_spec = Dict({}).tag(sync=True)
+    # The active spec which describes the displayed Vega-Lite Graph
+    graph_spec = Dict({}).tag(sync=True) 
+    # Encoding arguments supplied to the chart object in Python
     passed_encodings = Dict({}).tag(sync=True)
+    # The mark argument supplied to the chart object in Python
     passed_kind = Unicode("").tag(sync=True)
+    # The data source of the displayed graphs in Bifrost
     graph_data = List([]).tag(sync=True)
+    # The user-selected bounds from brushing/zooming.
     graph_bounds = Dict({}).tag(sync=True)
-    graph_encodings = Dict({}).tag(sync=True)
+    # The name of the variable that holds the dataframe which was passed to the chart object e.g. df in Chart(df)
     df_variable_name = Unicode("").tag(sync=True)
+    # The name of the capturing variable that receives the output of `.plot()` e.g. res in res = Chart(df).plot()
     output_variable = Unicode("").tag(sync=True)
     # Exported code that applies the graph spec changes to the original dataframe
     df_code = Unicode("").tag(sync=True)
+    # The names of each of the dataframe columns
     df_columns = List([]).tag(sync=True)
+    # The max and min values for quantitative variables.
+    df_column_ranges = Dict({}).tag(sync=True)
+    # User-selected fields during onboarding in the ColumnSelectorSidebar
     selected_columns = List([]).tag(sync=True)
+    # Ranges of data selected using the brush functionality on the primary Vega-Lite Graph.
     selected_data = List([]).tag(sync=True)
+    # Graph specs recommended by Draco. Used for selecting `graph_spec`.
     suggested_graphs = List([]).tag(sync=True)
+    # The data type of the contents of each column (df.dtypes)
     column_types = Dict({}).tag(sync=True)
+    # Map from the Draco-safe naming scheme used in Bifrost to the original column names from the DataFrame.
     column_name_map = Dict({}).tag(sync=True)
+    # Data configuration that controls sampling
     graph_data_config = Dict({"sampleSize": 100, "datasetLength": 0}).tag(sync=True)
+    # The url argument that is passed to the chart object e.g. Chart("www.data.gov/...")
     input_url = Unicode("").tag(sync=True)
 
     def __init__(
@@ -81,7 +102,10 @@ class BifrostWidget(DOMWidget):
             df, data, column_types, kind=kind, x=x, y=y, color=color
         )
         df.columns = column_name_map.values()
+        num_cols = df.select_dtypes(include=np.number)
+        column_ranges = {c:[num_cols[c].min(), num_cols[c].max()] for c in num_cols.columns}
         self.set_trait("df_columns", sorted(list(df.columns)))
+        self.set_trait("df_column_ranges", column_ranges)
         self.set_trait("selected_data", [])
         self.set_trait("query_spec", graph_info["query_spec"])
         self.set_trait("graph_data", graph_info["data"])
@@ -134,7 +158,7 @@ class BifrostWidget(DOMWidget):
         if len(nan_columns):
             raise SystemError(f"{nan_columns} in this dataset have only NaN values")
 
-        if sample_limit:
+        if sample_limit and sample_limit < len(df):
             df = self.get_non_na(df, sample_limit)
         return json.loads(df.to_json(orient="records"))
 

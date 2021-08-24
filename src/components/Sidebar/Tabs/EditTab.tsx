@@ -12,7 +12,6 @@ import {
 import {
   VegaEncoding,
   vegaMarkEncodingMap,
-  BifrostVegaMark,
   VegaMark,
   VegaColumnType,
 } from '../../../modules/VegaEncodings';
@@ -22,7 +21,6 @@ import SearchBar from '../../ui-widgets/SearchBar';
 import FilterScreen from './FilterScreen';
 import {
   deleteSpecFilter,
-  getBounds,
   getCategories,
   getFilterList,
   stringifyFilter,
@@ -146,6 +144,7 @@ export default function EditTab({
 }) {
   const columns = useModelState('df_columns')[0];
   const [columnTypes, setColumnTypes] = useModelState('column_types');
+  const [columnRanges] = useModelState('df_column_ranges');
   const graphData = useModelState('graph_data')[0];
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -165,17 +164,22 @@ export default function EditTab({
   const [dataSectionOpen, setDataSectionOpen] = useState<boolean>(true);
   const [samplingSectionOpen, setSamplingSectionOpen] = useState<boolean>(true);
   const [addNewPill, setAddNewPill] = useState<boolean>(false);
+  // A list of GraphPill Props. Defined separately from spec to prevent reordering during user edits.
+  const [pillsInfo, setPillsInfo] = useState<PillState[]>([]);
 
   useEffect(() => {
     setActiveOptions((opt) => ({ ...opt, encoding: clickedAxis }));
   }, [clickedAxis]);
   const saveSpecToHistory = useSpecHistory();
-  // A list of GraphPill Props. Defined separately from spec to prevent reordering during user edits.
-  const [pillsInfo, setPillsInfo] = useState<PillState[]>([]);
 
   // Set initial pills based off of spec.
   useEffect(() => {
-    const newSpec = initializeDefaultFilter(graphSpec, data, columnTypes);
+    const newSpec = initializeDefaultFilter(
+      graphSpec,
+      data,
+      columnTypes,
+      columnRanges
+    );
     setGraphSpec(newSpec);
     setPillsInfo(extractPillProps(newSpec));
     if (typeof newSpec.mark === 'object') {
@@ -521,7 +525,7 @@ export default function EditTab({
               <ul className="pill-list">{encodingList}</ul>
               {activeOptions.menu === 'encoding' && (
                 <ul className="encoding-choices">
-                  {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]
+                  {vegaMarkEncodingMap[graphSpec.mark as VegaMark]
                     .filter((encoding) => !(encoding in graphSpec.encoding))
                     .map((encoding) => (
                       <Pill
@@ -616,7 +620,8 @@ type PillMap = Record<string, PillState[]>;
 function initializeDefaultFilter(
   spec: GraphSpec,
   data: GraphData,
-  columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>
+  columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>,
+  columnRanges: Record<string, [number, number]>
 ): GraphSpec {
   const filters = getFilterList(spec);
   let newSpec = Object.assign({}, spec);
@@ -631,7 +636,7 @@ function initializeDefaultFilter(
           getCategories(data, field)
         );
       } else {
-        const range = getBounds(data, field);
+        const range = columnRanges[field];
         if (isFinite(range[0])) {
           newSpec = updateSpecFilter(newSpec, field, 'range', range);
         }

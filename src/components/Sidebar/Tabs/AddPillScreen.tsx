@@ -3,11 +3,8 @@ import { jsx, css } from '@emotion/react';
 import { useState } from 'react';
 import { X } from 'react-feather';
 import { useModelState, EncodingInfo } from '../../../hooks/bifrost-model';
-import { VegaEncoding } from '../../../modules/VegaEncodings';
-import {
-  BifrostVegaMark,
-  vegaMarkEncodingMap,
-} from '../../../modules/VegaEncodings';
+import { VegaEncoding, VegaMark } from '../../../modules/VegaEncodings';
+import { vegaMarkEncodingMap } from '../../../modules/VegaEncodings';
 import Pill from '../../ui-widgets/Pill';
 import SearchBar from '../../ui-widgets/SearchBar';
 import produce from 'immer';
@@ -186,7 +183,7 @@ function VariableScreen({
 
   return (
     <ul className="encoding-choices">
-      {vegaMarkEncodingMap[graphSpec.mark as BifrostVegaMark]
+      {vegaMarkEncodingMap[graphSpec.mark as VegaMark]
         .filter((encoding) => !(encoding in graphSpec.encoding))
         .map((encoding) => (
           <Pill

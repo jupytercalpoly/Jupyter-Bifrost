@@ -149,10 +149,11 @@ export const vegaScaleList = [
   'log',
   'pow',
   'sqrt',
-  'quantile',
-  'quantize',
-  'threshold',
-];
+  // The last three don't work without additional properties.
+  // 'quantile',
+  // 'quantize',
+  // 'threshold',
+] as const;
 
 const bifrostVegaMark = [
   'point',
@@ -167,14 +168,14 @@ const bifrostVegaMark = [
 const minimalEncoding = ['x', 'y', 'color', 'opacity', 'size', 'facet'];
 minimalEncoding.sort();
 
-export const vegaMarkEncodingMap: Record<string, string[]> = {
+export const vegaMarkEncodingMap: { [mark in VegaMark]: string[] } = {
   point: minimalEncoding,
-  circle: minimalEncoding,
-  square: minimalEncoding,
   tick: minimalEncoding,
   line: minimalEncoding,
   bar: minimalEncoding,
-  trail: minimalEncoding,
+  errorband: minimalEncoding,
+  boxplot: minimalEncoding,
+  errorbar: minimalEncoding,
 };
 
 export const vegaTemporalChartList = ['area'];
@@ -188,5 +189,7 @@ export type VegaAggregation = typeof vegaAggregationList[number];
 export type VegaParamPredicate = typeof vegaParamPredicatesList[number];
 
 export type VegaMark = typeof vegaChartList[number];
+
+export type VegaAxisScale = typeof vegaScaleList[number];
 
 export type BifrostVegaMark = typeof bifrostVegaMark[number];

@@ -12,11 +12,7 @@ import {
 } from '../../../modules/VegaEncodings';
 import RangeSlider from '../../ui-widgets/RangeSlider';
 import useSpecHistory from '../../../hooks/useSpecHistory';
-import {
-  updateSpecFilter,
-  getBounds,
-  getCategories,
-} from '../../../modules/VegaFilters';
+import { updateSpecFilter, getCategories } from '../../../modules/VegaFilters';
 
 const screenCss = (theme: BifrostTheme) => css`
   position: absolute;
@@ -37,7 +33,6 @@ const screenCss = (theme: BifrostTheme) => css`
   }
 
   h2 {
-    font-size: 28px;
     font-weight: 700;
     margin: 0;
     .encoding {
@@ -143,7 +138,15 @@ export default function FilterScreen(props: FilterScreenProps) {
   return (
     <article css={screenCss}>
       <nav className="filter-nav">
-        <h2>
+        <h2
+          style={{
+            fontSize:
+              Math.max(
+                35 - (props.encoding.length + columnInfo.field.length) * 0.7,
+                15
+              ) + 'px',
+          }}
+        >
           <span className="encoding">{props.encoding}</span>
           {': '}
           <span className="column">{columnInfo.field}</span>
@@ -153,8 +156,8 @@ export default function FilterScreen(props: FilterScreenProps) {
         </button>
       </nav>
       <div className="filter-contents">
-        <Filters 
-          encoding={props.encoding} 
+        <Filters
+          encoding={props.encoding}
           updateAggregation={updateAggregation}
         />
       </div>
@@ -163,16 +166,13 @@ export default function FilterScreen(props: FilterScreenProps) {
 }
 
 function QuantitativeFilters(props: FilterGroupProps) {
-  const [graphData] = useModelState('graph_data');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+  const [columnRanges] = useModelState('df_column_ranges');
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const currentScale =
     graphSpec.encoding[props.encoding].scale?.type || 'linear';
-  const bounds = useMemo(
-    () => getBounds(graphData, field),
-    [graphData, currentAggregation]
-  );
+  const bounds = columnRanges[field];
   const ranges = getRanges();
 
   // Initialize a slider if one doesn't exist
