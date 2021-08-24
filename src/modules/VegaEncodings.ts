@@ -169,17 +169,12 @@ minimalEncoding.sort();
 
 export const vegaMarkEncodingMap: { [mark in VegaMark]: string[] } = {
   point: minimalEncoding,
-  circle: minimalEncoding,
-  square: minimalEncoding,
   tick: minimalEncoding,
   line: minimalEncoding,
   bar: minimalEncoding,
-  trail: minimalEncoding,
   errorband: minimalEncoding,
   boxplot: minimalEncoding,
   errorbar: minimalEncoding,
-  area: minimalEncoding,
-  rect: minimalEncoding,
 };
 
 export const vegaTemporalChartList = ['area'];
