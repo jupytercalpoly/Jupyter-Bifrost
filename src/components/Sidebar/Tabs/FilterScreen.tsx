@@ -12,11 +12,7 @@ import {
 } from '../../../modules/VegaEncodings';
 import RangeSlider from '../../ui-widgets/RangeSlider';
 import useSpecHistory from '../../../hooks/useSpecHistory';
-import {
-  updateSpecFilter,
-  getBounds,
-  getCategories,
-} from '../../../modules/VegaFilters';
+import { updateSpecFilter, getCategories } from '../../../modules/VegaFilters';
 
 const screenCss = (theme: BifrostTheme) => css`
   position: absolute;
@@ -170,16 +166,13 @@ export default function FilterScreen(props: FilterScreenProps) {
 }
 
 function QuantitativeFilters(props: FilterGroupProps) {
-  const [graphData] = useModelState('graph_data');
   const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+  const [columnRanges] = useModelState('df_column_ranges');
   const { field } = graphSpec.encoding[props.encoding];
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
   const currentScale =
     graphSpec.encoding[props.encoding].scale?.type || 'linear';
-  const bounds = useMemo(
-    () => getBounds(graphData, field),
-    [graphData, currentAggregation]
-  );
+  const bounds = columnRanges[field];
   const ranges = getRanges();
 
   // Initialize a slider if one doesn't exist

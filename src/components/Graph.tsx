@@ -2,12 +2,8 @@
 import { jsx, css } from '@emotion/react';
 // import { VegaLite } from 'react-vega';
 import { useModelState, GraphSpec } from '../hooks/bifrost-model';
-import {
-  deleteSpecFilter,
-  getBounds,
-  updateSpecFilter,
-} from '../modules/VegaFilters';
-import React, { useEffect, useMemo, useState } from 'react';
+import { deleteSpecFilter, updateSpecFilter } from '../modules/VegaFilters';
+import React, { useEffect, useState } from 'react';
 import BifrostVega from '../modules/BifrostVega';
 import { View } from 'vega';
 import theme from '../theme';
@@ -331,8 +327,8 @@ function AxisRangeSlider({
   field: string;
   axis: string;
 }) {
-  const [graphData] = useModelState('graph_data');
-  const bounds = useMemo(() => getBounds(graphData, field), [field]);
+  const [columnRanges] = useModelState('df_column_ranges');
+  const bounds = columnRanges[field];
   const range = getRange();
   const save = useSpecHistory();
 
