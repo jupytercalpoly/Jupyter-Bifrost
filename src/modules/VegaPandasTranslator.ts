@@ -4,6 +4,7 @@ import {
   VegaAggregation,
 } from './VegaEncodings';
 import { GraphSpec, EncodingInfo } from '../hooks/bifrost-model';
+import { isFunction } from './utils';
 
 const filterTypes = new Set<string>(vegaParamPredicatesList);
 
@@ -109,11 +110,13 @@ export default class VegaPandasTranslator {
             pandasGroupFields,
             `${dfName} = ${dfName}.join(${dfName}.groupby(group_fields).agg("${agg}")["${encoding.field}"], on=group_fields, rsuffix=" ${agg}")`,
           ].join('\n');
-        } else {
+        } else if (isFunction(agg)) {
           return [
             pandasGroupFields,
             `${dfName} = ${agg(encoding, dfName)}`,
           ].join('\n');
+        } else {
+          return '';
         }
       })
       .join('\n');
