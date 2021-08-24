@@ -75,7 +75,7 @@ class BifrostWidget(DOMWidget):
         super().__init__(**kwargs)
         self.df_history = [df]
 
-        data = self.get_data(df, self.graph_data_config["sampleSize"])
+        data = self.get_data(df, self.graph_data_config["sampleSize"], True)
         column_types = self.get_column_types(df)
         graph_info = self.create_graph_data(
             df, data, column_types, kind=kind, x=x, y=y, color=color
@@ -129,22 +129,32 @@ class BifrostWidget(DOMWidget):
             "graph_data", self.get_data(self.df_history[-1], config["sampleSize"])
         )
 
-    def get_data(self, df: pd.DataFrame, sampleLimit: int = None):
+    def get_data(
+        self, df: pd.DataFrame, sample_limit: int = None, recommending: bool = False
+    ):
         nan_columns = df.columns[df.isna().all()].tolist()
         if len(nan_columns):
-            raise SystemError(f"{nan_columns} in this dataset have only Na's")
+            raise SystemError(f"{nan_columns} in this dataset have only NaN values")
 
-        if sampleLimit:
-            df = self.get_non_na(df, sampleLimit)
+        if sample_limit:
+            if recommending:
+                df = self.get_non_na(df, sample_limit)
+            else:
+                df = df.sample(n=sample_limit)
         return json.loads(df.to_json(orient="records"))
 
-    def get_non_na(self, df: pd.DataFrame, sampleLimit: int = None):
+    def get_non_na(self, df: pd.DataFrame, sample_limit: int = None):
         indices = self.get_each_valid_data(df)
-        if sampleLimit:
+        if sample_limit:
+            sample_size = sample_limit - len(indices)
+            # if sample_size is negative, then set the length of indices as sampleSize
+            if sample_size < 0:
+                sample_size = len(indices)
+                self.graph_data_config["SampleSize"] = sample_size
             return pd.concat(
                 [
                     df.loc[indices, :],
-                    df.drop(indices).sample(n=(sampleLimit - len(indices))),
+                    df.drop(indices).sample(n=sample_size),
                 ]
             )
 
