@@ -19,7 +19,7 @@ const vegaAggToPd: { [vegaAgg: string]: string | AggFunc } = {
   missing: (encoding, dfName) =>
     `${dfName}.join(${dfName}.groupby(group_fields)["${encoding.field}"].apply(lambda x: x.isnull().sum()), on=group_fields, rsuffix=" missing")`,
   distinct: (encoding, dfName) =>
-    `${dfName}.join(${dfName}.dropna().groupby(group_fields).unique()["${encoding.field}"], on=group_fields, rsuffix=" distinct")`,
+    `${dfName}.join(${dfName}.dropna().groupby(group_fields)["${encoding.field}"].unique(), on=group_fields, rsuffix=" distinct")`,
   sum: 'sum',
   product: 'prod',
   mean: 'mean',
@@ -141,43 +141,46 @@ export default class VegaPandasTranslator {
       .join('\n');
   }
 
+  /**
+   * Creates a pandas column which is the result the vega-lite axis binning operation
+   */
   private getBinning(encodings: GraphSpec['encoding'], dfName: string) {
     const encodingInfo: EncodingInfo[] = Object.values(encodings);
     return encodingInfo
       .filter((info) => info.bin)
       .map(({ field }) => {
         const series = `${dfName}["${field}"]`;
-        return `_bifrost_bins = pd.cut(${series}, bins=pd.interval_range(start=${series}.min(), freq=10, end=${series}.max())).rename("${field} (bins)")
-        ${dfName} = pd.concat((${dfName}, _bifrost_bins), axis=1)
+        return `_bifrost_bins = pd.cut(${series}, bins=pd.interval_range(start=${series}.min(), freq=10, end=${series}.max())).rename("${field} (bin)")\n${dfName} = pd.concat((${dfName}, _bifrost_bins), axis=1)
         `;
       })
       .join('\n');
   }
 
+  /**
+   * Creates a pandas column which is the result the vega-lite axis scaling operation
+   */
   private getAxisScaling(encodings: GraphSpec['encoding'], dfName: string) {
     const encodingInfo: EncodingInfo[] = Object.values(encodings);
     const columns = encodingInfo
-      .filter((info) => 'scale' in info && info.scale!.type !== 'linear')
+      .filter(
+        (info) =>
+          'scale' in info && info.scale!.type && info.scale!.type !== 'linear'
+      )
       .map((info) => {
         const field = info.field;
         const scale: VegaAxisScale = info.scale!.type;
         const columnName = `${field} (${scale})`;
-        let query: string;
+        let query = '';
         switch (scale) {
           case 'log':
             query = `np.log(df["${field}"])`;
             break;
           case 'pow':
-            query = `np.pow(df["${field}"])`;
+            query = `np.exp(df["${field}"])`;
             break;
           case 'sqrt':
             query = `np.sqrt(df["${field}"])`;
             break;
-          case 'quantile':
-            query = `np.quantile(df["${field}"], 0.25)`;
-            break;
-          default:
-            query = '';
         }
         return `${query}.rename("${columnName}")`;
       })
@@ -217,7 +220,7 @@ export default class VegaPandasTranslator {
         ? `${outputDf} = ${inputDataFrame}[${filterQuery}]`
         : `${inputDataFrame}[${filterQuery}]`
       : '';
-    codeBlocks.push(filteredDs);
+    filteredDs && codeBlocks.push(filteredDs);
 
     // Aggregators
     const aggregations = this.getAggregations(spec.encoding, outputDf);

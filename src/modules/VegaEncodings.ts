@@ -149,8 +149,8 @@ export const vegaScaleList = [
   'log',
   'pow',
   'sqrt',
-  'quantile',
-  // The last two don't work without additional properties.
+  // The last three don't work without additional properties.
+  // 'quantile',
   // 'quantize',
   // 'threshold',
 ] as const;
