@@ -5,7 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import pandas as pd
-import random
+import sys
 from importlib import import_module
 
 bifrost_tracing = import_module(
@@ -70,7 +70,7 @@ class BifrostWidget(DOMWidget):
         x=None,
         y=None,
         color=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.df_history = [df]
@@ -130,9 +130,32 @@ class BifrostWidget(DOMWidget):
         )
 
     def get_data(self, df: pd.DataFrame, sampleLimit: int = None):
+        nan_columns = df.columns[df.isna().all()].tolist()
+        if len(nan_columns):
+            raise SystemError(f"{nan_columns} in this dataset have only Na's")
+
         if sampleLimit:
-            df = df.sample(n=sampleLimit)
+            df = self.get_non_na(df, sampleLimit)
         return json.loads(df.to_json(orient="records"))
+
+    def get_non_na(self, df: pd.DataFrame, sampleLimit: int = None):
+        indices = self.get_each_valid_data(df)
+        if sampleLimit:
+            return pd.concat(
+                [
+                    df.loc[indices, :],
+                    df.drop(indices).sample(n=(sampleLimit - len(indices))),
+                ]
+            )
+
+    def get_each_valid_data(self, df: pd.DataFrame) -> list[int]:
+        columns = df.columns
+        valid_indices = []
+        for column in columns:
+            valid_idx = df[~df[column].isna()].index
+            if len(valid_idx) and valid_idx[0] not in valid_indices:
+                valid_indices.append(valid_idx[0])
+        return valid_indices
 
     def get_column_types(self, df: pd.DataFrame):
         graph_types = {
