@@ -98,6 +98,23 @@ const screenCss = (theme: BifrostTheme) => css`
       background-color: ${theme.color.primary.dark};
     }
   }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+
+    .toggle-all {
+      margin-left: 10px;
+      color: gray;
+      font-size: 14px;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 `;
 
 interface FilterGroupProps {
@@ -324,12 +341,12 @@ function CategoricalFilters(props: FilterGroupProps) {
   const selectedCategories = useMemo(getSelectedCategories, [graphSpec]);
   const currentAggregation = graphSpec.encoding[props.encoding].aggregate;
 
-  function getSelectedCategories() {
+  function getSelectedCategories(): Set<string> {
     const type = 'oneOf';
     const filteredCategories = graphSpec.transform.find(
       (f) => 'field' in f.filter && f.filter.field === field && type in f.filter
     )?.filter[type] as string[] | undefined;
-    return new Set(filteredCategories || categories);
+    return new Set(filteredCategories || new Set(categories));
   }
 
   function updateFilter(
@@ -360,9 +377,24 @@ function CategoricalFilters(props: FilterGroupProps) {
     });
   }
 
+  function toggleAll() {
+    updateFilter('oneOf', (currentCategories) => {
+      if (currentCategories?.length) {
+        return [];
+      } else {
+        return categories;
+      }
+    });
+  }
+
   return (
     <div>
-      <h3>Category</h3>
+      <header className="category-header">
+        <h3>Category</h3>
+        <span className="toggle-all" onClick={toggleAll}>
+          {selectedCategories.size ? 'Uncheck All' : 'Check All'}
+        </span>
+      </header>
 
       <ul style={{ listStyle: 'none' }}>
         {categories.map((category) => (
