@@ -5,6 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import pandas as pd
+import sys
 import numpy as np
 from importlib import import_module
 
@@ -90,7 +91,7 @@ class BifrostWidget(DOMWidget):
         x=None,
         y=None,
         color=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.df_history = [df]
@@ -152,10 +153,44 @@ class BifrostWidget(DOMWidget):
             "graph_data", self.get_data(self.df_history[-1], config["sampleSize"])
         )
 
-    def get_data(self, df: pd.DataFrame, sampleLimit: int = None):
-        if sampleLimit and sampleLimit < len(df):
-            df = df.sample(n=sampleLimit)
+    def get_data(self, df: pd.DataFrame, sample_limit: int = None):
+        nan_columns = df.columns[df.isna().all()].tolist()
+        if len(nan_columns):
+            raise SystemError(f"{nan_columns} in this dataset have only NaN values")
+
+        if sample_limit and sample_limit < len(df):
+            df = self.get_non_na(df, sample_limit)
         return json.loads(df.to_json(orient="records"))
+
+    def get_non_na(self, df: pd.DataFrame, sample_limit: int = None):
+        indices = self.get_each_valid_data(df)
+        if sample_limit:
+            sample_size = sample_limit - len(indices)
+            # if sample_size is negative, then set the length of indices as sampleSize
+            if sample_size < 0:
+                sample_size = len(indices)
+                self.set_trait(
+                    "graph_data_config",
+                    {
+                        "sampleSize": sample_size,
+                        "datasetLength": self.graph_data_config["datasetLength"],
+                    },
+                )
+            return pd.concat(
+                [
+                    df.loc[indices, :],
+                    df.drop(indices).sample(n=sample_size),
+                ]
+            )
+
+    def get_each_valid_data(self, df: pd.DataFrame) -> list[int]:
+        columns = df.columns
+        valid_indices = []
+        for column in columns:
+            valid_idx = df[~df[column].isna()].index
+            if len(valid_idx) and valid_idx[0] not in valid_indices:
+                valid_indices.append(valid_idx[0])
+        return valid_indices
 
     def get_column_types(self, df: pd.DataFrame):
         graph_types = {

@@ -43,11 +43,12 @@ export default function OnboardingWidget(props: OnboardingWidgetProps) {
       5000,
       graphConfig.datasetLength
     );
-    setGraphConfig(
-      produce(graphConfig, (gc) => {
-        gc.sampleSize = 100;
-      })
-    );
+    userDefinedSample &&
+      setGraphConfig(
+        produce(graphConfig, (gc) => {
+          gc.sampleSize = 100;
+        })
+      );
     return () => {
       setTimeout(() => {
         setGraphConfig(

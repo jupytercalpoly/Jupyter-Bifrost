@@ -118,6 +118,8 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
   function recommendCharts() {
     const dataSchema = data2schema(data);
     const dataAsp = schema2asp(dataSchema);
+    // console.log(data);
+    // console.log(dataAsp);
 
     const selectedEncodings = selectedColumns.map((column) => {
       if (preSelectedColumns.has(column)) {
