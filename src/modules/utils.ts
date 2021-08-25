@@ -22,13 +22,14 @@ export function hasDuplicateField(
 export function round(val: number, decimalPlaces: number) {
   const s = 10 ** decimalPlaces;
   return Math.floor(s * val) / s;
+}
 
 /**
- * 
+ *
  * @param spec vega lite graph spec
  * @param prop property of vega lite graph spec
  * @param val new value for a given property
- * @returns 
+ * @returns
  */
 export function changeSpecProp(spec: GraphSpec, prop: GraphProps, val: any) {
   return produce(spec, (gs) => {

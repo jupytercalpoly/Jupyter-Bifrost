@@ -261,7 +261,12 @@ export default function EditTab({
     }
 
     if (!checkDefaultFilterInitialized(graphSpec)) {
-      const newSpec = initializeDefaultFilter(graphSpec, data, columnTypes);
+      const newSpec = initializeDefaultFilter(
+        graphSpec,
+        data,
+        columnTypes,
+        columnRanges
+      );
       setGraphSpec(newSpec);
     }
 
