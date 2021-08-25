@@ -198,16 +198,18 @@ export default function EditTab({
     }
     const dtype = columnTypes[field];
     const oldFieldInfo = graphSpec.encoding[activeOptions.encoding];
-    if (oldFieldInfo.field === field)
+    if (oldFieldInfo.field === field) {
       return setActiveOptions((opt) => ({ ...opt, menu: '' }));
+    }
     let newSpec = graphSpec;
-    if (!hasDuplicateField(newSpec, field))
+    if (!hasDuplicateField(newSpec, field)) {
       newSpec = deleteSpecFilter(
         newSpec,
         oldFieldInfo.field,
         oldFieldInfo.type === 'quantitative' ? 'range' : 'oneOf',
         { deleteCompound: true }
       );
+    }
     // change the encoded field.
     newSpec = produce(newSpec, (gs) => {
       (gs.encoding[activeOptions.encoding as VegaEncoding] as EncodingInfo) = {
@@ -217,8 +219,10 @@ export default function EditTab({
     });
 
     // check if the filter is being used in another pill
-    if (!hasDuplicateField(newSpec, field))
-      newSpec = addDefaultFilter(newSpec, data, columnTypes, field);
+    if (!hasDuplicateField(newSpec, field)) {
+      const type = columnTypes[field];
+      newSpec = addDefaultFilter(newSpec, data, type, field);
+    }
 
     const newPillsInfo = produce(pillsInfo, (info) => {
       const pill = info.find(
@@ -244,11 +248,23 @@ export default function EditTab({
     setActiveOptions((opt) => ({ ...opt, menu: '' }));
   };
 
+  function checkDefaultFilterInitialized(graphSpec: GraphSpec): boolean {
+    return (
+      Object.keys(graphSpec.encoding).length === graphSpec.transform.length
+    );
+  }
+
   function updatePillFilters() {
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
+
+    if (!checkDefaultFilterInitialized(graphSpec)) {
+      const newSpec = initializeDefaultFilter(graphSpec, data, columnTypes);
+      setGraphSpec(newSpec);
+    }
+
     setPillsInfo((pillsInfo) =>
       produce(pillsInfo, (info) => {
         info.forEach((config) => {
@@ -710,7 +726,9 @@ function validateMarkChange(mark: VegaMark, spec: GraphSpec): boolean {
       );
     } else if (types.length === 1) {
       return xAxisType === types[0] || yAxisType === types[0];
-    } else return false;
+    } else {
+      return false;
+    }
   };
 
   const quantComponents: (VegaColumnType | undefined)[][] = [

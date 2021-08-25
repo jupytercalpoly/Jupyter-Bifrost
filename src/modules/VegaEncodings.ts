@@ -163,7 +163,7 @@ const bifrostVegaMark = [
   'line',
   'bar',
   'trail',
-];
+] as const;
 
 const minimalEncoding = ['x', 'y', 'color', 'opacity', 'size', 'facet'];
 minimalEncoding.sort();

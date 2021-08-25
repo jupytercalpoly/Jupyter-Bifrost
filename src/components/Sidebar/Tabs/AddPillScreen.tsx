@@ -101,7 +101,7 @@ export default function AddPillScreen(props: AddPillScreenProps) {
         ? // keep the same filter
           newSpec
         : // add default filter
-          addDefaultFilter(newSpec, data, columnTypes, selectedDataField);
+          addDefaultFilter(newSpec, data, dtype, selectedDataField);
 
     const newPills = produce(props.pillsInfo, (info) => {
       info.push({

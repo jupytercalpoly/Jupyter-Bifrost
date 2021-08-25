@@ -9,6 +9,8 @@ import { VegaEncoding } from '../modules/VegaEncodings';
 import SideBarCollapsibleButtonIcon from '../assets/icons/SideBarCollapsibleButtonIcon';
 import theme from '../theme';
 import { View } from 'vega';
+import { useModelState } from '../hooks/bifrost-model';
+import { changeSpecProp } from '../modules/utils';
 
 const bifrostWidgetCss = css`
   // Element-based styles
@@ -51,6 +53,24 @@ export default function VisualizationScreen({
   const [clickedAxis, setClickedAxis] = useState<VegaEncoding | ''>('');
   const [sideBarOpen, setSideBarOpen] = useState<boolean>(true);
   const [vegaView, setVegaView] = useState<View>();
+  const [selection, setSelection] = useState<string>('zoom');
+  const [graphSpec, setGraphSpec] = useModelState('graph_spec');
+
+  function toggleSelection() {
+    if (selection === 'zoom') {
+      const newSpec = changeSpecProp(graphSpec, 'params', [
+        { name: 'brush', select: 'interval' },
+      ]);
+      setSelection('brush');
+      setGraphSpec(newSpec);
+    } else if (selection === 'brush') {
+      const newSpec = changeSpecProp(graphSpec, 'params', [
+        { name: 'zoom', select: 'interval', bind: 'scales' },
+      ]);
+      setSelection('zoom');
+      setGraphSpec(newSpec);
+    }
+  }
 
   function updateClickedAxis(encoding: VegaEncoding | ''): void {
     setClickedAxis(encoding);
@@ -65,7 +85,12 @@ export default function VisualizationScreen({
       {onPrevious ? (
         <GridArea area="nav">
           <div className={'nav-wrapper'}>
-            <NavBar onBack={onPrevious} vegaView={vegaView} />
+            <NavBar
+              onBack={onPrevious}
+              vegaView={vegaView}
+              selection={selection}
+              toggleSelection={toggleSelection}
+            />
             <div
               className={`side-bar-collapsible-button${
                 sideBarOpen ? ' open' : ''
@@ -92,6 +117,7 @@ export default function VisualizationScreen({
           sideBarOpen={sideBarOpen}
           clickSidebarButton={onClickCollapsibleButton}
           onViewCreated={setVegaView}
+          selection={selection}
         />
       </GridArea>
 

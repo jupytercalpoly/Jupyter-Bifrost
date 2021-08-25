@@ -74,6 +74,8 @@ export type GraphDataConfig = {
   datasetLength: number;
 };
 
+export type GraphProps = keyof GraphSpec;
+
 // HOOKS
 //============================================================================================
 
