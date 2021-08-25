@@ -190,6 +190,7 @@ function setEncodingHighlight(spec: GraphSpec, encoding: VegaEncoding) {
     case 'size':
     case 'shape':
       spec.encoding[encoding].legend = { titleColor };
+      break;
     default:
       break;
   }
@@ -200,11 +201,12 @@ function setEncodingHighlight(spec: GraphSpec, encoding: VegaEncoding) {
  * Removes colored encoding highlights from the nearby graph.
  */
 function removeEncodingHighlights(spec: GraphSpec) {
-  for (let key in spec.encoding) {
-    if (spec.encoding[key as VegaEncoding].axis)
+  for (const key in spec.encoding) {
+    if (spec.encoding[key as VegaEncoding].axis) {
       delete spec.encoding[key as VegaEncoding].axis;
-    else if (spec.encoding[key as VegaEncoding].legend)
+    } else if (spec.encoding[key as VegaEncoding].legend) {
       delete spec.encoding[key as VegaEncoding].legend;
+    }
   }
   return spec;
 }
@@ -219,6 +221,16 @@ function preprocessRecommendation(recommendation: any): GraphSpec {
   recommendation['transform'] = [];
   recommendation.width = 120;
   recommendation.height = 120;
+
+  // delete binning if it's applied to channels other than x and y
+  Object.keys(recommendation['encoding'])
+    .filter((channel) => !['x', 'y'].includes(channel))
+    .forEach((channel) => {
+      if ('bin' in recommendation['encoding'][channel]) {
+        delete recommendation['encoding'][channel]['bin'];
+      }
+    });
+
   if (['circle', 'square'].includes(recommendation.mark as string)) {
     recommendation.mark = 'point';
   }
