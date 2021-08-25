@@ -195,17 +195,17 @@ export function getCategories(graphData: GraphData, field: string): string[] {
  * Add default filter in a pill when it's first created
  * @param spec
  * @param data
- * @param columnTypes
- * @param field
+ * @param type: corresponding data type of the given field
+ * @param field: field to add default filter to
  * @returns
  */
 export function addDefaultFilter(
   spec: GraphSpec,
   data: GraphData,
-  columnTypes: Record<EncodingInfo['field'], EncodingInfo['type']>,
+  type: EncodingInfo['type'],
   field: string
 ) {
-  return ['ordinal', 'nominal'].includes(columnTypes[field])
+  return ['ordinal', 'nominal'].includes(type)
     ? updateSpecFilter(spec, field, 'oneOf', getCategories(data, field))
     : updateSpecFilter(spec, field, 'range', getBounds(data, field));
 }

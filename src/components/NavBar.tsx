@@ -26,11 +26,14 @@ interface NavBarProps {
   onHelpRequested?(): void;
   onMoreClicked?(): void;
   vegaView?: View;
+  selection: string;
+  toggleSelection: () => void;
 }
 
 export default function NavBar(props: NavBarProps) {
   const [showHelpScreen, setShowHelpScreen] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+
   return (
     <nav className="graph-nav-bar" css={graphNavCss}>
       <ul className="menu-list">
@@ -47,6 +50,11 @@ export default function NavBar(props: NavBarProps) {
         <li className="menu-option">
           <button className="wrapper" onClick={() => setShowMoreMenu(true)}>
             <MoreHorizontal />
+          </button>
+        </li>
+        <li className="selection">
+          <button className="wrapper" onClick={props.toggleSelection}>
+            {props.selection}
           </button>
         </li>
       </ul>

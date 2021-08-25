@@ -303,14 +303,16 @@ function QuantitativeFilters(props: FilterGroupProps) {
             ))}
           </select>
         </article>
-        <article className={'binning-article'}>
-          <h3>Bin</h3>
-          <input
-            className="bin-checkbox"
-            type="checkbox"
-            onChange={updateBin}
-          />
-        </article>
+        {['x', 'y'].includes(props.encoding) ? (
+          <article className={'binning-article'}>
+            <h3>Bin</h3>
+            <input
+              className="bin-checkbox"
+              type="checkbox"
+              onChange={updateBin}
+            />
+          </article>
+        ) : null}
       </section>
     </section>
   );

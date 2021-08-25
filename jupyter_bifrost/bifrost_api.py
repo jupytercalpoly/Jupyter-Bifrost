@@ -14,6 +14,8 @@ class Chart:
     def _prepare_data(self, data) -> pd.DataFrame:
         if isinstance(data, pd.DataFrame):
             return data
+        if isinstance(data, pd.Series):
+            return pd.DataFrame(data)
         elif isinstance(data, str):
             filename, fileext = os.path.splitext(data)
             if fileext == ".csv":

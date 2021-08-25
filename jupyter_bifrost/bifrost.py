@@ -245,7 +245,8 @@ class BifrostWidget(DOMWidget):
                 "width": 550,
                 "height": 405,
                 "mark": kind,
-                "params": [{"name": "brush", "select": "interval"}],
+                # "params": [{"name": "brush", "select": "interval"}],
+                "params": [{"name": "zoom", "select": "interval", "bind": "scales"}],
                 "data": {"name": "data"},
                 "transform": [],
                 "encoding": {

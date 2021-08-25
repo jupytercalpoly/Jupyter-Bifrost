@@ -1,8 +1,12 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
 // import { VegaLite } from 'react-vega';
-import { useModelState, GraphSpec } from '../hooks/bifrost-model';
-import { deleteSpecFilter, updateSpecFilter } from '../modules/VegaFilters';
+import { useModelState, GraphSpec, EncodingInfo } from '../hooks/bifrost-model';
+import {
+  deleteSpecFilter,
+  updateSpecFilter,
+  addDefaultFilter,
+} from '../modules/VegaFilters';
 import React, { useEffect, useState } from 'react';
 import BifrostVega from '../modules/BifrostVega';
 import { View } from 'vega';
@@ -10,8 +14,6 @@ import theme from '../theme';
 import { VegaEncoding } from '../modules/VegaEncodings';
 import RangeSlider from './ui-widgets/RangeSlider';
 import useSpecHistory from '../hooks/useSpecHistory';
-// import { useResizeDetector } from 'react-resize-detector';
-// import produce from 'immer';
 
 const graphCss = css`
   padding-left: 34px;
@@ -36,7 +38,10 @@ interface GraphProps {
   sideBarOpen: boolean;
   clickSidebarButton: () => void;
   onViewCreated(vegaView: View): void;
+  selection: string;
 }
+
+export type GraphSpecProps = keyof GraphSpec;
 
 export default function Graph(props: GraphProps) {
   const [selectedData, setSelectedData] = useModelState('selected_data');
@@ -123,26 +128,27 @@ export default function Graph(props: GraphProps) {
       );
     }, spec);
     setSpec(snapshotSpec);
-
     setGraphBounds(graphBounds);
   }
 
   function resetBrushView() {
     const fields = Object.keys(graphBounds);
+
     const snapshotSpec = fields.reduce((newSpec, field) => {
       const fieldInfo = Object.values(spec.encoding).find(
         (info) => info.field === field
       );
-      const type = fieldInfo.type as string;
+      const type = fieldInfo.type as EncodingInfo['type'];
       if (!fieldInfo) {
         return newSpec;
       }
-      return deleteSpecFilter(
+      const temp = deleteSpecFilter(
         newSpec,
         field,
         type === 'quantitative' ? 'range' : 'oneOf',
         { compoundOperator: 'and' }
       );
+      return addDefaultFilter(temp, data, type, field);
     }, spec);
     setSpec(snapshotSpec);
 
@@ -156,22 +162,20 @@ export default function Graph(props: GraphProps) {
     }
     const field = spec.encoding[channel].field;
 
-    const encodingList =
-      props.sideBarRef.current?.getElementsByClassName('encoding-list')[0];
+    const pillList =
+      props.sideBarRef.current?.getElementsByClassName('pill-list')[0];
 
     let newChannel: VegaEncoding | '' =
       axisState['activeAxis'] === channel ? '' : channel;
 
-    if (!encodingList) {
+    if (!pillList) {
       newChannel = '';
     } else {
-      const pills = encodingList.getElementsByClassName('graph-pill');
+      const pills = pillList.getElementsByClassName('graph-pill');
       if (pills) {
         Array.from(pills).forEach((pill) => {
           if (
-            pill
-              .querySelectorAll('.pill-header span')[1]
-              .getElementsByTagName('b')[0]?.textContent === field
+            pill.querySelectorAll('.pill-header span')[1].textContent === field
           ) {
             (
               pill.querySelectorAll('.pill-header span')[1] as HTMLElement
@@ -275,12 +279,13 @@ export default function Graph(props: GraphProps) {
         // style={{ width: '100%', height: '100%' }}
         onMouseUp={updateGraphBounds}
         onMouseLeave={() => setSelectedData(['brush', {}])}
-        // ref={ref}
       >
         <BifrostVega
           spec={spec}
           data={graphData}
-          signalListeners={signalListeners}
+          signalListeners={
+            props.selection === 'brush' ? signalListeners : undefined
+          }
           renderer={'svg'}
           actions={false}
           onNewView={onNewView}
