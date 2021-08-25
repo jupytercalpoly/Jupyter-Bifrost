@@ -647,22 +647,24 @@ function initializeDefaultFilter(
   const filters = getFilterList(spec);
   let newSpec = Object.assign({}, spec);
   if (!filters.length) {
-    Object.values(newSpec.encoding).map((info) => {
-      const field = info.field;
-      if (['ordinal', 'nominal'].includes(columnTypes[field])) {
-        newSpec = updateSpecFilter(
-          newSpec,
-          field,
-          'oneOf',
-          getCategories(data, field)
-        );
-      } else {
-        const range = columnRanges[field];
-        if (isFinite(range[0])) {
-          newSpec = updateSpecFilter(newSpec, field, 'range', range);
+    Object.values(newSpec.encoding)
+      .filter((info) => info.field)
+      .map((info) => {
+        const field = info.field;
+        if (['ordinal', 'nominal'].includes(columnTypes[field])) {
+          newSpec = updateSpecFilter(
+            newSpec,
+            field,
+            'oneOf',
+            getCategories(data, field)
+          );
+        } else {
+          const range = columnRanges[field];
+          if (isFinite(range[0])) {
+            newSpec = updateSpecFilter(newSpec, field, 'range', range);
+          }
         }
-      }
-    });
+      });
   }
   return newSpec;
 }
