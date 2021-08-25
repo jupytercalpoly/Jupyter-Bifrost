@@ -5,7 +5,6 @@
 # Distributed under the terms of the Modified BSD License.
 
 import pandas as pd
-import sys
 import numpy as np
 from importlib import import_module
 
@@ -32,6 +31,7 @@ class BifrostWidget(DOMWidget):
     """
     Data representation of the graph visualization platform Bifrost
     """
+
     # Jupyter Widget config
     _model_name = Unicode("BifrostModel").tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
@@ -49,7 +49,7 @@ class BifrostWidget(DOMWidget):
     # The spec used to initialize Draco recommendations
     query_spec = Dict({}).tag(sync=True)
     # The active spec which describes the displayed Vega-Lite Graph
-    graph_spec = Dict({}).tag(sync=True) 
+    graph_spec = Dict({}).tag(sync=True)
     # Encoding arguments supplied to the chart object in Python
     passed_encodings = Dict({}).tag(sync=True)
     # The mark argument supplied to the chart object in Python
@@ -103,7 +103,9 @@ class BifrostWidget(DOMWidget):
         )
         df.columns = column_name_map.values()
         num_cols = df.select_dtypes(include=np.number)
-        column_ranges = {c:[num_cols[c].min(), num_cols[c].max()] for c in num_cols.columns}
+        column_ranges = {
+            c: [num_cols[c].min(), num_cols[c].max()] for c in num_cols.columns
+        }
         self.set_trait("df_columns", sorted(list(df.columns)))
         self.set_trait("df_column_ranges", column_ranges)
         self.set_trait("selected_data", [])
@@ -183,7 +185,7 @@ class BifrostWidget(DOMWidget):
                 ]
             )
 
-    def get_each_valid_data(self, df: pd.DataFrame) -> list[int]:
+    def get_each_valid_data(self, df: pd.DataFrame) -> list:
         columns = df.columns
         valid_indices = []
         for column in columns:
