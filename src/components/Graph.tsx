@@ -41,6 +41,8 @@ interface GraphProps {
   selection: string;
 }
 
+export type GraphSpecProps = keyof GraphSpec;
+
 export default function Graph(props: GraphProps) {
   const [selectedData, setSelectedData] = useModelState('selected_data');
   const [spec, setSpec] = useModelState('graph_spec');

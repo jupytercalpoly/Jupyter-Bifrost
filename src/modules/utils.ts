@@ -1,5 +1,6 @@
 import produce from 'immer';
-import { GraphSpec, EncodingInfo, GraphProps } from '../hooks/bifrost-model';
+import { GraphSpec, EncodingInfo } from '../hooks/bifrost-model';
+import { GraphSpecProps } from '../components/Graph';
 
 export const isFunction = (val: any): val is Function =>
   val && {}.toString.call(val) === '[object Function]';
@@ -31,7 +32,11 @@ export function round(val: number, decimalPlaces: number) {
  * @param val new value for a given property
  * @returns
  */
-export function changeSpecProp(spec: GraphSpec, prop: GraphProps, val: any) {
+export function changeSpecProp(
+  spec: GraphSpec,
+  prop: GraphSpecProps,
+  val: any
+) {
   return produce(spec, (gs) => {
     (gs as any)[prop] = val;
   });
