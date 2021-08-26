@@ -28,7 +28,7 @@ jobs:
           python -m pip install -U pip setuptools jupyter_packaging
 
       - name: Upload Package with `twine` 👏
-        uses: yaananth/twine-upload@v2
+#         uses: yaananth/twine-upload@v2
         env:
           RUNNER: ${{ toJson(runner) }}
           SECRETS: ${{ toJson(secrets) }}
