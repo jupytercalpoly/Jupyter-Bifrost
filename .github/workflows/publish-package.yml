@@ -14,6 +14,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '12.x'
+      - name: Yarn CLI
+        uses: CultureHQ/actions-yarn@v1.0.1
       - name: Install Python
         uses: actions/setup-python@v2
         with:
@@ -22,15 +24,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install -U pip setuptools
+          pip install jupyterlab
+          python -m pip install -U pip setuptools jupyter_packaging
 
-        - name: Install Publishing Dependencies
-          run: |
-            python setup.py sdist bdist_wheel
-            pip install twine
-        - name: twine-upload
-          uses: yaananth/twine-upload@v2
-            env:
-            RUNNER: ${{ toJson(runner) }}
-            SECRETS: ${{ toJson(secrets) }}
-
+      - name: Upload Package with `twine` 👏
+        uses: yaananth/twine-upload@v2
+        env:
+          RUNNER: ${{ toJson(runner) }}
+          SECRETS: ${{ toJson(secrets) }}
