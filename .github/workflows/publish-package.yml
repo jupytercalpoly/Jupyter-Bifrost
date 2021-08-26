@@ -32,3 +32,4 @@ jobs:
         env:
           RUNNER: ${{ toJson(runner) }}
           SECRETS: ${{ toJson(secrets) }}
+        run: echo "SECRETS"
