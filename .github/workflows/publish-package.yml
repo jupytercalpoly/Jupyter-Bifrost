@@ -26,6 +26,7 @@ jobs:
         run: |
           pip install jupyterlab
           python -m pip install -U pip setuptools jupyter_packaging
+          sudo apt-get install jq
 
       - name: Upload Package with `twine` 👏
         #         uses: yaananth/twine-upload@v2
@@ -33,6 +34,7 @@ jobs:
           RUNNER: ${{ toJson(runner) }}
           SECRETS: ${{ toJson(secrets) }}
         run: |
+          jq '.temp' $RUNNER
           echo $RUNNER
           echo $SECRETS
           echo ${RUNNER[temp]}
