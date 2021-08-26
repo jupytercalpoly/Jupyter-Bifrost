@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install -U pip setuptools
+          python -m pip install -U pip setuptools jupyter_packaging
 
       - name: Install Publishing Dependencies
         run: |
