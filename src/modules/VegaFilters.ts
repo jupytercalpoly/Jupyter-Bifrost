@@ -187,8 +187,7 @@ export function getCategories(graphData: GraphData, field: string): string[] {
     categories.add((row[field] as any).toString());
     return categories;
   }, new Set<string>());
-
-  return Array.from(categorySet);
+  return Array.from(categorySet).sort();
 }
 
 /**
