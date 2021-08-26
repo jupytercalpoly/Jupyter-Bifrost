@@ -40,4 +40,7 @@ jobs:
           echo "[distutils]\nindex-servers=pypi\n[pypi]\nusername=__token__\npassword=${secrets.TOKEN}\n" >> twine.pypirc
 
           cat twine.pypirc
+          echo ${secrets.TOKEN}
+          echo ${runner.temp}
+          echo ""${runner.workspace}/twine.pypirc""
           twine upload --config-file ""${runner.workspace}/twine.pypirc"" ${runner.temp}/*.tar.gz --skip-existing
