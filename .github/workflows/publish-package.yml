@@ -30,7 +30,7 @@ jobs:
           pip install twine
       - name: twine-upload
         uses: yaananth/twine-upload@v2
-          env:
+        env:
           RUNNER: ${{ toJson(runner) }}
           SECRETS: ${{ toJson(secrets) }}
 
