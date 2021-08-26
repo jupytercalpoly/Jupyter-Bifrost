@@ -6,7 +6,7 @@ import { VegaParamPredicate, vegaParamPredicatesList } from './VegaEncodings';
 const filterTypes = new Set<string>(vegaParamPredicatesList);
 
 /**
- * minor change
+ * minor change f
  * @param graphSpec The Vega Graph Spec that will be the basis for the new filter.
  * @param field data field to filter.
  * @param type Type of filter.
