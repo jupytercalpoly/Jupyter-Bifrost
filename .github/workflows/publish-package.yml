@@ -33,9 +33,9 @@ jobs:
         #   RUNNER: ${{ toJson(runner) }}
         # SECRETS: ${{ toJson(secrets) }}
         run: |
-          echo runner
-          echo secrets
-          echo runner.temp
+          echo $runner
+          echo $secrets
+          echo $runner.temp
           echo $secrets.TOKEN
           echo $runner.temp
           echo "$runner.workspace/twine.pypirc"
