@@ -24,6 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pip install jupyterlab
           python -m pip install -U pip setuptools jupyter_packaging
 
       - name: Prepare Package for Publishing 
