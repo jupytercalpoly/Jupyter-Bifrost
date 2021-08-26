@@ -34,7 +34,9 @@ jobs:
           RUNNER: ${{ toJson(runner) }}
           SECRETS: ${{ toJson(secrets) }}
         run: |
-          jq '.temp' $RUNNER
+          echo $RUNNER | jq '.temp'
+          temp=echo $RUNNER | jq '.temp'
+          echo $temp
           echo $RUNNER
           echo $SECRETS
           echo ${RUNNER[temp]}
