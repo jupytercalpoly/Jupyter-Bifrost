@@ -35,7 +35,7 @@ jobs:
         run: |
           echo $RUNNER
           echo $SECRETS
-          echo $RUNNER.temp
+          echo ${RUNNER[temp]}
           echo $SECRETS.TOKEN
           echo $RUNNER.temp
           echo "$runner.workspace/twine.pypirc"
