@@ -34,12 +34,16 @@ jobs:
           RUNNER: ${{ toJson(runner) }}
           SECRETS: ${{ toJson(secrets) }}
         run: |
-          echo $RUNNER | jq '.temp'
-          temp=echo $RUNNER | jq '.temp'
-          echo $temp
-          echo $RUNNER
-          echo $SECRETS
-          echo ${RUNNER[temp]}
-          echo $SECRETS.TOKEN
-          echo $RUNNER.temp
-          echo "$runner.workspace/twine.pypirc"
+          temp=$(echo $RUNNER | jq '.temp')
+          token=$(echo $SECRETS | jq '.TOKEN')
+          workspace=$(echo $RUNNER | jq '.workspace')
+          
+          python -m pip install pip twine
+          python -m pip install -r requirements.txt
+          python setup.py sdist --dist-dir $temp
+          
+          echo "[distutils]\nindex-servers=pypi\n[pypi]\nusername=__token__\npassword=$token\n" >> twine.pypirc
+          cat twine.pypirc
+          twine upload --config-file "\"$workspace/twine.pypirc\"" $temp/*.tar.gz --skip-existing
+
+
