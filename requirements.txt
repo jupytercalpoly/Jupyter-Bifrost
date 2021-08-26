@@ -28,7 +28,7 @@ deprecation==2.1.0
 entrypoints==0.3
 idna==3.1
 immutables==0.16
-importlib-metadata==0.0.0
+importlib-metadata==3.6
 ipykernel==5.5.5
 ipython==7.16.1
 ipython-genutils==0.2.0
