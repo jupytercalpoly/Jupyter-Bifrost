@@ -38,9 +38,9 @@ jobs:
           token=$(echo $SECRETS | jq '.TOKEN')
           workspace=$(echo $RUNNER | jq '.workspace')
           
-          python -m pip install pip twine
-          python -m pip install -r requirements.txt
-          python setup.py sdist --dist-dir $temp
+          #python -m pip install pip twine
+          #python -m pip install -r requirements.txt
+          #python setup.py sdist --dist-dir $temp
           
           echo "[distutils]\nindex-servers=pypi\n[pypi]\nusername=__token__\npassword=$token\n" >> $workspace/twine.pypirc
           cat twine.pypirc
