@@ -42,11 +42,11 @@ jobs:
           
           python -m pip install pip twine
           python -m pip install -r requirements.txt
-          python setup.py sdist --dist-dir $temp bdist_wheel
+          python setup.py sdist bdist_wheel
           
           echo "[distutils]index-servers=pypi\n[pypi]\nusername=__token__\npassword=$token\n" >> $workspace/twine.pypirc
           
-          twine upload -u __token__ -p $token $temp/*.tar.gz --skip-existing
+          twine upload -u __token__ -p $token dist/jupyter_bifrost* --skip-existing
 
         
 
