@@ -37,8 +37,16 @@ jobs:
           temp=$(echo $RUNNER | jq '.temp' | tr -d '"')
           token=$(echo $SECRETS | jq '.TOKEN' | tr -d '"')
           workspace=$(echo $RUNNER | jq '.workspace' | tr -d '"')
+          
+          python -m pip install pip twine
+          python -m pip install -r requirements.txt
+          python setup.py sdist --dist-dir $temp
+          
           echo "[distutils]\nindex-servers=pypi\n[pypi]\nusername=__token__\npassword=$token\n" >> $workspace/twine.pypirc
           cat $workspace/twine.pypirc
+          
           echo "$workspace/twin.pypirc"
+          twine upload --config-file "$workspace/twine.pypirc" $temp/*.tar.gz --skip-existing
+
         
 
