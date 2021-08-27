@@ -1,6 +1,6 @@
 {
   "name": "jupyter_bifrost",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Jupyter Widget for Interactive Data Visualization",
   "keywords": [
     "jupyter",

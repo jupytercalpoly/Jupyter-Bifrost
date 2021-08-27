@@ -49,7 +49,6 @@ data_files_spec = [
     (
         "share/jupyter/labextensions/jupyter_bifrost",
         "jupyter_bifrost/labextension",
-        "jupyter_bifrost-tracing",
         "**",
     ),
     ("share/jupyter/labextensions/jupyter_bifrost", ".", "install.json"),
