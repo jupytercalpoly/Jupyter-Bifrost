@@ -45,8 +45,8 @@ jobs:
           echo "[distutils]\nindex-servers=pypi\n[pypi]\nusername=__token__\npassword=$token\n" >> $workspace/twine.pypirc
           cat $workspace/twine.pypirc
           
-          echo "$workspace/twin.pypirc"
-          twine upload --config-file "$workspace/twine.pypirc" $temp/*.tar.gz --skip-existing
+          echo "$workspace/twine.pypirc"
+          twine upload --config-file "\"$workspace/twine.pypirc\"" $temp/*.tar.gz --skip-existing
 
         
 
