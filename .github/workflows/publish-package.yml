@@ -34,10 +34,9 @@ jobs:
           RUNNER: ${{ toJson(runner) }}
           SECRETS: ${{ toJson(secrets) }}
         run: |
-          temp=$(echo $RUNNER | jq '.temp')
-          token=$(echo $SECRETS | jq '.TOKEN')
-          workspace=$(echo $RUNNER | jq '.workspace')
-          
+          temp=$(echo $RUNNER | jq '.temp') | tr -d '"'
+          token=$(echo $SECRETS | jq '.TOKEN') | tr -d '"'
+          workspace=$(echo $RUNNER | jq '.workspace') | tr -d '"'
           echo "[distutils]\nindex-servers=pypi\n[pypi]\nusername=__token__\npassword=$token\n" >> $workspace/twine.pypirc
           cat twine.pypirc
           echo "$workspace/twin.pypirc"
