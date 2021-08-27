@@ -94,6 +94,7 @@ setup_args = dict(
     python_requires=">=3.6",
     install_requires=[
         "ipywidgets>=7.0.0",
+        "bifrost-tracing>=0.1.0"
     ],
     extras_require={
         "test": [
