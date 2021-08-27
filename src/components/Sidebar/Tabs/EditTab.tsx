@@ -528,7 +528,10 @@ export default function EditTab({
                 {chartIcons.map(({ icon: Icon, mark }) => {
                   return (
                     <li key={mark}>
-                      <Tooltip message={mark} position="top">
+                      <Tooltip
+                        message={mark}
+                        position={mark === 'errorbar' ? 'left' : 'top'}
+                      >
                         <button
                           className={mark === graphMark ? 'active' : ''}
                           onClick={() => handleClickOnMark(mark)}

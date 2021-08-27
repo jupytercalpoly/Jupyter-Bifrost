@@ -41,7 +41,7 @@ export default function RangeSlider({
       className="RangeSlider"
       css={css`
         width: 100%;
-        padding: 12px;
+        padding: 12px 20px;
         width: ${width}px;
       `}
     >
@@ -102,7 +102,7 @@ function Tooltip(props: TooltipProps) {
   const tooltipCss = css`
     left: ${props.percent}%;
     position: absolute;
-    margin-left: -11px;
+    margin-left: -25px;
     margin-top: -35px;
     padding: 10px;
   `;

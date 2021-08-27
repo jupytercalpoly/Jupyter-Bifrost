@@ -247,12 +247,16 @@ export default function ColumnSelectorSidebar(props: { plotArgs: Args }) {
                 <span style={{ padding: '0px 5px', fontSize: 12 }}>
                   {column}
                 </span>
-                <button
-                  className={`tagButton_${column}`}
-                  onClick={() => handleDelete(column)}
-                >
-                  <X size={10} />
-                </button>
+                {preSelectedColumns.has(column) ? (
+                  <Lock size={15} />
+                ) : (
+                  <button
+                    className={`tagButton_${column}`}
+                    onClick={() => handleDelete(column)}
+                  >
+                    <X size={10} />
+                  </button>
+                )}
               </div>
             </Pill>
           );
