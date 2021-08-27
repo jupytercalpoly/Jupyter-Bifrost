@@ -19,7 +19,6 @@ const screenCss = (theme: BifrostTheme) => css`
   top: 0;
   background-color: ${theme.color.background[0]};
   width: 100%;
-  height: 100%;
   padding: 15px;
 
   .filter-nav {
@@ -27,6 +26,10 @@ const screenCss = (theme: BifrostTheme) => css`
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    position: sticky;
+    top: 0;
+    background-color: ${theme.color.background[0]};
+    z-index: 1;
   }
   nav {
     padding-bottom: 5px;
