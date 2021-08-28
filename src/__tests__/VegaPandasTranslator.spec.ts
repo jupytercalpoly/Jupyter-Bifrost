@@ -6,7 +6,9 @@ describe('Vega Pandas Translator', () => {
 
   it('Should output the dataframe variable name when there are no transforms present', () => {
     const basicSpec: any = createGraphSpec();
-    expect(translator.convertSpecToCode(basicSpec)).toEqual('$df');
+    expect(translator.convertSpecToCode(basicSpec)).toEqual(
+      "temp = pd.read_csv('')"
+    );
   });
   it('Should convert range filters to Pandas queries', () => {
     const basicSpec: any = createGraphSpec({
@@ -26,7 +28,7 @@ describe('Vega Pandas Translator', () => {
 
     const code = translator.convertSpecToCode(basicSpec);
     expect(code).toEqual(
-      "$df = $df[($df['field'] >= 3.3) & ($df['field'] <= 4)]\n"
+      "temp = pd.read_csv('')\ntemp[(temp['field'] >= 3.3) & (temp['field'] <= 4)]"
     );
   });
 
@@ -43,7 +45,9 @@ describe('Vega Pandas Translator', () => {
     });
 
     const code = translator.convertSpecToCode(spec);
-    expect(code).toEqual('$df = $df[($df[\'class\'].isin(["iris_setosa"]))]\n');
+    expect(code).toEqual(
+      "temp = pd.read_csv('')\ntemp[(temp['class'].isin([\"iris_setosa\"]))]"
+    );
   });
 
   it('Should be able to handle compound filter statements', () => {
@@ -70,7 +74,7 @@ describe('Vega Pandas Translator', () => {
 
     const code = translator.convertSpecToCode(spec);
     expect(code).toEqual(
-      "$df = $df[($df['class'].isin([\"iris_setosa\",\"iris_versicolour\"]))&($df['sepal length (cm)'] >= 5) & ($df['sepal length (cm)'] <= 7.9)]\n"
+      "temp = pd.read_csv('')\ntemp[(temp['class'].isin([\"iris_setosa\",\"iris_versicolour\"]))&(temp['sepal length (cm)'] >= 5) & (temp['sepal length (cm)'] <= 7.9)]"
     );
   });
 });
