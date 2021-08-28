@@ -1,5 +1,7 @@
 # Jupyter Bifrost
 
+![Github Actions Status](https://github.com/jupytercalpoly/Jupyter-Bifrost/workflows/Build/badge.svg) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupytercalpoly/Jupyter-Bifrost.git/main?urlpath=lab%2Ftree%2Fexamples%2Fintroduction.ipynb) [![npm version](https://badge.fury.io/js/jupyter_bifrost.svg)](https://badge.fury.io/js/jupyter_bifrost) [![PyPI version](https://badge.fury.io/py/jupyter-bifrost.svg)](https://badge.fury.io/py/jupyter-bifrost) [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) 
+
 ![Jupyter Bifrost Workflow](docs/resources/ChartSelection.gif)
 A Jupyter Widget for Interactive Data Visualization. Bifrost provides useful chart recommendations and easy integration with Pandas DataFrames. It also provides a variety of analysis tools:
 
