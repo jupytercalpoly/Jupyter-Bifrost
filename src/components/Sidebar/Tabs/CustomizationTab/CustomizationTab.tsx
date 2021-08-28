@@ -63,7 +63,7 @@ export default function CustomizationTab() {
   const saveSpec = useSpecHistory();
 
   function updateGraphSpec(spec: GraphSpec) {
-    saveSpec(spec, `Customized graph`);
+    saveSpec(spec, 'Customized graph');
     setGraphSpec(spec);
   }
 
