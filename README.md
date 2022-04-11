@@ -61,21 +61,19 @@ For additional help with the extension, take a look at the wiki, or the help men
 Create a dev environment:
 
 ```bash
-conda create -n jupyter_bifrost-dev -c conda-forge nodejs yarn python jupyterlab
+conda create -n jupyter_bifrost-dev -c conda-forge nodejs yarn python jupyterlab pandas
 conda activate jupyter_bifrost-dev
 ```
 
-Install the python. This will also build the TS package.
+Install the python. This will also build the TS package:
 
 ```bash
 pip install -e ".[test, examples]"
 ```
 
-When developing your extensions, you need to manually enable your extensions with the
-notebook / lab frontend. For lab, this is done by the command:
+Build JupyterLab extension:
 
 ```
-jupyter labextension develop --overwrite .
 yarn run build
 ```
 
